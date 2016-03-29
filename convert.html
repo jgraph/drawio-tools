@@ -1,0 +1,222 @@
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge" ><![endif]-->
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Inflate/deflate, URL encode/decode</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <script type="text/javascript" src="deflate/rawinflate.js"></script>
+  <script type="text/javascript" src="deflate/rawdeflate.min.js"></script>
+<script type="text/javascript">
+//<![CDATA[
+function stringToBytes(str)
+{
+    var arr = new Array(str.length);
+
+    for (var i = 0; i < str.length; i++)
+    {
+        arr[i] = str.charCodeAt(i);
+    }
+
+    return arr;
+};
+
+function bytesToString(arr)
+{
+    var str = '';
+
+    for (var i = 0; i < arr.length; i++)
+    {
+        str += String.fromCharCode(arr[i]);
+    }
+
+    return str;
+};
+
+function encode(data)
+{
+    if (document.getElementById('encodeCheckbox').checked)
+    {
+        data = encodeURIComponent(data);
+    }
+
+    if (document.getElementById('deflateCheckbox').checked)
+    {
+        var deflate = new Zlib.RawDeflate(stringToBytes(data));
+        data = bytesToString(deflate.compress());
+    }
+
+    if (document.getElementById('base64Checkbox').checked)
+    {
+        data = btoa(data);
+    }
+
+    document.getElementById('textarea').value = data;
+};
+
+function removeLinebreaks(data)
+{
+    document.getElementById('textarea').value = data.replace(/(\r\n|\n|\r)/gm, '');
+};
+
+function decode(data)
+{
+    try
+    {
+        var node = parseXml(data).documentElement;
+
+        if (node != null && node.nodeName == 'mxfile')
+        {
+            var diagrams = node.getElementsByTagName('diagram');
+
+            if (diagrams.length > 0)
+            {
+                data = getTextContent(diagrams[0]);
+            }
+        }
+    }
+    catch (e)
+    {
+        // ignore
+    }
+
+    if (document.getElementById('base64Checkbox').checked)
+    {
+        try
+        {
+            data = atob(data);
+        }
+        catch (e)
+        {
+            console.log(e);
+            alert('atob failed: ' + e);
+            
+            return;
+        }
+    }
+
+    if (document.getElementById('deflateCheckbox').checked)
+    {
+        try
+        {
+            data = RawDeflate.inflate(data);
+        }
+        catch (e)
+        {
+            console.log(e);
+            alert('RawDeflate failed: ' + e);
+            
+            return;
+        }
+    }
+
+    if (document.getElementById('encodeCheckbox').checked)
+    {
+        try
+        {
+            data = decodeURIComponent(data);
+        }
+        catch (e)
+        {
+            console.log(e);
+            alert('decodeURIComponent failed: ' + e);
+            
+            return;
+        }
+    }
+
+    document.getElementById('textarea').value = data;
+};
+
+function parseXml(xml)
+{
+    if (window.DOMParser)
+    {
+        var parser = new DOMParser();
+
+        return parser.parseFromString(xml, 'text/xml');
+    }
+    else
+    {
+        var result = createXmlDocument();
+
+        result.async = 'false';
+        result.loadXML(xml);
+
+        return result;
+    }
+};
+
+function createXmlDocument()
+{
+    var doc = null;
+
+    if (document.implementation && document.implementation.createDocument)
+    {
+        doc = document.implementation.createDocument('', '', null);
+    }
+    else if (window.ActiveXObject)
+    {
+        doc = new ActiveXObject('Microsoft.XMLDOM');
+    }
+
+    return doc;
+};
+
+function getTextContent(node)
+{
+    return (node != null) ? node[(node.textContent === undefined) ? 'text' : 'textContent'] : '';
+};
+//]]>
+</script>
+</head>
+<body>
+  <h2>Inflate/deflate, URL encode/decode</h2>
+  <textarea rows="40" cols="120" id="textarea" placeholder="Drop files here or enter text"></textarea>
+  <br/><br/>
+  <form>
+    <input type="checkbox" id="encodeCheckbox" checked="checked" /> URL Encode&nbsp;
+    <input type="checkbox" id="deflateCheckbox" checked="checked" /> Deflate&nbsp;
+    <input type="checkbox" id="base64Checkbox" checked="checked" /> Base64&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button onclick="removeLinebreaks(document.getElementById('textarea').value);return false;">Remove linebreaks</button>&nbsp;
+    <button onclick="document.getElementById('textarea').value = encodeURIComponent(document.getElementById('textarea').value);return false;">URL Encode</button>&nbsp;
+    <button onclick="document.getElementById('textarea').value = decodeURIComponent(document.getElementById('textarea').value);return false;">URL Decode</button>&nbsp;
+    <button onclick="encode(document.getElementById('textarea').value);return false;">Encode</button>&nbsp;
+    <button onclick="decode(document.getElementById('textarea').value);return false;">Decode</button>
+<script type="text/javascript">
+//<![CDATA[
+// Enables dropping files
+if (window.File != null && window.FileReader != null && window.FileList != null)
+{
+    function handleDrop(evt)
+    {
+        evt.stopPropagation();
+        evt.preventDefault();
+
+        if (evt.dataTransfer.files.length > 0)
+        {
+            var file = evt.dataTransfer.files[0];
+
+            var reader = new FileReader();
+            reader.onload = function (e)
+            {
+                evt.target.value = e.target.result;
+            };
+            reader.readAsText(file);
+        }
+    };
+
+    function handleDragOver(evt)
+    {
+        evt.stopPropagation();
+        evt.preventDefault();
+    };
+
+    // Setup the dnd listeners.
+    document.getElementById('textarea').addEventListener('dragover', handleDragOver, false);
+    document.getElementById('textarea').addEventListener('drop', handleDrop, false);
+}
+//]]>
+</script>
+</form>
+</body>
+</html>

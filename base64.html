@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Base64 encode image</title>
+  <meta charset="utf-8"/>
+<script type="text/javascript">
+//<![CDATA[
+	function main()
+	{
+		var dropZone = document.getElementById('dropZone');
+		var result = document.getElementById('result');
+	
+		dropZone.addEventListener('dragover', function(evt)
+		{
+			evt.stopPropagation();
+		    evt.preventDefault();
+		}, false);
+	
+		dropZone.addEventListener('drop', function(evt)
+		{
+			evt.stopPropagation();
+        	evt.preventDefault();
+        
+			if (evt.dataTransfer.files.length > 0)
+			{
+				try
+				{
+					var reader = new FileReader();
+
+					reader.onload = function(e)
+					{
+						result.value = e.target.result;
+					};
+					
+					reader.readAsDataURL(evt.dataTransfer.files[0]);
+			    }
+			    catch (e)
+			    {
+			    	alert('error:' + e);
+			    }
+			}
+		}, false);
+	}
+//]]>
+</script>
+</head>
+<body onload="main();">
+	<h2>Base64 encode image</h2>
+	<div id="dropZone" style="width:600px;height:200px;border:1px dashed gray;">Drag image here</div>
+	<br/>
+	Result:
+	<br/>
+	<textarea rows="20" cols="96" id="result" placeholder="No image yet" style="outline:none;"></textarea>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Create vertical image stack</title>
+  <meta charset="utf-8"/>
+<script type="text/javascript">
+//<![CDATA[
+	var images = [];
+
+	function main()
+	{
+		var dropZone = document.getElementById('dropZone');
+		var result = document.getElementById('result');
+	
+		dropZone.addEventListener('dragover', function(evt)
+		{
+			evt.stopPropagation();
+		    evt.preventDefault();
+		}, false);
+	
+		dropZone.addEventListener('drop', function(evt)
+		{
+	        evt.stopPropagation();
+	        evt.preventDefault();
+		
+			if (evt.dataTransfer.files.length > 0)
+			{
+				try
+				{
+					for (var i = 0; i < evt.dataTransfer.files.length; i++)
+					{
+						var idx = images.length;
+						images.push(new Image());
+					
+						(function(index)
+						{
+							var reader = new FileReader();
+
+							reader.onload = function(e)
+							{
+								var img = new Image();
+								images[index].src = e.target.result;
+								result.innerHTML = images.length + ' image(s)';
+							};
+					
+							reader.readAsDataURL(evt.dataTransfer.files[i]);
+						})(idx);
+				    }
+			    }
+			    catch (e)
+			    {
+			    	alert('error:' + e);
+			    }
+			}
+		}, false);
+	
+		document.getElementById('reset').addEventListener('click', function()
+		{
+			result.innerHTML = 'No images yet';
+			images = [];
+		});
+		
+		document.getElementById('create').addEventListener('click', function()
+		{
+			if (images.length > 0)
+			{
+				try
+				{
+					var width = 0;
+					var height = 0;
+		
+					for (var i = 0; i < images.length; i++)
+					{
+						width = Math.max(width, images[i].width);
+						height += images[i].height;
+					}
+					
+					var canvas = document.createElement('canvas');
+					canvas.setAttribute('width', width);
+					canvas.setAttribute('height', height);
+				
+					var ctx = canvas.getContext('2d');
+					var top = 0;
+
+					for (var i = 0; i < images.length; i++)
+					{
+						ctx.drawImage(images[i], 0, top);
+						top += images[i].height;
+					}
+				
+					result.innerHTML = '';
+					result.appendChild(canvas);
+				}
+				catch (e)
+				{
+					alert('error:' + e);
+				}
+			}
+		});
+	}
+//]]>
+</script>
+</head>
+<body onload="main();">
+	<h2>Create vertical image stack</h2>
+	<div id="dropZone" style="width:600px;height:200px;border:1px dashed gray;">Drag images here</div>
+	<br/>
+	<button id="reset">Reset</button>
+	<button id="create">Create vertical stack</button>
+	<br/><br/>
+	<div id="result">No images yet</div>
+</body>
+</html>
