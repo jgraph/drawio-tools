@@ -4,8 +4,7 @@
   <title>Inflate/deflate, URL encode/decode</title>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <script type="text/javascript" src="deflate/rawinflate.js"></script>
-  <script type="text/javascript" src="deflate/rawdeflate.min.js"></script>
+  <script type="text/javascript" src="deflate/pako.min.js"></script>
 <script type="text/javascript">
 //<![CDATA[
 function stringToBytes(str)
@@ -36,21 +35,53 @@ function encode(data)
 {
     if (document.getElementById('encodeCheckbox').checked)
     {
-        data = encodeURIComponent(data);
+        try
+        {
+            data = encodeURIComponent(data);
+        }
+        catch (e)
+        {
+            console.log(e);
+            alert('encodeURIComponent failed: ' + e);
+            
+            return;
+        }
     }
 
-    if (document.getElementById('deflateCheckbox').checked)
+    if (document.getElementById('deflateCheckbox').checked && data.length > 0)
     {
-        var deflate = new Zlib.RawDeflate(stringToBytes(data));
-        data = bytesToString(deflate.compress());
+		try
+        {
+        	data = bytesToString(pako.deflateRaw(data));
+        }
+        catch (e)
+        {
+            console.log(e);
+            alert('deflateRaw failed: ' + e);
+            
+            return;
+        }
     }
 
     if (document.getElementById('base64Checkbox').checked)
     {
-        data = btoa(data);
+    	try
+    	{
+        	data = btoa(data);
+        }
+        catch (e)
+        {
+            console.log(e);
+            alert('atob failed: ' + e);
+            
+            return;
+        }
     }
 
-    document.getElementById('textarea').value = data;
+	if (data.length > 0)
+	{
+    	document.getElementById('textarea').value = data;
+    }
 };
 
 function removeLinebreaks(data)
@@ -94,16 +125,16 @@ function decode(data)
         }
     }
 
-    if (document.getElementById('deflateCheckbox').checked)
+    if (document.getElementById('deflateCheckbox').checked && data.length > 0)
     {
         try
         {
-            data = RawDeflate.inflate(data);
+            data = bytesToString(pako.inflateRaw(data));
         }
         catch (e)
         {
             console.log(e);
-            alert('RawDeflate failed: ' + e);
+            alert('inflateRaw failed: ' + e);
             
             return;
         }
@@ -123,8 +154,11 @@ function decode(data)
             return;
         }
     }
-
-    document.getElementById('textarea').value = data;
+    
+	if (data.length > 0)
+	{
+    	document.getElementById('textarea').value = data;
+    }
 };
 
 function parseXml(xml)
