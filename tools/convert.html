@@ -197,6 +197,19 @@ function createXmlDocument()
     return doc;
 };
 
+function decodeFromUri()
+{
+    try
+    {
+        document.getElementById('textarea').value = decodeURIComponent(document.getElementById('textarea').value)
+    }
+	catch (e)
+	{
+		console.log(e);
+		alert('decodeURIComponent failed: ' + e);
+    }
+};
+
 function getTextContent(node)
 {
     return (node != null) ? node[(node.textContent === undefined) ? 'text' : 'textContent'] : '';
@@ -214,7 +227,7 @@ function getTextContent(node)
     <input type="checkbox" id="base64Checkbox" checked="checked" /> Base64&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <button onclick="removeLinebreaks(document.getElementById('textarea').value);return false;">Remove linebreaks</button>&nbsp;
     <button onclick="document.getElementById('textarea').value = encodeURIComponent(document.getElementById('textarea').value);return false;">URL Encode</button>&nbsp;
-    <button onclick="document.getElementById('textarea').value = decodeURIComponent(document.getElementById('textarea').value);return false;">URL Decode</button>&nbsp;
+    <button onclick="decodeFromUri();return false;">URL Decode</button>&nbsp;
     <button onclick="encode(document.getElementById('textarea').value);return false;">Encode</button>&nbsp;
     <button onclick="decode(document.getElementById('textarea').value);return false;">Decode</button>
 <script type="text/javascript">
