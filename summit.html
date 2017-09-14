@@ -1,0 +1,58 @@
+<html>
+<head>
+<title>US Atlassian Summit 2017 with draw.io</title>
+</head>
+<body style="margin:0px;">
+<iframe id="frame" src="" width="100%" height="100%" frameborder="0"></iframe>
+<script>
+	var urls = ['http://www.360moments.com/sanjose_2282',
+		'http://www.360moments.com/sanjose_2281',
+		'http://www.360moments.com/sanjose_2280',
+		'http://www.360moments.com/sanjose_2279',
+		'http://www.360moments.com/sanjose_2278',
+		
+		'http://www.360moments.com/sanjose_2277',
+		'http://www.360moments.com/sanjose_2274',
+		'http://www.360moments.com/sanjose_2273',
+		'http://www.360moments.com/sanjose_2272',
+		'http://www.360moments.com/sanjose_2270',
+		'http://www.360moments.com/sanjose_2269',
+		'http://www.360moments.com/sanjose_2268',
+		'http://www.360moments.com/sanjose_2267',
+		
+		'http://www.360moments.com/sanjose_2266',
+		'http://www.360moments.com/sanjose_2265',
+		'http://www.360moments.com/sanjose_2264',
+		'http://www.360moments.com/sanjose_2263',
+		'http://www.360moments.com/sanjose_2261',
+		'http://www.360moments.com/sanjose_2260',
+		'http://www.360moments.com/sanjose_2259',
+		'http://www.360moments.com/sanjose_2257',
+		'http://www.360moments.com/sanjose_2256',
+		'http://www.360moments.com/sanjose_2255'];
+	var current = 0;
+	var frame = document.getElementById('frame');
+	var search = location.search;
+	
+	if (search == '')
+	{
+		search = 60000;
+	}
+	else
+	{
+		search = search.substring(1);
+	}
+	
+	var delay = parseInt(search);
+	
+	function next()
+	{
+		frame.src = urls[current];
+		current = (current + 1) % urls.length;
+		window.setTimeout(next, delay)
+	};
+	
+	next();
+</script>
+</body>
+</html>
