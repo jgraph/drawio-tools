@@ -1,0 +1,77 @@
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge" ><![endif]-->
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Online Diagram Viewer</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<script type="text/javascript">
+function create()
+{
+	var url = document.getElementById('url').value;
+	
+	if (url.length == 0 || url.substring(0, 4) != 'http')
+	{
+		alert("Please enter a valid URL");
+		document.getElementById('url').focus();
+	}
+	else
+	{
+		var area = document.getElementById('textarea');
+		var a = document.getElementById('result');
+		area.style.display = 'none';
+		area.innerHTML = '';
+		a.innerHTML = '';
+		
+		var link = 'https://www.draw.io';
+		
+		if (url.substring(0, 32) == 'https://drive.google.com/file/d/')
+		{
+			var id = url.substring(32, url.lastIndexOf('/'));
+			url = 'https://drive.google.com/uc?id=' + id + '&export=download';
+		}
+		
+		if (document.getElementById('iframe').checked)
+		{
+			area.style.display = '';
+			area.appendChild(document.createTextNode(
+				'<iframe frameborder="0" style="width:100%;height:' +
+				document.getElementById('height').value + ';" src="' +
+				link + '?lightbox=1#U' + encodeURIComponent(url) + '"></iframe>'));
+			area.focus();
+			document.execCommand('selectAll');
+		}
+		else
+		{
+			if (document.getElementById('lightbox').checked)
+			{
+				link += '?lightbox=1&edit=_blank';
+			}
+	
+			link += '#U' + encodeURIComponent(url);
+			a.setAttribute('href', link);
+			a.appendChild(document.createTextNode(link));
+		}
+	}
+}
+</script>
+</head>
+<body onload="document.getElementById('url').focus();">
+  <h2>Online Diagram Viewer</h2>
+  View public VSDX, Gliffy, Lucidchart and draw.io diagrams (Google Link Sharing Links supported):
+  <br><br>
+  1. Link to Diagram: <input type="text" id="url" size="80" value="" placeholder="https://www.example.com/diagram.xml"></input>
+  <br><br>
+  2. Choose Mode:
+  <input type="radio" name="option" id="lightbox" checked="checked"/> Full Screen Mode&nbsp;
+  <input type="radio" name="option"/> Editor&nbsp;
+  <input type="radio" name="option" id="iframe"/> IFrame
+  &nbsp;(Height: <input type="text" id="height" size="10" value="400px"/>)
+  <br><br>
+  <button onclick="create();return false;" style="font-weight:bold;">3. Click Here!</button>
+  <br><br>
+  <a href="" target="_blank" id="result"></a>
+  <textarea style="display:none;" rows="4" cols="100" id="textarea"
+  	spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+</body>
+</html>

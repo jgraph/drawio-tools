@@ -1,0 +1,181 @@
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge" ><![endif]-->
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Online CSV Viewer</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <script type="text/javascript" src="deflate/pako.min.js"></script>
+<script type="text/javascript">
+function bytesToString(arr)
+{
+    var str = '';
+
+    for (var i = 0; i < arr.length; i++)
+    {
+        str += String.fromCharCode(arr[i]);
+    }
+
+    return str;
+};
+
+function encode(data)
+{
+  return btoa(bytesToString(pako.deflateRaw(encodeURIComponent(data))));
+};
+
+function getDesc()
+{
+	var data = document.getElementById('desc').value;
+	var lines = data.split('\n');
+	var result = [];
+	
+	for (var i = 0; i < lines.length; i++)
+	{
+		if (lines[i].charAt(0) != '#' && lines[i].length > 0)
+		{
+			result.push('#' + lines[i]).replace;
+		}
+	}
+	
+	return result.join('\n');	
+};
+
+function create()
+{
+	var url = document.getElementById('url').value;
+	
+	if (url.length == 0 || url.substring(0, 4) != 'http')
+	{
+		alert("Please enter a valid URL");
+		document.getElementById('url').focus();
+	}
+	else
+	{
+		var area = document.getElementById('textarea');
+		var a = document.getElementById('result');
+		area.style.display = 'none';
+		area.innerHTML = '';
+		a.innerHTML = '';
+		
+		var link = 'https://www.draw.io';
+		var title = document.getElementById('title').value;
+		
+		if (title.length > 0)
+		{
+			link += '?title=' + encodeURIComponent(title);
+		}
+		
+		link += '#S' + encode(JSON.stringify({url: url, format: 'csv', data: getDesc()}));
+		a.setAttribute('href', link);
+		a.appendChild(document.createTextNode(link));
+	}
+}
+</script>
+</head>
+<body onload="document.getElementById('url').focus();">
+  <h2>Online CSV Viewer</h2>
+  View public CSV files:
+  <br><br>
+  1. Link to CSV file: <input type="text" id="url" size="80" value="" placeholder="https://www.example.com/diagram.xml"></input>
+  <br><br>
+  2. Enter Title: <input type="text" size="30" id="title" placeholder="Title"></input> (Optional)
+  <br><br>
+  3. Enter Description:
+  <br>
+  <textarea rows="20" cols="100" id="desc"
+  	spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">
+# Example CSV description. Lines starting with # are comments. The following
+# names are eserved and should not be used (or ignored): id, tooltip,
+# placeholder(s), link and label (see below)
+
+# Node label with placeholders and HTML.
+# Default is \'%name_of_first_column%\'.
+
+label: %name%<br><i style="color:gray;">%position%</i><br><a href="mailto:%email%">Email</a>
+
+# Node style (placeholders are replaced once).
+# Default is the current style for nodes.
+
+style: label;image=%image%;whiteSpace=wrap;html=1;rounded=1;fillColor=%fill%;strokeColor=%stroke%;
+
+# Uses the given column name as the identity for cells (updates existing cells).
+# Default is no identity (empty value or -).
+
+identity: -
+
+# Adds a prefix to the identity of cells to make sure they do not collide with existing cells (whose
+# IDs are numbers from 0..n, sometimes with a GUID prefix in the context of realtime collaboration).
+# Default is csvimport-.
+
+namespace: csvimport-
+
+# Connections between rows ("from": source colum, "to": target column).
+# Label, style and invert are optional. Defaults are '', current style and false.
+# In addition to label, an optional fromlabel and tolabel can be used to name the column
+# that contains the text for the label in the edges source or target (invert ignored).
+# The label is concatenated in the form fromlabel + label + tolabel if all are defined.
+# The target column may contain a comma-separated list of values.
+# Multiple connect entries are allowed.
+
+connect: {"from": "manager", "to": "name", "invert": true, "label": "manages", \
+         "style": "curved=1;endArrow=blockThin;endFill=1;fontSize=11;"}
+connect: {"from": "refs", "to": "id", "style": "curved=1;fontSize=11;"}
+
+# Node x-coordinate. Possible value is a column name. Default is empty. Layouts will
+# override this value.
+
+left: 
+
+# Node y-coordinate. Possible value is a column name. Default is empty. Layouts will
+# override this value.
+
+top: 
+
+# Node width. Possible value is a number (in px), auto or an @ sign followed by a column
+# name that contains the value for the width. Default is auto.
+
+width: auto
+
+# Node height. Possible value is a number (in px), auto or an @ sign followed by a column
+# name that contains the value for the height. Default is auto.
+
+height: auto
+
+# Padding for autosize. Default is 0.
+
+padding: -12
+
+# Comma-separated list of ignored columns for metadata. (These can be
+# used for connections and styles but will not be added as metadata.)
+
+ignore: id,image,fill,stroke
+
+# Column to be renamed to link attribute (used as link).
+
+link: url
+
+# Spacing between nodes. Default is 40.
+
+nodespacing: 40
+
+# Spacing between parallel edges. Default is 40.
+
+edgespacing: 40
+
+# Name of layout. Possible values are auto, none, verticaltree, horizontaltree,
+# verticalflow, horizontalflow, organic, circle. Default is auto.
+
+layout: auto
+
+# If the CSV at the given URL has no column names in the first line, then please
+# add them here as a comma-separated list, eg. name,location,id
+</textarea>
+  <br><br>
+  <button onclick="create();return false;" style="font-weight:bold;">4. Click Here!</button>
+  <br><br>
+  <a href="" target="_blank" id="result"></a>
+  <textarea style="display:none;" rows="20" cols="100" id="textarea"
+  	spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+</body>
+</html>
