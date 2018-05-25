@@ -224,12 +224,13 @@ function getTextContent(node)
   <form>
     <input type="checkbox" id="encodeCheckbox" checked="checked" /> URL Encode&nbsp;
     <input type="checkbox" id="deflateCheckbox" checked="checked" /> Deflate&nbsp;
-    <input type="checkbox" id="base64Checkbox" checked="checked" /> Base64&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" id="base64Checkbox" checked="checked" /> Base64&nbsp;&nbsp;
     <button onclick="removeLinebreaks(document.getElementById('textarea').value);return false;">Remove linebreaks</button>&nbsp;
     <button onclick="document.getElementById('textarea').value = encodeURIComponent(document.getElementById('textarea').value);return false;">URL Encode</button>&nbsp;
     <button onclick="decodeFromUri();return false;">URL Decode</button>&nbsp;
     <button onclick="encode(document.getElementById('textarea').value);return false;">Encode</button>&nbsp;
-    <button onclick="decode(document.getElementById('textarea').value);return false;">Decode</button>
+    <button onclick="decode(document.getElementById('textarea').value);return false;">Decode</button>&nbsp;
+    (<span id="count">0</span> chars)
 <script type="text/javascript">
 //<![CDATA[
 // Enables dropping files
@@ -260,8 +261,18 @@ if (window.File != null && window.FileReader != null && window.FileList != null)
     };
 
     // Setup the dnd listeners.
-    document.getElementById('textarea').addEventListener('dragover', handleDragOver, false);
-    document.getElementById('textarea').addEventListener('drop', handleDrop, false);
+    var textarea = document.getElementById('textarea');
+    
+    textarea.addEventListener('dragover', handleDragOver, false);
+    textarea.addEventListener('drop', handleDrop, false);
+	var span = document.getElementById('count')
+
+	function updateCount()
+	{
+		span.innerHTML = textarea.value.length;
+	}
+    
+    textarea.addEventListener('input', updateCount, false);
 }
 //]]>
 </script>
