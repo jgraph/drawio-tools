@@ -5,3 +5,4 @@
 * <a href="https://jgraph.github.io/drawio-tools/tools/merge.html" target="_blank">Merge:</a> Create vertical image stack
 * <a href="https://jgraph.github.io/drawio-tools/tools/viewer.html" target="_blank">Viewer:</a> Create link for viewing diagrams
 * <a href="https://jgraph.github.io/drawio-tools/tools/csv.html" target="_blank">CSV:</a> Create link for viewing CSV
+* <a href="https://jgraph.github.io/drawio-tools/tools/link.html" target="_blank">Link:</a> Create custom links
