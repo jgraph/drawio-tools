@@ -62,6 +62,17 @@ function resetLink()
 {
 	document.getElementById('link').value = 'data:action/json,{"actions":[]}';
 }
+
+function copyLink()
+{
+	var link = document.getElementById('link');
+	link.removeAttribute('disabled');
+	link.focus();
+	link.select();
+	document.execCommand('copy');
+	link.setAttribute('disabled', 'true');
+	alert('Copied to Clipbaord');
+}
 </script>
 </head>
 <body onload="document.getElementById('cells').focus();">
@@ -93,6 +104,7 @@ function resetLink()
 data:action/json,{"actions":[]}
 </textarea>
 <br>
+<button onclick="copyLink();return false;"><b>Copy to Clipboard</b></button>
 <button onclick="resetLink();return false;">Click Here to Reset Link</button>
 <br><br>
 <a href="https://desk.draw.io/solution/articles/16000080137" target="_blank">Help</a>
