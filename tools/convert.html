@@ -44,7 +44,7 @@ function encode(data)
         {
             console.log(e);
             alert('encodeURIComponent failed: ' + e);
-            
+
             return;
         }
     }
@@ -59,7 +59,7 @@ function encode(data)
         {
             console.log(e);
             alert('deflateRaw failed: ' + e);
-            
+
             return;
         }
     }
@@ -74,7 +74,7 @@ function encode(data)
         {
             console.log(e);
             alert('atob failed: ' + e);
-            
+
             return;
         }
     }
@@ -121,7 +121,7 @@ function decode(data)
         {
             console.log(e);
             alert('atob failed: ' + e);
-            
+
             return;
         }
     }
@@ -136,7 +136,7 @@ function decode(data)
         {
             console.log(e);
             alert('inflateRaw failed: ' + e);
-            
+
             return;
         }
     }
@@ -151,11 +151,11 @@ function decode(data)
         {
             console.log(e);
             alert('decodeURIComponent failed: ' + e);
-            
+
             return;
         }
     }
-    
+
 	if (data.length > 0)
 	{
     	document.getElementById('textarea').value = data;
@@ -214,6 +214,21 @@ function getTextContent(node)
 {
     return (node != null) ? node[(node.textContent === undefined) ? 'text' : 'textContent'] : '';
 };
+
+function normalizeXml()
+{
+  try
+  {
+    var str = document.getElementById('textarea').value;
+    str = str.replace(/>\s*/g, '>');  // Replace "> " with ">"
+    str = str.replace(/\s*</g, '<');  // Replace "< " with "<"
+    document.getElementById('textarea').value = str;
+  }
+  catch (e)
+  {
+    alert(e.message);
+  }
+};
 //]]>
 </script>
 </head>
@@ -235,6 +250,7 @@ function getTextContent(node)
     <button onclick="document.getElementById('textarea').value=escape(document.getElementById('textarea').value);return false;">Escape</button>&nbsp;
     <button onclick="document.getElementById('textarea').value=btoa(document.getElementById('textarea').value);return false;">btoa</button>
     <button onclick="document.getElementById('textarea').value=atob(document.getElementById('textarea').value);return false;">atob</button>
+    <button onclick="normalizeXml();return false;">Normalize XML</button>
 <script type="text/javascript">
 //<![CDATA[
 // Enables dropping files
@@ -266,7 +282,7 @@ if (window.File != null && window.FileReader != null && window.FileList != null)
 
     // Setup the dnd listeners.
     var textarea = document.getElementById('textarea');
-    
+
     textarea.addEventListener('dragover', handleDragOver, false);
     textarea.addEventListener('drop', handleDrop, false);
 	var span = document.getElementById('count')
@@ -275,7 +291,7 @@ if (window.File != null && window.FileReader != null && window.FileList != null)
 	{
 		span.innerHTML = textarea.value.length;
 	}
-    
+
     textarea.addEventListener('input', updateCount, false);
 }
 //]]>
