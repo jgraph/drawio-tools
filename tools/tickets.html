@@ -41,6 +41,10 @@ function start()
   <br><br>
   Freshdesk API Key: <input type="password" id="freshdeskApiKey" size="20" value="" placeholder="See Profile Settings"></input>
   <br><br>
-  <button onclick="start();return false;" style="font-weight:bold;">3. Start Editor</button>
+  <button onclick="start();return false;" style="font-weight:bold;">Start Editor</button>
+  <br><br>
+  Note: The API Key will be passed to draw.io using a location hash property, which is then removed from the address bar.
+  Hash properties do not appear in server access logs and your API key is only used for communications between
+  your browser and Freshdesk.
 </body>
 </html>
