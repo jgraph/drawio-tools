@@ -96,6 +96,16 @@ style: label;image=%image%;whiteSpace=wrap;html=1;rounded=1;fillColor=%fill%;str
 
 parentstyle: swimlane;whiteSpace=wrap;html=1;childLayout=stackLayout;horizontal=1;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;
 
+# Optional column name that contains a reference to a named style in styles.
+# Default is the current style for nodes.
+
+stylename: -
+
+# JSON for named styles of the form {"name": "style", "name": "style"} where style is a cell style with
+# placeholders that are replaced once.
+
+styles: -
+
 # Uses the given column name as the identity for cells (updates existing cells).
 # Default is no identity (empty value or -).
 
