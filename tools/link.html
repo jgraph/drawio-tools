@@ -22,14 +22,14 @@ function add(useHref)
 			var action = {};
 			var selector = {};
 			var cells = document.getElementById('cells').value;
-			
+
 			if (cells.length > 0)
 			{
 				selector['cells'] = cells.split(' ');
 			}
-			
+
 			var tags = document.getElementById('tags').value;
-			
+
 			if (tags == '*')
 			{
 				selector['tags'] = [''];
@@ -38,11 +38,11 @@ function add(useHref)
 			{
 				selector['tags'] = tags.split(' ');
 			}
-			
+
 			action[document.getElementById('action').value] = selector;
 			obj.actions.push(action);
 		}
-		
+
 		document.getElementById('link').value = 'data:action/json,' + JSON.stringify(obj);
 	}
 	catch (e)
@@ -86,7 +86,7 @@ function copyLink()
     <option value="scroll">Scroll</option>
   </select>
   <br><br>
-  2. Cells: <input type="text" size="60" id="cells" placeholder="1 2 3"></input> (Space-separated list of cell IDs, * for all)
+  2. Cells/Layers: <input type="text" size="60" id="cells" placeholder="1 2 3"></input> (Space-separated list of cell IDs, * for all)
   <br><br>
   3. Tags: <input type="text" size="60" id="tags" placeholder="water pipes"></input> (Space-separated list of tags, * for all)
   <br><br>
