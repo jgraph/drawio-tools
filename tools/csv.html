@@ -37,8 +37,8 @@ function getDesc()
 			result.push('#' + lines[i]).replace;
 		}
 	}
-	
-	return result.join('\n');	
+
+	return result.join('\n');
 };
 
 function create()
@@ -49,15 +49,15 @@ function create()
 	area.style.display = 'none';
 	area.innerHTML = '';
 	a.innerHTML = '';
-		
+
 	var link = 'https://www.draw.io';
 	var title = document.getElementById('title').value;
-		
+
 	if (title.length > 0)
 	{
 		link += '?title=' + encodeURIComponent(title);
 	}
-		
+
 	link += '#S' + encode(JSON.stringify({url: url, format: 'csv', data: getDesc()}));
 	a.setAttribute('href', link);
 	a.appendChild(document.createTextNode(link));
@@ -65,22 +65,24 @@ function create()
 </script>
 </head>
 <body onload="document.getElementById('url').focus();">
-  <h2>Online CSV Viewer</h2>
-  View public CSV files:
-  <br><br>
-  1. Link to CSV file: <input type="text" id="url" size="80" value="" placeholder="https://jgraph.github.io/drawio-diagrams/diagrams/orgchart.csv"></input>
-  <br><small>Note: Public Google sheets can be used via https://docs.google.com/spreadsheets/d/{fileId}/export?format=csv&usp=sharing where {fileId} is
-  the ID of the file.</small>
-  <br><br>
-  2. Enter Title: <input type="text" size="30" id="title" placeholder="Title"></input> (Optional)
-  <br><br>
-  3. Enter Description:
-  <br>
-  <textarea rows="20" cols="100" id="desc"
-  	spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">
-# Example CSV description. Lines starting with # are comments. The following
-# names are reserved and should not be used (or ignored): id, tooltip,
-# placeholder(s), link and label (see below)
+ <h2>Online CSV Viewer</h2>
+ View public CSV files:
+ <br><br>
+ 1. Link to CSV file: <input type="text" id="url" size="80" value="" placeholder="https://jgraph.github.io/drawio-diagrams/diagrams/orgchart.csv"></input>
+ <br><small>Note: Public Google sheets can be used via https://docs.google.com/spreadsheets/d/{fileId}/export?format=csv&usp=sharing where {fileId} is
+ the ID of the file.</small>
+ <br><br>
+ 2. Enter Title: <input type="text" size="30" id="title" placeholder="Title"></input> (Optional)
+ <br><br>
+ 3. Enter Description:
+ <br>
+ <textarea rows="20" cols="100" id="desc"
+ 	spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">
+#
+# Example CSV import. Use ## for comments and # for configuration. Paste CSV below.
+# The following names are reserved and should not be used (or ignored):
+# id, tooltip, placeholder(s), link and label (see below)
+#
 
 # Node label with placeholders and HTML.
 # Default is '%name_of_first_column%'.
@@ -134,6 +136,8 @@ namespace: csvimport-
 
 # Connections between rows ("from": source colum, "to": target column).
 # Label, style and invert are optional. Defaults are '', current style and false.
+# If placeholders are used in the style, they are replaced with data from the source.
+# An optional placeholders can be set to target to use data from the target instead.
 # In addition to label, an optional fromlabel and tolabel can be used to name the column
 # that contains the text for the label in the edges source or target (invert ignored).
 # The label is concatenated in the form fromlabel + label + tolabel if all are defined.
@@ -147,12 +151,12 @@ connect: {"from": "refs", "to": "id", "style": "curved=1;fontSize=11;"}
 # Node x-coordinate. Possible value is a column name. Default is empty. Layouts will
 # override this value.
 
-left: 
+left:
 
 # Node y-coordinate. Possible value is a column name. Default is empty. Layouts will
 # override this value.
 
-top: 
+top:
 
 # Node width. Possible value is a number (in px), auto or an @ sign followed by a column
 # name that contains the value for the width. Default is auto.
@@ -183,26 +187,26 @@ nodespacing: 40
 
 # Spacing between levels of hierarchical layouts. Default is 100.
 
-levelspacing: 20
+levelspacing: 100
 
 # Spacing between parallel edges. Default is 40. Use 0 to disable.
 
 edgespacing: 40
 
-# Name of layout. Possible values are auto, none, verticaltree, horizontaltree,
-# verticalflow, horizontalflow, organic, circle  or a JSON string as used in Layout, Apply.
+# Name or JSON of layout. Possible values are auto, none, verticaltree, horizontaltree,
+# verticalflow, horizontalflow, organic, circle or a JSON string as used in Layout, Apply.
 # Default is auto.
 
 layout: auto
 
-# If the CSV at the given URL has no column names in the first line, then please
-# add them here as a comma-separated list, eg. name,location,id
+#If the CSV at the given URL has no column names in the first line, then please
+#add them here as a comma-separated list, eg. name,location,id
 </textarea>
-  <br><br>
-  <button onclick="create();return false;" style="font-weight:bold;">4. Click Here!</button>
-  <br><br>
-  <a href="" target="_blank" id="result"></a>
-  <textarea style="display:none;" rows="20" cols="100" id="textarea"
-  	spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+ <br><br>
+ <button onclick="create();return false;" style="font-weight:bold;">4. Click Here!</button>
+ <br><br>
+ <a href="" target="_blank" id="result"></a>
+ <textarea style="display:none;" rows="20" cols="100" id="textarea"
+ 	spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
 </body>
 </html>
