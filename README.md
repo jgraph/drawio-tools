@@ -7,3 +7,4 @@
 * <a href="https://jgraph.github.io/drawio-tools/tools/csv.html" target="_blank">CSV:</a> Create link for viewing CSV
 * <a href="https://jgraph.github.io/drawio-tools/tools/link.html" target="_blank">Link:</a> Create custom links
 * <a href="https://jgraph.github.io/drawio-tools/tools/tickets.html" target="_blank">Tickets:</a> Freshdesk Tickets Editor
+* <a href="https://jgraph.github.io/drawio-tools/tools/navigor.html" target="_blank">Navigator:</a> Navigator Object Info
