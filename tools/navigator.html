@@ -3,6 +3,10 @@
 <head>
   <title>Navigator</title>
   <meta charset="utf-8"/>
+  <script type="text/javascript">
+		mxBasePath = 'https://jgraph.github.io/mxgraph/javascript/src';
+	</script>
+  <script type="text/javascript" src="https://jgraph.github.io/mxgraph/javascript/src/js/mxClient.js"></script>
 </head>
 <body>
   <h2>Navigator</h2>
@@ -12,7 +16,8 @@ document.getElementById('info').innerHTML =
   'userAgent=' + navigator.userAgent + '<br>' +
   'appVersion=' + navigator.appVersion + '<br>' +
   'appName=' + navigator.appName + '<br>' +
-  'platform=' + navigator.platform;
+  'platform=' + navigator.platform + '<br>' +
+  'mxClient={\n' + mxUtils.toString(mxClient) + '}';
 </script>
 </form>
 </body>
