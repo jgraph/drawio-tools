@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Navigator</title>
+  <title>Browser</title>
   <meta charset="utf-8"/>
   <script type="text/javascript">
-		mxBasePath = 'https://jgraph.github.io/mxgraph/javascript/src';
+		mxBasePath = 'https://app.diagrams.net/mxgraph';
 	</script>
-  <script type="text/javascript" src="https://jgraph.github.io/mxgraph/javascript/src/js/mxClient.js"></script>
+  <script type="text/javascript" src="https://app.diagrams.net/js/app.min.js"></script>
 </head>
 <body>
-  <h2>Navigator</h2>
+  <h2>Browser</h2>
   <pre id="info"></pre>
 <script type="text/javascript">
 document.getElementById('info').innerHTML =
@@ -17,8 +17,8 @@ document.getElementById('info').innerHTML =
   'appVersion=' + navigator.appVersion + '<br>' +
   'appName=' + navigator.appName + '<br>' +
   'platform=' + navigator.platform + '<br>' +
+  'vendor=' + navigator.vendor + '<br>' +
   'mxClient={\n' + mxUtils.toString(mxClient) + '}';
 </script>
-</form>
 </body>
 </html>
