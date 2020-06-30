@@ -229,6 +229,19 @@ function normalizeXml()
     alert(e.message);
   }
 };
+
+function formatJson(indent)
+{
+  try
+  {
+    var str = document.getElementById('textarea').value;
+    document.getElementById('textarea').value = JSON.stringify(JSON.parse(str), null, indent);
+  }
+  catch (e)
+  {
+    alert(e.message);
+  }
+};
 //]]>
 </script>
 </head>
@@ -251,6 +264,8 @@ function normalizeXml()
     <button onclick="document.getElementById('textarea').value=btoa(document.getElementById('textarea').value);return false;">btoa</button>
     <button onclick="document.getElementById('textarea').value=atob(document.getElementById('textarea').value);return false;">atob</button>
     <button onclick="normalizeXml();return false;">Normalize XML</button>
+    <button onclick="formatJson(2);return false;">Format JSON</button>
+    <button onclick="formatJson();return false;">Normalize JSON</button>
 <script type="text/javascript">
 //<![CDATA[
 // Enables dropping files
@@ -285,12 +300,12 @@ if (window.File != null && window.FileReader != null && window.FileList != null)
 
     textarea.addEventListener('dragover', handleDragOver, false);
     textarea.addEventListener('drop', handleDrop, false);
-	var span = document.getElementById('count')
+    var span = document.getElementById('count')
 
-	function updateCount()
-	{
-		span.innerHTML = textarea.value.length;
-	}
+	  function updateCount()
+	  {
+		  span.innerHTML = textarea.value.length;
+	  }
 
     textarea.addEventListener('input', updateCount, false);
 }
