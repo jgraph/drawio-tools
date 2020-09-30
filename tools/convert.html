@@ -199,15 +199,15 @@ function createXmlDocument()
 
 function decodeFromUri()
 {
-    try
-    {
-        document.getElementById('textarea').value = decodeURIComponent(document.getElementById('textarea').value)
-    }
+  try
+  {
+    document.getElementById('textarea').value = decodeURIComponent(document.getElementById('textarea').value)
+  }
 	catch (e)
 	{
-		console.log(e);
-		alert('decodeURIComponent failed: ' + e);
-    }
+    console.log(e);
+    alert('decodeURIComponent failed: ' + e);
+  }
 };
 
 function getTextContent(node)
@@ -223,6 +223,38 @@ function normalizeXml()
     str = str.replace(/>\s*/g, '>');  // Replace "> " with ">"
     str = str.replace(/\s*</g, '<');  // Replace "< " with "<"
     document.getElementById('textarea').value = str;
+  }
+  catch (e)
+  {
+    alert(e.message);
+  }
+};
+
+function formatXml()
+{
+  try
+  {
+    var xmlDoc = new DOMParser().parseFromString(document.getElementById('textarea').value, 'application/xml');
+    var xsltDoc = new DOMParser().parseFromString([
+        // describes how we want to modify the XML - indent everything
+        '<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform">',
+        '  <xsl:strip-space elements="*"/>',
+        '  <xsl:template match="para[content-style][not(text())]">', // change to just text() to strip space in text nodes
+        '    <xsl:value-of select="normalize-space(.)"/>',
+        '  </xsl:template>',
+        '  <xsl:template match="node()|@*">',
+        '    <xsl:copy><xsl:apply-templates select="node()|@*"/></xsl:copy>',
+        '  </xsl:template>',
+        '  <xsl:output indent="yes"/>',
+        '</xsl:stylesheet>'
+    ].join('\n'), 'application/xml');
+
+    var xsltProcessor = new XSLTProcessor();
+    xsltProcessor.importStylesheet(xsltDoc);
+    var resultDoc = xsltProcessor.transformToDocument(xmlDoc);
+    var resultXml = new XMLSerializer().serializeToString(resultDoc);
+
+    document.getElementById('textarea').value = resultXml;
   }
   catch (e)
   {
@@ -264,6 +296,7 @@ function formatJson(indent)
     <button onclick="document.getElementById('textarea').value=btoa(document.getElementById('textarea').value);return false;">btoa</button>
     <button onclick="document.getElementById('textarea').value=atob(document.getElementById('textarea').value);return false;">atob</button>
     <button onclick="normalizeXml();return false;">Normalize XML</button>
+    <button onclick="formatXml();return false;">Format XML</button>
     <button onclick="formatJson(2);return false;">Format JSON</button>
     <button onclick="formatJson();return false;">Normalize JSON</button>
 <script type="text/javascript">
