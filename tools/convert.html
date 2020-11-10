@@ -274,6 +274,30 @@ function formatJson(indent)
     alert(e.message);
   }
 };
+
+function jsVar()
+{
+  try
+  {
+    var str = document.getElementById('textarea').value;
+    var lines = str.split('\n');
+    var result = [];
+
+    for (var i = 0; i < lines.length; i++)
+    {
+      if (i < lines.length - 1 || lines[i].length > 0)
+      {
+        result.push('\'' + lines[i].replace(/\\/g, '\\\\').replace(/\'/g, '\\\'') + '\\n\'');
+      }
+    }
+
+    document.getElementById('textarea').value = result.join(' +\n');
+  }
+  catch (e)
+  {
+    alert(e.message);
+  }
+};
 //]]>
 </script>
 </head>
@@ -299,6 +323,7 @@ function formatJson(indent)
     <button onclick="formatXml();return false;">Format XML</button>
     <button onclick="formatJson(2);return false;">Format JSON</button>
     <button onclick="formatJson();return false;">Normalize JSON</button>
+    <button onclick="jsVar();return false;">JS variable</button>
 <script type="text/javascript">
 //<![CDATA[
 // Enables dropping files
