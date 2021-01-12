@@ -8,30 +8,6 @@
   <script type="text/javascript" src="deflate/pako.min.js"></script>
 <script type="text/javascript">
 //<![CDATA[
-function stringToBytes(str)
-{
-    var arr = new Array(str.length);
-
-    for (var i = 0; i < str.length; i++)
-    {
-        arr[i] = str.charCodeAt(i);
-    }
-
-    return arr;
-};
-
-function bytesToString(arr)
-{
-    var str = '';
-
-    for (var i = 0; i < arr.length; i++)
-    {
-        str += String.fromCharCode(arr[i]);
-    }
-
-    return str;
-};
-
 function encode(data)
 {
     if (document.getElementById('encodeCheckbox').checked)
@@ -42,46 +18,46 @@ function encode(data)
         }
         catch (e)
         {
-            console.log(e);
-            alert('encodeURIComponent failed: ' + e);
+          console.log(e);
+          alert('encodeURIComponent failed: ' + e);
 
-            return;
+          return;
         }
     }
 
     if (document.getElementById('deflateCheckbox').checked && data.length > 0)
     {
-		try
+		    try
         {
-        	data = bytesToString(pako.deflateRaw(data));
+          data = String.fromCharCode.apply(null, new Uint8Array(pako.deflateRaw(data)));
         }
         catch (e)
         {
-            console.log(e);
-            alert('deflateRaw failed: ' + e);
+          console.log(e);
+          alert('deflateRaw failed: ' + e);
 
-            return;
+          return;
         }
     }
 
     if (document.getElementById('base64Checkbox').checked)
     {
-    	try
-    	{
+        try
+        {
         	data = btoa(data);
         }
         catch (e)
         {
-            console.log(e);
-            alert('atob failed: ' + e);
+          console.log(e);
+          alert('atob failed: ' + e);
 
-            return;
+          return;
         }
     }
 
-	if (data.length > 0)
-	{
-    	document.getElementById('textarea').value = data;
+    if (data.length > 0)
+    {
+      document.getElementById('textarea').value = data;
     }
 };
 
@@ -130,7 +106,7 @@ function decode(data)
     {
         try
         {
-            data = bytesToString(pako.inflateRaw(data));
+            data = pako.inflateRaw(Uint8Array.from(data, c => c.charCodeAt(0)), {to: 'string'});
         }
         catch (e)
         {
