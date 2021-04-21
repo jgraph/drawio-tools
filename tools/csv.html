@@ -82,7 +82,7 @@ function create()
  <textarea rows="20" cols="100" id="desc"
  	spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">
 #
-# Example CSV import. Use ## for comments and # for configuration. Paste CSV below.
+# Example CSV import. Use # for comments and # for configuration. Paste CSV below.
 # The following names are reserved and should not be used (or ignored):
 # id, tooltip, placeholder(s), link and label (see below)
 #
@@ -148,10 +148,14 @@ namespace: csvimport-
 # An optional placeholders can be set to target to use data from the target instead.
 # In addition to label, an optional fromlabel and tolabel can be used to name the column
 # that contains the text for the label in the edges source or target (invert ignored).
-# The label is concatenated in the form fromlabel + label + tolabel if all are defined.
+# In addition to those, an optional source and targetlabel can be used to specify a label
+# that contains placeholders referencing the respective columns in the source or target row.
+# The label is created in the form fromlabel + sourcelabel + label + tolabel + targetlabel.
 # Additional labels can be added by using an optional labels array with entries of the
 # form {"label": string, "x": number, "y": number, "dx": number, "dy": number} where
 # x is from -1 to 1 along the edge, y is orthogonal, and dx/dy are offsets in pixels.
+# An optional placeholders with the string value "source" or "target" can be specified
+# to replace placeholders in the additional label with data from the source or target.
 # The target column may contain a comma-separated list of values.
 # Multiple connect entries are allowed.
 
