@@ -183,6 +183,8 @@ function actionChanged()
 		(action == 'style') ? '' : 'none';
 	document.getElementById('styleOption').style.display =
 		(action == 'toggle') ? '' : 'none';
+	document.getElementById('opacityOption').style.display =
+		(action == 'toggle') ? 'none' : '';
 
 	if (type == 'style' && action != 'toggle')
 	{
@@ -210,7 +212,7 @@ function actionChanged()
 				<option value="default" selected>Visibility</option>
 				<option value="fade">Fade</option>
 				<option value="wipe">Wipe</option>
-				<option value="opacity">Opacity</option>
+				<option id="opacityOption" value="opacity">Opacity</option>
 				<option id="styleOption" value="style">Style</option>
 			</select>
 		</span>
