@@ -19,7 +19,8 @@ function add(type)
 		}
 		else if (type == 'wait')
 		{
-			obj.actions.push({wait: document.getElementById('wait').value});
+			var wait = document.getElementById('wait').value;
+			obj.actions.push({wait: (wait != '') ? wait : 1000});
 		}
 		else if (type == 'viewbox')
 		{
@@ -66,28 +67,16 @@ function add(type)
 				selector['tags'] = tags.split(' ');
 			}
 
-			if (isSetVisibleAction(name))
-			{
-				var type = document.getElementById('type').value;
-
-				if (type != 'default')
-				{
-					selector.type = type;
-
-					if (type == 'style' && name == 'toggle')
-					{
-						var key = document.getElementById('key').value;
-						selector.key = (key != '') ? key : 'flowAnimation';
-					}
-				}
-			}
-			else if (name == 'style')
+			if (name == 'style' || name == 'toggleStyle')
 			{
 				var key = document.getElementById('key').value;
-				var value = document.getElementById('value').value;
-
 				selector.key = (key != '') ? key : 'flowAnimation';
-				selector.value = (value != '') ? value : '1';
+			}
+
+			if (name == 'style' || name == 'opacity')
+			{
+				var value = document.getElementById('value').value;
+				selector.key = (value != '') ? value : '1';
 			}
 
 			action[name] = selector;
@@ -110,6 +99,8 @@ function clearInput()
 	document.getElementById('cells').value = '';
 	document.getElementById('tags').value = '';
 	document.getElementById('href').value = '';
+	document.getElementById('wait').value = '';
+	document.getElementById('viewbox').value = '';
 	actionChanged();
 };
 
@@ -172,24 +163,10 @@ function isSetVisibleAction(action)
 function actionChanged()
 {
 	var action = document.getElementById('action').value;
-	var type = document.getElementById('type').value;
-
-	document.getElementById('typeBox').style.display =
-		(isSetVisibleAction(action)) ? '' : 'none';
 	document.getElementById('keyBox').style.display =
-		(action == 'style' || (action == 'toggle' &&
-		type == 'style')) ? '' : 'none';
+		(action == 'style' || action == 'toggleStyle') ? '' : 'none';
 	document.getElementById('valueBox').style.display =
-		(action == 'style') ? '' : 'none';
-	document.getElementById('styleOption').style.display =
-		(action == 'toggle') ? '' : 'none';
-	document.getElementById('opacityOption').style.display =
-		(action == 'toggle') ? 'none' : '';
-
-	if (type == 'style' && action != 'toggle')
-	{
-		document.getElementById('type').value = 'default';
-	}
+		(action == 'style' || action == 'opacity') ? '' : 'none';
 };
 
 </script>
@@ -200,22 +177,20 @@ function actionChanged()
 		<hr>
 		1. Action for Cell(s): <select id="action" onchange="actionChanged();">
 			<option value="toggle" selected>Toggle</option>
-			<option value="style">Style</option>
 			<option value="show">Show</option>
 			<option value="hide">Hide</option>
+			<option value="style">Set Style</option>
+			<option value="toggleStyle">Toggle Style</option>
+			<option disabled>-</option>
+			<option value="opacity">Opacity</option>
+			<option value="wipeIn">Wipe In</option>
+			<option value="wipeOut">Wipe Out</option>
+			<option value="fadeIn">Fade In</option>
+			<option value="fadeOut">Fade Out</option>
 			<option value="highlight">Highlight</option>
 			<option value="select">Select</option>
 			<option value="scroll">Scroll</option>
 		</select>
-		<span id="typeBox">
-			Type: <select onchange="actionChanged();" id="type">
-				<option value="default" selected>Visibility</option>
-				<option value="fade">Fade</option>
-				<option value="wipe">Wipe</option>
-				<option id="opacityOption" value="opacity">Opacity</option>
-				<option id="styleOption" value="style">Style</option>
-			</select>
-		</span>
 		<span id="keyBox">Key: <input type="text" size="20" id="key" placeholder="flowAnimation"></input></span>
 		<span id="valueBox">Value: <input type="text" size="20" id="value" placeholder="1"></input></span>
 		<br><br>
@@ -224,7 +199,6 @@ function actionChanged()
 		3. Tags: <input type="text" size="60" id="tags" placeholder="water pipes"></input> Space-separated list of tags, * for all
 		<br><br>
 		4. <button onclick="add();return false;" style="font-weight:bold;">Add Action</button>
-		&nbsp;5. <button onclick="clearInput();return false;">Clear</button>
 		<br><hr>
 		Or <button onclick="add('link');return false;" style="font-weight:bold;">Add Link:</button>
 		&nbsp;<input type="text" size="60" id="href" placeholder="data:page/id,d77c2f53-a0fe-16b8-c644-547af6ee0c87"></input>
@@ -237,6 +211,8 @@ function actionChanged()
 		Or <button onclick="add('viewbox');return false;" style="font-weight:bold;">Add Viewbox:</button>
 		&nbsp;<input type="text" size="60" id="viewbox"></input>
 		x y width height border
+		<br><hr>
+		<button onclick="clearInput();return false;">Clear Input</button>
 		<br><hr>
 		Custom Link:
 		<br>
