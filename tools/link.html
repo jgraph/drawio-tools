@@ -41,19 +41,26 @@ function add(type)
 			}
 			else
 			{
-				alert('Missing arguments');
+				showMessage('Missing arguments');
 			}
 		}
 		else
 		{
-			var action = {};
+			var action = document.getElementById('parallel').checked && obj.actions.length > 0 ?
+				obj.actions[obj.actions.length - 1] : {};
 			var selector = {};
 			var cells = document.getElementById('cells').value;
+			var exclude = document.getElementById('exclude').value;
 			var name = document.getElementById('action').value;
 
 			if (cells.length > 0)
 			{
 				selector['cells'] = cells.split(' ');
+			}
+
+			if (exclude.length > 0)
+			{
+				selector['excludeCells'] = exclude.split(' ');
 			}
 
 			var tags = document.getElementById('tags').value;
@@ -79,15 +86,30 @@ function add(type)
 				selector.key = (value != '') ? value : '1';
 			}
 
+			if (name == 'fadeIn' || name == 'fadeOut')
+			{
+				selector.delay = 1000;
+			}
+
+			if (name == 'wipeIn' || name == 'wipeOut')
+			{
+				action.delay = 30;
+				action.steps = 30;
+			}
+
 			action[name] = selector;
-			obj.actions.push(action);
+
+			if (!document.getElementById('parallel').checked)
+			{
+				obj.actions.push(action);
+			}
 		}
 
-		document.getElementById('link').value = 'data:action/json,' + JSON.stringify(obj, null, '  ');
+		document.getElementById('link').value = 'data:action/json,' + JSON.stringify(obj, null, 2);
 	}
 	catch (e)
 	{
-		alert(e);
+		showMessage(e);
 	}
 };
 
@@ -97,16 +119,18 @@ function clearInput()
 	document.getElementById('key').value = '';
 	document.getElementById('value').value = '';
 	document.getElementById('cells').value = '';
+	document.getElementById('exclude').value = '';
 	document.getElementById('tags').value = '';
 	document.getElementById('href').value = '';
 	document.getElementById('wait').value = '';
 	document.getElementById('viewbox').value = '';
+	document.getElementById('parallel').checked = false;
 	actionChanged();
 };
 
 function resetLink()
 {
-	document.getElementById('link').value = 'data:action/json,' + JSON.stringify({"actions":[]}, null, '  ');
+	document.getElementById('link').value = 'data:action/json,' + JSON.stringify({"actions":[]}, null, 2);
 };
 
 function validateLink(quiet)
@@ -114,7 +138,8 @@ function validateLink(quiet)
 	try
 	{
 		var href = document.getElementById('link').value;
-		var link = JSON.parse(href.substring(17));
+		var start = href.indexOf('data:action/json,');
+		var link = JSON.parse(href.substring(start + 17));
 
 		if (link.actions == null || link.actions.length == 0)
 		{
@@ -122,16 +147,57 @@ function validateLink(quiet)
 		}
 		else if (!quiet)
 		{
-			document.getElementById('link').value = 'data:action/json,' + JSON.stringify(link, null, '  ');
-			alert('Link is valid');
+			document.getElementById('link').value = 'data:action/json,' + JSON.stringify(link, null, 2);
+			showMessage('Link is valid');
 		}
 
 		return true;
 	}
 	catch (e)
 	{
-		alert('Error: ' + e);
+		var index = (e.message != null) ? e.message.indexOf(' at position ') : 0;
+
+		if (index > 0)
+		{
+			var pos = parseInt(e.message.substring(index + 13));
+			setCaretPosition('link', pos + 14);
+		}
+		
+		showMessage('Error: ' + e);
 	}
+};
+
+function showMessage(message)
+{
+	var confirmation = document.getElementById('confirmation');
+	confirmation.style.display = '';
+	confirmation.innerHTML = message;
+
+	window.setTimeout(function()
+	{
+		confirmation.style.display = 'none';
+	}, 3000);
+};
+
+function setCaretPosition(elemId, caretPos)
+{
+    var elem = document.getElementById(elemId);
+
+    if (elem != null)
+	{
+		elem.focus();
+
+        if (elem.createTextRange)
+		{
+            var range = elem.createTextRange();
+            range.move('character', caretPos);
+            range.select();
+        }
+        else if (elem.selectionStart)
+		{
+			elem.setSelectionRange(caretPos, caretPos);
+		}
+    }
 };
 
 function copyLink()
@@ -147,17 +213,13 @@ function copyLink()
 			link.select();
 			document.execCommand('copy');
 			link.value = prev;
+			showMessage('Link Copied');
 		}
 	}
 	catch (e)
 	{
-		alert('Error: ' + e);
+		showMessage('Error: ' + e);
 	}
-};
-
-function isSetVisibleAction(action)
-{
-	return action == 'toggle' || action == 'show' || action == 'hide';
 };
 
 function actionChanged()
@@ -198,7 +260,10 @@ function actionChanged()
 		<br><br>
 		3. Tags: <input type="text" size="60" id="tags" placeholder="water pipes"></input> Space-separated list of tags, * for all
 		<br><br>
-		4. <button onclick="add();return false;" style="font-weight:bold;">Add Action</button>
+		4. Exclude Cells/Layers: <input type="text" size="60" id="exclude" placeholder="1 2 3"></input> Space-separated list of cell or layer IDs
+		<br><br>
+		5. <button onclick="add();return false;" style="font-weight:bold;">Add Action</button>
+		<input type="checkbox" id="parallel"> Run at the same time
 		<br><hr>
 		Or <button onclick="add('link');return false;" style="font-weight:bold;">Add Link:</button>
 		&nbsp;<input type="text" size="60" id="href" placeholder="data:page/id,d77c2f53-a0fe-16b8-c644-547af6ee0c87"></input>
@@ -222,6 +287,7 @@ function actionChanged()
 		<button onclick="validateLink();return false;">Validate</button>
 		<button onclick="resetLink();return false;">Reset Link</button>
 		<button onclick="copyLink();return false;"><b>Copy Link</b></button>
+		<span id="confirmation" style="display:none;font-size:10pt;padding:3px;font-weight:bold;"></span>
 	</span>
 </body>
 </html>
