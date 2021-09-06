@@ -44,6 +44,74 @@ function add(type)
 				showMessage('Missing arguments');
 			}
 		}
+		else if (type == 'tags')
+		{
+			var hidden = document.getElementById('hiddenTags').value.split(' ');
+			var visible = document.getElementById('visibleTags').value.split(' ');
+
+			if (hidden.length > 0 || visible.length > 0)
+			{
+				var action = {};
+				var add = false;
+
+				if (hidden.length > 0)
+				{
+					if (hidden[0] == '*')
+					{
+						action.visible = [];
+						add = true;
+					}
+					else if (hidden[0] != '')
+					{
+						action.hidden = hidden;
+						add = true;
+					}
+				}
+
+				if (visible.length > 0)
+				{
+					if (visible[0] == '*')
+					{
+						action.hidden = [];
+						add = true;
+					}
+					else if (visible[0] != '')
+					{
+						action.visible = visible;
+						add = true;
+					}
+				}
+
+				if (add)
+				{
+					obj.actions.push({tags: action});
+				}
+				else
+				{
+					showMessage('Missing arguments');
+				}
+			}
+
+			var tokens = document.getElementById('viewbox').value.split(' ');
+
+			if (tokens.length > 3)
+			{
+				var action = {};
+				action.viewbox = {x: parseInt(tokens[0]), y: parseInt(tokens[1]),
+					width: parseInt(tokens[2]), height: parseInt(tokens[3])};
+
+				if (tokens.length > 4)
+				{
+					action.border = parseInt(tokens[4]);
+				}
+
+				obj.actions.push(action);
+			}
+			else
+			{
+				showMessage('Missing arguments');
+			}
+		}
 		else
 		{
 			var action = document.getElementById('parallel').checked && obj.actions.length > 0 ?
@@ -276,6 +344,10 @@ function actionChanged()
 		Or <button onclick="add('viewbox');return false;" style="font-weight:bold;">Add Viewbox:</button>
 		&nbsp;<input type="text" size="60" id="viewbox"></input>
 		x y width height border
+		<br><hr>
+		Or <button onclick="add('tags');return false;" style="font-weight:bold;">Add Tags:</button>
+		&nbsp;Hidden: <input type="text" size="24" id="hiddenTags"></input>
+		&nbsp;Visible: <input type="text" size="24" id="visibleTags"></input> Space-separated list of tags, * for all
 		<br><hr>
 		<button onclick="clearInput();return false;">Clear Input</button>
 		<br><hr>
