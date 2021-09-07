@@ -91,26 +91,6 @@ function add(type)
 					showMessage('Missing arguments');
 				}
 			}
-
-			var tokens = document.getElementById('viewbox').value.split(' ');
-
-			if (tokens.length > 3)
-			{
-				var action = {};
-				action.viewbox = {x: parseInt(tokens[0]), y: parseInt(tokens[1]),
-					width: parseInt(tokens[2]), height: parseInt(tokens[3])};
-
-				if (tokens.length > 4)
-				{
-					action.border = parseInt(tokens[4]);
-				}
-
-				obj.actions.push(action);
-			}
-			else
-			{
-				showMessage('Missing arguments');
-			}
 		}
 		else
 		{
