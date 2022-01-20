@@ -101,6 +101,11 @@ style: label;image=%image%;whiteSpace=wrap;html=1;rounded=1;fillColor=%fill%;str
 
 parentstyle: swimlane;whiteSpace=wrap;html=1;childLayout=stackLayout;horizontal=1;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;
 
+# Style to be used for objects not in the CSV. If this is - then such objects are ignored,
+# else they are created using this as their style, eg. whiteSpace=wrap;html=1;
+
+unknownStyle: -
+
 # Optional column name that contains a reference to a named style in styles.
 # Default is the current style for nodes.
 
