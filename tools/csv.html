@@ -71,11 +71,11 @@ function create()
  <h2>Online CSV Viewer</h2>
  View public CSV files:
  <br><br>
- 1. Link to CSV file: <input type="text" id="url" size="80" value="" placeholder="https://jgraph.github.io/drawio-diagrams/diagrams/orgchart.csv"></input>
+ 1. Link to CSV file: <input type="text" id="url" size="80" value="" placeholder="eg. https://jgraph.github.io/drawio-diagrams/diagrams/orgchart.csv"></input>
  <br><small>Note: Public Google sheets can be used via https://docs.google.com/spreadsheets/d/{fileId}/export?format=csv&usp=sharing where {fileId} is
  the ID of the file.</small>
  <br><br>
- 2. Enter Title: <input type="text" size="30" id="title" placeholder="Title"></input> (Optional)
+ 2. Enter Title: <input type="text" size="30" id="title" placeholder="eg. Title"></input> (Optional)
  <br><br>
  3. Enter Description:
  <br>
@@ -214,13 +214,13 @@ levelspacing: 100
 edgespacing: 40
 
 # Name or JSON of layout. Possible values are auto, none, verticaltree, horizontaltree,
-# verticalflow, horizontalflow, organic, circle or a JSON string as used in Layout, Apply.
-# Default is auto.
+# verticalflow, horizontalflow, organic, circle, orgchart or a JSON string as used in
+# Layout, Apply. Default is auto.
 
 layout: auto
 
-#If the CSV at the given URL has no column names in the first line, then please
-#add them here as a comma-separated list, eg. name,location,id
+# If the CSV at the given URL has no column names in the first line, then please
+# add them here as a comma-separated list, eg. name,location,id
 </textarea>
  <br><br>
  <button onclick="create();return false;" style="font-weight:bold;">4. Click Here!</button>
