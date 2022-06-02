@@ -289,23 +289,20 @@ function checkMxFile()
     {
       var data = diagrams[i].textContent;
 
-      if (!base64regex.test(data))
+      while (data.charAt(data.length - 1) == '=')
       {
-        while (data.charAt(data.length - 1) == '=')
-        {
-          data = data.substring(0, data.length - 1);
-        }
+        data = data.substring(0, data.length - 1);
+      }
 
-        for (var j = 0; j < data.length; j++)
-        {
-          var code = data.charCodeAt(j);
+      for (var j = 0; j < data.length; j++)
+      {
+        var code = data.charCodeAt(j);
 
-          if (!((code > 47 && code < 58) /*0-9*/ || (code > 64 && code < 91) /*A-Z*/ ||
-            (code > 96 && code < 123) /*a-z*/ || code == 43 /*+*/ || code == 47 /*/*/))
-          {
-            result.push('Invalid char at position ' + j + ' on page ' +
-              i + ': char=' + data.charAt(j) + ' code=' + code );
-          }
+        if (!((code > 47 && code < 58) /*0-9*/ || (code > 64 && code < 91) /*A-Z*/ ||
+          (code > 96 && code < 123) /*a-z*/ || code == 43 /*+*/ || code == 47 /*/*/))
+        {
+          result.push('Invalid char at position ' + j + ' on page ' +
+            i + ': char=' + data.charAt(j) + ' code=' + code );
         }
       }
     }
