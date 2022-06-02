@@ -274,6 +274,56 @@ function jsVar()
     alert(e.message);
   }
 };
+
+function checkMxFile()
+{
+  try
+  {
+    var xmlDoc = new DOMParser().parseFromString(document.
+      getElementById('textarea').value, 'application/xml');
+    var diagrams = xmlDoc.getElementsByTagName('diagram');
+    var base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+    var result = [];
+
+    for (var i = 0; i < diagrams.length; i++)
+    {
+      var data = diagrams[i].textContent;
+
+      if (!base64regex.test(data))
+      {
+        while (data.charAt(data.length - 1) == '=')
+        {
+          data = data.substring(0, data.length - 1);
+        }
+
+        for (var j = 0; j < data.length; j++)
+        {
+          var code = data.charCodeAt(j);
+
+          if (!((code > 47 && code < 58) /*0-9*/ || (code > 64 && code < 91) /*A-Z*/ ||
+            (code > 96 && code < 123) /*a-z*/ || code == 43 /*+*/ || code == 47 /*/*/))
+          {
+            result.push('Invalid char at position ' + j + ' on page ' +
+              i + ': char=' + data.charAt(j) + ' code=' + code );
+          }
+        }
+      }
+    }
+
+    if (result.length == 0)
+    {
+      alert('No errors found');
+    }
+    else
+    {
+      document.getElementById('textarea').value = result.join('\n');
+    }
+  }
+  catch (e)
+  {
+    alert(e.message);
+  }
+};
 //]]>
 </script>
 </head>
@@ -300,6 +350,7 @@ function jsVar()
     <button onclick="formatJson(2);return false;">Format JSON</button>
     <button onclick="formatJson();return false;">Normalize JSON</button>
     <button onclick="jsVar();return false;">JS variable</button>
+    <button onclick="checkMxFile();return false;">Check mxFile</button>
 <script type="text/javascript">
 //<![CDATA[
 // Enables dropping files
