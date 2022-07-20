@@ -50,15 +50,15 @@ function create()
 	area.innerHTML = '';
 	a.innerHTML = '';
 
-	var link = 'https://import.diagrams.net/';
+	var link = 'https://app.diagrams.net/';
 	var title = document.getElementById('title').value;
-  var params = [];
+	var params = [];
 
-  params.push('desc=' + encode(JSON.stringify({url: url, format: 'csv', data: getDesc()})));
+	params.push('desc=' + encode(JSON.stringify({url: url, format: 'csv', data: getDesc()})));
 
 	if (title.length > 0)
 	{
-    params.push('title=' + encodeURIComponent(title));
+    	params.push('title=' + encodeURIComponent(title));
 	}
 
 	link += '?' + params.join('&');
