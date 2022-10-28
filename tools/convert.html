@@ -307,6 +307,16 @@ function checkMxFile()
       }
     }
 
+    var errors = xmlDoc.getElementsByTagName('parsererror');
+    
+    if (errors != null && errors.length > 0)
+    {
+      for (var i = 0; i < errors.length; i++)
+      {
+        result.push('Invalid XML content: ' + errors[i].outerHTML);
+      }
+    }
+
     if (result.length == 0)
     {
       alert('No errors found');
