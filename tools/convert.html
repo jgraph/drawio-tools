@@ -275,25 +275,43 @@ function jsVar()
   }
 };
 
+function customDecodeURIComponent(encodedURI) {
+  let output = "";
+  for (let i = 0; i < encodedURI.length; i++) {
+    if (encodedURI[i] === "%") {
+      const hex = encodedURI.substring(i + 1, i + 3);
+      const charCode = parseInt(hex, 16);
+      const char = String.fromCharCode(charCode);
+      output += char;
+      i += 2;
+    } else {
+      output += encodedURI[i];
+    }
+  }
+  return output;
+}
+
 function checkMxFile()
 {
   try
   {
-    var xmlDoc = new DOMParser().parseFromString(document.
-      getElementById('textarea').value, 'application/xml');
-    var diagrams = xmlDoc.getElementsByTagName('diagram');
-    var base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+    var value = document.getElementById('textarea').value;
+    var tokens = value.split('<diagram ');
+    var pos = tokens[0].length + 10;
     var result = [];
 
-    for (var i = 0; i < diagrams.length; i++)
+    for (var i = 1; i < tokens.length; i++)
     {
-      var data = diagrams[i].textContent;
-
+      var start = tokens[i].indexOf('>') + 1;
+      var end = tokens[i].lastIndexOf('</diagram>');
+      var data = tokens[i].substring(start, end);
+      
       while (data.charAt(data.length - 1) == '=')
       {
         data = data.substring(0, data.length - 1);
       }
 
+      // Checks base64 characters in diagram pages
       for (var j = 0; j < data.length; j++)
       {
         var code = data.charCodeAt(j);
@@ -301,12 +319,16 @@ function checkMxFile()
         if (!((code > 47 && code < 58) /*0-9*/ || (code > 64 && code < 91) /*A-Z*/ ||
           (code > 96 && code < 123) /*a-z*/ || code == 43 /*+*/ || code == 47 /*/*/))
         {
-          result.push('Invalid char at position ' + j + ' on page ' +
-            i + ': char=' + data.charAt(j) + ' code=' + code );
+          result.push('Invalid char: position=' + (pos + start + j) + ' page=' +
+            (i - 1) + ' char=' + data.charAt(j) + ' code=' + code );
         }
       }
+
+      pos += tokens[i].length + 9;
     }
 
+    // Checks XML document parsing
+    var xmlDoc = new DOMParser().parseFromString(value, 'application/xml');
     var errors = xmlDoc.getElementsByTagName('parsererror');
     
     if (errors != null && errors.length > 0)
@@ -314,6 +336,41 @@ function checkMxFile()
       for (var i = 0; i < errors.length; i++)
       {
         result.push('Invalid XML content: ' + errors[i].outerHTML);
+      }
+    }
+
+    // Checks diagram data
+    var diagrams = xmlDoc.getElementsByTagName('diagram');
+
+    for (var i = 0; i < diagrams.length; i++)
+    {
+      var data = getTextContent(diagrams[i]);
+
+      try
+      {
+          data = atob(data);
+
+          try
+          {
+            data = pako.inflateRaw(Uint8Array.from(data, c => c.charCodeAt(0)), {to: 'string'});
+            
+            try
+            {
+              data = decodeURIComponent(data);
+            } 
+            catch (e)
+            {
+              result.push('Invalid data: page=' + i + ' decodeURIComponent error=' + e.message);
+            }
+          } 
+          catch (e)
+          {
+            result.push('Invalid data: page=' + i + ' inflateRaw error=' + e.message);
+          }
+      }
+      catch (e)
+      {
+          result.push('Invalid data: page=' + i + ' atob error=' + e.message);
       }
     }
 
