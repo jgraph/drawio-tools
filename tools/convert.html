@@ -342,7 +342,7 @@ function checkMxFile()
           (code > 96 && code < 123) /*a-z*/ || code == 43 /*+*/ || code == 47 /*/*/))
         {
           result.push('Invalid char: position=' + (pos + start + j) + ' page=' +
-            (i - 1) + ' char=' + data.charAt(j) + ' code=' + code );
+            i + ' char=' + data.charAt(j) + ' code=' + code );
         }
       }
 
@@ -382,18 +382,18 @@ function checkMxFile()
             } 
             catch (e)
             {
-              result.push('Invalid data: page=' + i + ' decodeURIComponent error=' + e.message);
+              result.push('Invalid data: page=' + (i + 1) + ' decodeURIComponent error=' + e.message);
               result = result.concat(checkURI(data));
             }
           } 
           catch (e)
           {
-            result.push('Invalid data: page=' + i + ' inflateRaw error=' + e.message);
+            result.push('Invalid data: page=' + (i + 1) + ' inflateRaw error=' + e.message);
           }
       }
       catch (e)
       {
-          result.push('Invalid data: page=' + i + ' atob error=' + e.message);
+          result.push('Invalid data: page=' + (i + 1) + ' atob error=' + e.message);
       }
     }
 
