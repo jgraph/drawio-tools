@@ -275,21 +275,43 @@ function jsVar()
   }
 };
 
-function customDecodeURIComponent(encodedURI) {
-  let output = "";
-  for (let i = 0; i < encodedURI.length; i++) {
-    if (encodedURI[i] === "%") {
-      const hex = encodedURI.substring(i + 1, i + 3);
-      const charCode = parseInt(hex, 16);
-      const char = String.fromCharCode(charCode);
-      output += char;
-      i += 2;
-    } else {
-      output += encodedURI[i];
+function checkURI(data)
+{
+  var tokens = data.split('%');
+  var result = [];
+  var temp = [];
+  var pos = 0;
+
+  for (var j = 0; j < tokens.length; j++)
+  {
+    if (tokens[j].length > 0)
+    {
+      temp.push(tokens[j]);
+      pos += 1;
+
+      if (tokens[j].length > 2 || j == tokens.length)
+      {
+        var value = '%' + temp.join('%');
+        
+        try
+        {
+          decodeURIComponent(value);
+        }
+        catch (ex)
+        {
+          result.push('Invalid URI component: position=' + pos + ' value=' +
+            ((value.length < 32) ? value : value.substring(0, 32) + '...'));
+        }
+
+        temp = [];
+      }
+
+      pos += tokens[j].length;
     }
   }
-  return output;
-}
+
+  return result;
+};
 
 function checkMxFile()
 {
@@ -356,11 +378,12 @@ function checkMxFile()
             
             try
             {
-              data = decodeURIComponent(data);
+              decodeURIComponent(data);
             } 
             catch (e)
             {
               result.push('Invalid data: page=' + i + ' decodeURIComponent error=' + e.message);
+              result = result.concat(checkURI(data));
             }
           } 
           catch (e)
