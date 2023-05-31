@@ -46,13 +46,28 @@ function add(type)
 		}
 		else if (type == 'tags')
 		{
+			var toggle = document.getElementById('toggleTags').value.split(' ');
 			var hidden = document.getElementById('hiddenTags').value.split(' ');
 			var visible = document.getElementById('visibleTags').value.split(' ');
 
-			if (hidden.length > 0 || visible.length > 0)
+			if (toggle.length > 0 || hidden.length > 0 || visible.length > 0)
 			{
 				var action = {};
 				var add = false;
+
+				if (toggle.length > 0)
+				{
+					if (toggle[0] == '*')
+					{
+						action.toggle = [];
+						add = true;
+					}
+					else if (toggle[0] != '')
+					{
+						action.toggle = toggle;
+						add = true;
+					}
+				}
 
 				if (hidden.length > 0)
 				{
@@ -326,8 +341,9 @@ function actionChanged()
 		x y width height border
 		<br><hr>
 		Or <button onclick="add('tags');return false;" style="font-weight:bold;">Add Tags:</button>
-		&nbsp;Hidden: <input type="text" size="24" id="hiddenTags"></input>
-		&nbsp;Visible: <input type="text" size="24" id="visibleTags"></input> Space-separated list of tags, * for all
+		&nbsp;Toggle: <input type="text" size="16" id="toggleTags"></input>
+		&nbsp;Hidden: <input type="text" size="16" id="hiddenTags"></input>
+		&nbsp;Visible: <input type="text" size="16" id="visibleTags"></input> Space-separated list of tags, * for all
 		<br><hr>
 		<button onclick="clearInput();return false;">Clear Input</button>
 		<br><hr>
