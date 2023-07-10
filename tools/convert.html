@@ -430,6 +430,7 @@ function checkMxFile()
     (<span id="count">0</span> chars)
     <br>
     <button onclick="document.getElementById('textarea').value=escape(document.getElementById('textarea').value);return false;">Escape</button>&nbsp;
+    <button onclick="document.getElementById('textarea').value=unescape(document.getElementById('textarea').value);return false;">Unescape</button>&nbsp;
     <button onclick="document.getElementById('textarea').value=btoa(document.getElementById('textarea').value);return false;">btoa</button>
     <button onclick="document.getElementById('textarea').value=atob(document.getElementById('textarea').value);return false;">atob</button>
     <button onclick="normalizeXml();return false;">Normalize XML</button>
