@@ -13,6 +13,18 @@ function add(type)
 		var link = document.getElementById('link').value;
 		var obj = JSON.parse(link.substring(link.indexOf(',') + 1));
 
+		var title = document.getElementById('title').value;
+
+		if (title != '')
+		{
+			obj.title = title;
+		}
+
+		if (obj.actions == null)
+		{
+			obj.actions = [];
+		}
+
 		if (type == 'link')
 		{
 			obj.actions.push({open: document.getElementById('href').value});
@@ -169,6 +181,14 @@ function add(type)
 		}
 
 		document.getElementById('link').value = 'data:action/json,' + JSON.stringify(obj, null, 2);
+
+		var href = getLink();
+		document.getElementById('anchor').href = href;
+		document.getElementById('anchor').innerHTML = href.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;")
+			.replace(/'/g, "&#39;");
 	}
 	catch (e)
 	{
@@ -193,7 +213,7 @@ function clearInput()
 
 function resetLink()
 {
-	document.getElementById('link').value = 'data:action/json,' + JSON.stringify({"actions":[]}, null, 2);
+	document.getElementById('link').value = 'data:action/json,' + JSON.stringify({}, null, 2);
 };
 
 function validateLink(quiet)
@@ -263,6 +283,11 @@ function setCaretPosition(elemId, caretPos)
     }
 };
 
+function getLink()
+{
+	return 'data:action/json,' + JSON.stringify(JSON.parse(link.value.substring(17)));
+};
+
 function copyLink()
 {
 	try
@@ -271,7 +296,7 @@ function copyLink()
 		{
 			var link = document.getElementById('link');
 			var prev = link.value;
-			link.value = 'data:action/json,' + JSON.stringify(JSON.parse(link.value.substring(17)));
+			link.value = getLink();
 			link.focus();
 			link.select();
 			document.execCommand('copy');
@@ -299,6 +324,8 @@ function actionChanged()
 <body style="font-family:sans-serif;" onload="resetLink();actionChanged();document.getElementById('cells').focus();">
 	<span style="position:relative;display:inline-block;left:50%;transform:translate(-50%,0);">
 		<h2 style="text-align:center;width:100%;">Create Custom Link</h2>
+		<hr>
+		Title: <input type="text" size="16" id="title"></input>
 		<hr>
 		1. Action for Cell(s): <select id="action" onchange="actionChanged();">
 			<option value="toggle" selected>Toggle</option>
@@ -356,6 +383,8 @@ function actionChanged()
 		<button onclick="resetLink();return false;">Reset Link</button>
 		<button onclick="copyLink();return false;"><b>Copy Link</b></button>
 		<span id="confirmation" style="display:none;font-size:10pt;padding:3px;font-weight:bold;"></span>
+		<br><br>
+		<a id="anchor" href="#" onclick="copyLink();return false;"></a>
 	</span>
 </body>
 </html>
