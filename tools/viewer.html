@@ -22,9 +22,7 @@ function create()
 		area.style.display = 'none';
 		area.innerHTML = '';
 		a.innerHTML = '';
-		
-		var link = 'https://www.draw.io';
-		
+
 		if (url.substring(0, 32) == 'https://drive.google.com/file/d/')
 		{
 			var id = url.substring(32, url.lastIndexOf('/'));
@@ -33,16 +31,19 @@ function create()
 		
 		if (document.getElementById('iframe').checked)
 		{
+			var link = 'https://viewer.diagrams.net';
 			area.style.display = '';
 			area.appendChild(document.createTextNode(
 				'<iframe frameborder="0" style="width:100%;height:' +
 				document.getElementById('height').value + ';" src="' +
-				link + '?lightbox=1#U' + encodeURIComponent(url) + '"></iframe>'));
+				link + '?#U' + encodeURIComponent(url) + '"></iframe>'));
 			area.focus();
 			document.execCommand('selectAll');
 		}
 		else
 		{
+			var link = 'https://app.diagrams.net';
+
 			if (document.getElementById('lightbox').checked)
 			{
 				link += '?lightbox=1&edit=_blank';
