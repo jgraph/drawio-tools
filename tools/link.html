@@ -349,6 +349,9 @@ function actionChanged()
 		2. Cells/Layers: <input type="text" size="60" id="cells" placeholder="1 2 3"></input> Space-separated list of cell or layer IDs, * for all
 		<br><br>
 		3. Tags: <input type="text" size="60" id="tags" placeholder="water pipes"></input> Space-separated list of tags, * for all
+		<br>
+		<small>This will find the cells that have <i>all</i> given tags and change their visible state.<br>
+		Use <i>Add Tags</i> below to set the visible state of the tags instead.</small>
 		<br><br>
 		4. Exclude Cells/Layers: <input type="text" size="60" id="exclude" placeholder="1 2 3"></input> Space-separated list of cell or layer IDs
 		<br><br>
@@ -371,7 +374,9 @@ function actionChanged()
 		&nbsp;Toggle: <input type="text" size="16" id="toggleTags"></input>
 		&nbsp;Hidden: <input type="text" size="16" id="hiddenTags"></input>
 		&nbsp;Visible: <input type="text" size="16" id="visibleTags"></input> Space-separated list of tags, * for all
-		<br><hr>
+		<br>
+		<small>This will set the visible state of the given tags in the current view.</small>
+		<hr>
 		<button onclick="clearInput();return false;">Clear Input</button>
 		<br><hr>
 		Custom Link:
