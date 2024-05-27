@@ -416,10 +416,10 @@ function correctMxFile()
 {
   try
   {
-    var value = document.getElementById('textarea').value;
-
+    var value = document.getElementById('textarea').value.trim();
+    
     // Checks if file ends with </mxfile>
-    if (value.substring(value.length - 8) != '</mxfile>')
+    if (value.substring(value.length - 9) != '</mxfile>')
     {
       // Finds last </diagram>
       var index = value.lastIndexOf('</diagram>');
@@ -432,6 +432,14 @@ function correctMxFile()
         document.getElementById('textarea').value = value;
         alert('File corrected');
       }
+      else
+      {
+        alert('Invalid file');
+      }
+    }
+    else
+    {
+      alert('File already correct');
     }
   }
   catch (e)
@@ -445,7 +453,7 @@ function download()
 {
   var a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([document.getElementById('textarea').value], {type: 'text/plain'}));
-  a.download = 'download.txt';
+  a.download = 'download.drawio';
   document.body.appendChild(a);
   a.click();
 };
