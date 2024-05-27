@@ -411,6 +411,44 @@ function checkMxFile()
     alert(e.message);
   }
 };
+
+function correctMxFile()
+{
+  try
+  {
+    var value = document.getElementById('textarea').value;
+
+    // Checks if file ends with </mxfile>
+    if (value.substring(value.length - 8) != '</mxfile>')
+    {
+      // Finds last </diagram>
+      var index = value.lastIndexOf('</diagram>');
+
+      // Replaces content from last </diagram> to end of file with </mxfile>
+      if (index > 0)
+      {
+        value = value.substring(0, index + 10) + '</mxfile>';
+
+        document.getElementById('textarea').value = value;
+        alert('File corrected');
+      }
+    }
+  }
+  catch (e)
+  {
+    alert(e.message);
+  }
+};
+
+
+function download()
+{
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([document.getElementById('textarea').value], {type: 'text/plain'}));
+  a.download = 'download.txt';
+  document.body.appendChild(a);
+  a.click();
+};
 //]]>
 </script>
 </head>
@@ -438,7 +476,10 @@ function checkMxFile()
     <button onclick="formatJson(2);return false;">Format JSON</button>
     <button onclick="formatJson();return false;">Normalize JSON</button>
     <button onclick="jsVar();return false;">JS variable</button>
+    <br>
     <button onclick="checkMxFile();return false;">Check mxFile</button>
+    <button onclick="correctMxFile();return false;">Correct mxFile</button>
+    <button onclick="download();return false;">Download</button>
 <script type="text/javascript">
 //<![CDATA[
 // Enables dropping files
