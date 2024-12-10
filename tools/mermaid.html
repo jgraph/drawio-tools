@@ -11,7 +11,8 @@ function create()
 {
   var value = document.getElementById('textarea').value;
   var link = 'https://www.draw.io/?create=' + encodeURIComponent(JSON.stringify({type: 'mermaid', data: value}));
-  document.getElementById('link').innerHTML = '<a href="' + link + '" target="_blank">Open in draw.io</a>';
+  document.getElementById('link').innerHTML = '<a href="' + link + '" target="_blank">Link</a>';
+  window.open(link);
 };
 //]]>
 </script>
@@ -20,7 +21,7 @@ function create()
   <h2>Create draw.io diagram from Mermaid diagram definition:</h2>
   <textarea rows="20" cols="80" id="textarea" placeholder="Drop files here or enter text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
   <br/><br/>
-  <button onclick="create();return false;">Create</button>
+  <button onclick="create();return false;">Open in draw.io</button>
   <span style="margin-left:4px;" id="link"></span>
 <script type="text/javascript">
 //<![CDATA[
