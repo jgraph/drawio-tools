@@ -1,0 +1,64 @@
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge" ><![endif]-->
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Inflate/deflate, URL encode/decode</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<script type="text/javascript">
+//<![CDATA[
+function create()
+{
+  var value = document.getElementById('textarea').value;
+  var link = 'https://www.draw.io/?create=' + encodeURIComponent(JSON.stringify({type: 'mermaid', data: value}));
+  document.getElementById('link').innerHTML = '<a href="' + link + '" target="_blank">Open in draw.io</a>';
+};
+//]]>
+</script>
+</head>
+<body style="color-scheme:light dark;">
+  <h2>Create draw.io diagram from Mermaid diagram definition:</h2>
+  <textarea rows="20" cols="80" id="textarea" placeholder="Drop files here or enter text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+  <br/><br/>
+  <button onclick="create();return false;">Create</button>
+  <span style="margin-left:4px;" id="link"></span>
+<script type="text/javascript">
+//<![CDATA[
+// Enables dropping files
+if (window.File != null && window.FileReader != null && window.FileList != null)
+{
+    function handleDrop(evt)
+    {
+        evt.stopPropagation();
+        evt.preventDefault();
+
+        if (evt.dataTransfer.files.length > 0)
+        {
+            var file = evt.dataTransfer.files[0];
+
+            var reader = new FileReader();
+            reader.onload = function (e)
+            {
+                evt.target.value = e.target.result;
+            };
+            reader.readAsText(file);
+        }
+    };
+
+    function handleDragOver(evt)
+    {
+        evt.stopPropagation();
+        evt.preventDefault();
+    };
+
+    // Setup the dnd listeners.
+    var textarea = document.getElementById('textarea');
+
+    textarea.addEventListener('dragover', handleDragOver, false);
+    textarea.addEventListener('drop', handleDrop, false);
+}
+//]]>
+</script>
+</form>
+</body>
+</html>
