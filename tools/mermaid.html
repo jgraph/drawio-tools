@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Inflate/deflate, URL encode/decode</title>
+  <title>Mermaid to draw.io</title>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <script type="text/javascript">
@@ -10,19 +10,27 @@
 function create()
 {
   var value = document.getElementById('textarea').value;
-  var prefix = (window.location.search == '?dev=1') ? 'https://test.draw.io/?dev=1&' : 'https://www.draw.io/?';
-  var link = prefix + 'create=' + encodeURIComponent(JSON.stringify({type: 'mermaid', data: value}));
-  document.getElementById('link').innerHTML = '<a href="' + link + '" target="_blank">Link</a>';
-  window.open(link);
+
+  if (value == null || value.length == 0)
+  {
+    document.getElementById('link').innerHTML = 'No input';
+  }
+  else
+  {
+    var prefix = (window.location.search == '?dev=1') ? 'https://test.draw.io/?dev=1&' : 'https://www.draw.io/?';
+    var link = prefix + 'create=' + encodeURIComponent(JSON.stringify({type: 'mermaid', data: value}));
+    document.getElementById('link').innerHTML = '<a href="' + link + '" target="_blank">Link</a>';
+    window.open(link);
+  }
 };
 //]]>
 </script>
 </head>
 <body style="color-scheme:light dark;">
-  <h2>Create draw.io diagram from Mermaid diagram definition:</h2>
+  <h2>Mermaid diagram</h2>
   <textarea rows="20" cols="80" id="textarea" placeholder="Drop files here or enter text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
   <br/><br/>
-  <button onclick="create();return false;">Open in draw.io</button>
+  <button onclick="create();return false;">Create draw.io diagram</button>
   <span style="margin-left:4px;" id="link"></span>
 <script type="text/javascript">
 //<![CDATA[
