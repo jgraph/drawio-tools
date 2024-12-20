@@ -72,6 +72,7 @@ function preview()
     'https://test.draw.io/?dev=1&lightbox=1&border=10&' :
     'https://www.draw.io/?lightbox=1&border=10&';
   var link = prefix + 'create=' + encodeURIComponent(JSON.stringify({type: 'mermaid', data: value}));
+  document.getElementById('preview').removeAttribute('srcdoc');
   document.getElementById('preview').src = link;
   prefix = (urlParams['dev'] == '1') ? 'https://test.draw.io/?dev=1&' : 'https://www.draw.io/?';
   link = prefix + 'create=' + encodeURIComponent(JSON.stringify({type: 'mermaid', data: value}));
@@ -86,11 +87,11 @@ function preview()
     <option value="gemini">Gemini</option>
   </select> API Key: <input size="50" id="apikey">
   <br><br>
-  <textarea rows="3" cols="80" id="prompt" placeholder="Prompt" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">five tier sequence diagram on how to order fast food online</textarea>
+  <textarea rows="3" cols="80" id="prompt" placeholder="Diagram description, eg. five tier sequence diagram on how to order fast food online" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
   <br/>
   <button id="generate" onclick="generate();return false;">Generate</button><br/><br/>
   <textarea rows="19" cols="36" id="mermaid" placeholder="Mermaid Syntax" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
-  <iframe id="preview" width="340" height="298" frameborder="0" style="border:1px solid gray;"></iframe>
+  <iframe id="preview" srcdoc="<div style='color:gray';>Preview</div>" width="340" height="298" frameborder="0" style="border:1px solid gray;resize:both;"></iframe>
   <br/>
   <button onclick="preview();return false;">Update</button>
   <span style="margin-left:4px;" id="link"></span>
