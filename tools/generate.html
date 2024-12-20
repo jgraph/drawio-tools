@@ -1,0 +1,168 @@
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge" ><![endif]-->
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Generate draw.io diagram</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<script type="text/javascript">
+//<![CDATA[
+
+function replaceEscapes() {
+    var input = document.getElementById('textarea').value;
+    // Replace Unicode escape sequences
+    input = input.replace(/\\u([0-9A-Fa-f]{4})/g, (match, group) => 
+        String.fromCharCode(parseInt(group, 16))
+    );
+    // Replace newline escape sequences
+    document.getElementById('textarea').value = input.replace(/\\n/g, '\n');
+}
+
+function generate()
+{
+  document.getElementById('generate').disabled = true;
+  async function sendPostRequest(url, data) {
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' // Specify JSON content
+            },
+            body: JSON.stringify(data) // Convert data to JSON string
+        });
+
+        document.getElementById('generate').disabled = false;
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const jsonResponse = await response.json(); // Parse the JSON response
+        return jsonResponse;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error; // Re-throw the error for further handling
+    }
+  }
+
+  var apikey = document.getElementById('apikey').value;
+  var prompt = document.getElementById('prompt').value;
+
+  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apikey;
+  sendPostRequest(url, {contents:
+    [{parts:
+      [{text: 'Write the declaration code for a ' + prompt +
+      ' using correct MermaidJS syntax and do not provide additional text in your response'}]
+    }]}).then(function(response) {
+      var value = extractMermaid(response.candidates[0].content.parts[0].text);
+      document.getElementById('mermaid').value = value;
+      preview();
+    });
+};
+
+function extractMermaid(input)
+{
+  return input.replace(/^```mermaid\n/, '').replace(/\n```\n$/, '');
+};
+
+function preview()
+{
+  var value = document.getElementById('mermaid').value;
+  var prefix = (urlParams['dev'] == '1') ?
+    'https://test.draw.io/?dev=1&lightbox=1&border=10&' :
+    'https://www.draw.io/?lightbox=1&border=10&';
+  var link = prefix + 'create=' + encodeURIComponent(JSON.stringify({type: 'mermaid', data: value}));
+  document.getElementById('preview').src = link;
+  prefix = (urlParams['dev'] == '1') ? 'https://test.draw.io/?dev=1&' : 'https://www.draw.io/?';
+  link = prefix + 'create=' + encodeURIComponent(JSON.stringify({type: 'mermaid', data: value}));
+  document.getElementById('link').innerHTML = '<a href="' + link + '" target="_blank">Open in draw.io</a>';
+};
+//]]>
+</script>
+</head>
+<body style="color-scheme:light dark;">
+  <h2>Generate diagram</h2>
+  Engine: <select id="engine">
+    <option value="gemini">Gemini</option>
+  </select> API Key: <input size="50" id="apikey">
+  <br><br>
+  <textarea rows="3" cols="80" id="prompt" placeholder="Prompt" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">five tier sequence diagram on how to order fast food online</textarea>
+  <br/>
+  <button id="generate" onclick="generate();return false;">Generate</button><br/><br/>
+  <textarea rows="19" cols="36" id="mermaid" placeholder="Mermaid Syntax" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+  <iframe id="preview" width="340" height="298" frameborder="0" style="border:1px solid gray;"></iframe>
+  <br/>
+  <button onclick="preview();return false;">Update</button>
+  <span style="margin-left:4px;" id="link"></span>
+<script type="text/javascript">
+//<![CDATA[
+// Enables dropping files
+var urlParams = (function(url) {
+	var result = new Object();
+	var idx = url.lastIndexOf('?');
+
+	if (idx > 0) {
+		var params = url.substring(idx + 1).split('&');
+
+		for ( var i = 0; i < params.length; i++) {
+			idx = params[i].indexOf('=');
+
+			if (idx > 0) {
+				result[params[i].substring(0, idx)] = params[i].substring(idx + 1);
+			}
+		}
+	}
+
+	return result;
+})(window.location.href);
+
+document.getElementById('apikey').value = urlParams['key'];
+
+if (window.File != null && window.FileReader != null && window.FileList != null)
+{
+    function handleDrop(evt)
+    {
+        evt.stopPropagation();
+        evt.preventDefault();
+
+        if (evt.dataTransfer.files.length > 0)
+        {
+            var file = evt.dataTransfer.files[0];
+
+            var reader = new FileReader();
+            reader.onload = function (e)
+            {
+                evt.target.value = e.target.result;
+            };
+            reader.readAsText(file);
+        }
+    };
+
+    function handleDragOver(evt)
+    {
+        evt.stopPropagation();
+        evt.preventDefault();
+    };
+
+    // Setup the dnd listeners.
+    var textarea = document.getElementById('prompt');
+    textarea.addEventListener('dragover', handleDragOver, false);
+    textarea.addEventListener('drop', handleDrop, false);
+
+    var textarea = document.getElementById('mermaid');
+    textarea.addEventListener('dragover', handleDragOver, false);
+    textarea.addEventListener('drop', handleDrop, false);
+
+    // Invoke generate on enter key
+    document.getElementById('prompt').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        generate();
+        e.preventDefault();
+      }
+    });
+}
+//]]>
+</script>
+</form>
+</body>
+</html>
