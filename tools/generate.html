@@ -38,6 +38,9 @@
         fill="currentColor" />
     </svg>
     <span style="font-family:Helvetica;font-weight:700;font-size:20px;margin-left:4px;">draw.io</span>
+    <a style="margin-left:auto;" href="https://github.com/jgraph/drawio-tools/discussions/3" target="_blank">
+      <img  style="opacity:0.6;height:16px;width:16px;filter:invert(1);" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJub25lIiBkPSJNMCAwaDI0djI0SDB6Ii8+PHBhdGggZD0iTTExIDE4aDJ2LTJoLTJ2MnptMS0xNkM2LjQ4IDIgMiA2LjQ4IDIgMTJzNC40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnptMCAxOGMtNC40MSAwLTgtMy41OS04LThzMy41OS04IDgtOCA4IDMuNTkgOCA4LTMuNTkgOC04IDh6bTAtMTRjLTIuMjEgMC00IDEuNzktNCA0aDJjMC0xLjEuOS0yIDItMnMyIC45IDIgMmMwIDItMyAxLjc1LTMgNWgyYzAtMi4yNSAzLTIuNSAzLTUgMC0yLjIxLTEuNzktNC00LTR6Ii8+PC9zdmc+" border="0">
+    </a>
   </div>
   <div style="display:block;align-items:center;padding:20px;">
     <textarea id="prompt"
@@ -231,6 +234,11 @@
 
       if (urlParams['engine'] != null) {
         document.getElementById('engine').value = urlParams['engine'];
+      }
+
+      if (urlParams['prompt'] != null) {
+        document.getElementById('prompt').value = urlParams['prompt'];
+        generate();
       }
     }
     //]]>
