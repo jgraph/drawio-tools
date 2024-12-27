@@ -1,169 +1,239 @@
-<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge" ><![endif]-->
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Generate draw.io diagram</title>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<script type="text/javascript">
-//<![CDATA[
-
-function replaceEscapes() {
-    var input = document.getElementById('textarea').value;
-    // Replace Unicode escape sequences
-    input = input.replace(/\\u([0-9A-Fa-f]{4})/g, (match, group) => 
-        String.fromCharCode(parseInt(group, 16))
-    );
-    // Replace newline escape sequences
-    document.getElementById('textarea').value = input.replace(/\\n/g, '\n');
-}
-
-function generate()
-{
-  document.getElementById('generate').disabled = true;
-  async function sendPostRequest(url, data) {
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json' // Specify JSON content
-            },
-            body: JSON.stringify(data) // Convert data to JSON string
-        });
-
-        document.getElementById('generate').disabled = false;
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const jsonResponse = await response.json(); // Parse the JSON response
-        return jsonResponse;
-    } catch (error) {
-        console.error('Error:', error);
-        throw error; // Re-throw the error for further handling
+  <title>Generate draw.io Diagrams</title>
+  <meta charset="utf-8" />
+  <style type="text/css">
+    body {
+      color-scheme: dark;
+      background: light-dark(rgb(255, 255, 255), rgb(18, 18, 18));
+      color: light-dark(rgb(18, 18, 18), white);
+      margin: 10px 5% 10px 5%;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      font-size: 16px;
     }
-  }
-
-  var apikey = document.getElementById('apikey').value;
-  var prompt = document.getElementById('prompt').value;
-
-  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apikey;
-  sendPostRequest(url, {contents:
-    [{parts:
-      [{text: 'Write the declaration code for a ' + prompt +
-      ' using correct MermaidJS syntax and do not provide additional text in your response'}]
-    }]}).then(function(response) {
-      var value = extractMermaid(response.candidates[0].content.parts[0].text);
-      document.getElementById('mermaid').value = value;
-      preview();
-    });
-};
-
-function extractMermaid(input)
-{
-  return input.replace(/^```mermaid\n/, '').replace(/\n```\n$/, '');
-};
-
-function preview()
-{
-  var value = document.getElementById('mermaid').value;
-  var prefix = (urlParams['dev'] == '1') ?
-    'https://test.draw.io/?dev=1&lightbox=1&border=10&' :
-    'https://www.draw.io/?lightbox=1&border=10&';
-  var link = prefix + 'create=' + encodeURIComponent(JSON.stringify({type: 'mermaid', data: value}));
-  document.getElementById('preview').removeAttribute('srcdoc');
-  document.getElementById('preview').src = link;
-  prefix = (urlParams['dev'] == '1') ? 'https://test.draw.io/?dev=1&' : 'https://www.draw.io/?';
-  link = prefix + 'create=' + encodeURIComponent(JSON.stringify({type: 'mermaid', data: value}));
-  document.getElementById('link').innerHTML = '<a href="' + link + '" target="_blank">Open in draw.io</a>';
-};
-//]]>
-</script>
+    button {
+      padding: 10px;
+      background: #1a4cad;
+      border: none;
+      border-radius: 4px;
+    }
+  </style>
 </head>
-<body style="color-scheme:light dark;">
-  <h2>Generate diagram</h2>
-  Engine: <select id="engine">
-    <option value="gemini">Gemini</option>
-  </select> API Key: <input size="50" id="apikey">
-  <br><br>
-  <textarea rows="3" cols="80" id="prompt" placeholder="Diagram description, eg. five tier sequence diagram on how to order fast food online" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
-  <br/>
-  <button id="generate" onclick="generate();return false;">Generate</button><br/><br/>
-  <textarea rows="19" cols="36" id="mermaid" placeholder="Mermaid Syntax" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
-  <iframe id="preview" srcdoc="<div style='color:gray';>Preview</div>" width="340" height="298" frameborder="0" style="border:1px solid gray;resize:both;"></iframe>
-  <br/>
-  <button onclick="preview();return false;">Update</button>
-  <span style="margin-left:4px;" id="link"></span>
-<script type="text/javascript">
-//<![CDATA[
-// Enables dropping files
-var urlParams = (function(url) {
-	var result = new Object();
-	var idx = url.lastIndexOf('?');
+<body>
+  <div style="display:flex;opacity:0.9;align-items:center;padding:20px 20px 10px 20px;">
+    <svg viewBox="24 26 68 68" style="width:28px;display:inline-block;">
+      <line y2="72.394" x2="41.061" y1="43.384" x1="58.069" stroke-miterlimit="10" stroke-width="3.5528"
+        stroke="currentColor" fill="none" />
+      <line y2="72.394" x2="75.076" y1="43.384" x1="58.068" stroke-miterlimit="10" stroke-width="3.5008"
+        stroke="currentColor" fill="none" />
+      <path
+        d="M52.773,77.084c0,1.954-1.599,3.553-3.553,3.553H36.999c-1.954,0-3.553-1.599-3.553-3.553v-9.379c0-1.954,1.599-3.553,3.553-3.553h12.222c1.954,0,3.553,1.599,3.553,3.553V77.084z"
+        fill="currentColor" />
+      <path
+        d="M67.762,48.074c0,1.954-1.599,3.553-3.553,3.553H51.988c-1.954,0-3.553-1.599-3.553-3.553v-9.379c0-1.954,1.599-3.553,3.553-3.553H64.21c1.954,0,3.553,1.599,3.553,3.553V48.074z"
+        fill="currentColor" />
+      <path
+        d="M82.752,77.084c0,1.954-1.599,3.553-3.553,3.553H66.977c-1.954,0-3.553-1.599-3.553-3.553v-9.379c0-1.954,1.599-3.553,3.553-3.553h12.222c1.954,0,3.553,1.599,3.553,3.553V77.084z"
+        fill="currentColor" />
+    </svg>
+    <span style="font-family:Helvetica;font-weight:700;font-size:20px;margin-left:4px;">draw.io</span>
+  </div>
+  <div style="display:block;align-items:center;padding:20px;">
+    <textarea id="prompt"
+      style="width:100%;height:60px;font-family:inherit;font-size:inherit;padding:10px;box-sizing:border-box;resize:vertical;"
+      placeholder="Diagram description, eg. five tier sequence diagram on how to order fast food online"
+      spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+    <div style="position:relative;display:flex;align-items:center;justify-items:stretch;padding-top:10px;">
+      <div style="margin-left:auto;opacity:0.5;">
+        Engine:
+        <select style="padding:4px;border-radius:4px;" id="engine">
+          <option value="gemini">Gemini</option>
+          <option value="chatgpt">ChatGPT</option>
+        </select>
+      </div>
+      <div style="opacity:0.5;margin-left:20px;border-radius:4px;">
+        Key: <input style="padding:4px;" id="apikey">
+      </div>
+      <button style="position:relative;margin-left:20px;" id="generate" onclick="generate();return false;">
+        Generate Diagram
+      </button>
+    </div>
+  </div>
+  <div style="display:block;align-items:center;padding:20px;">
+    <div
+      style="position:relative;height:640px;border:1px solid rgb(133, 133, 133);resize:vertical;overflow:auto;box-sizing:border-box;background-repeat:no-repeat;background-position:center center;background-image:url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPCFET0NUWVBFIHN2ZyBQVUJMSUMgIi0vL1czQy8vRFREIFNWRyAxLjEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkIj4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHdpZHRoPSI2MHB4IiBoZWlnaHQ9IjMwcHgiIHZpZXdCb3g9Ii0wLjUgLTAuNSA2MCAzMCIgY2xhc3M9ImdlLWV4cG9ydC1zdmctZGFyayI+PGRlZnM+PHN0eWxlIHR5cGU9InRleHQvY3NzIj5zdmcuZ2UtZXhwb3J0LXN2Zy1kYXJrOm5vdChtangtY29udGFpbmVyICZndDsgc3ZnKSB7IGZpbHRlcjogaW52ZXJ0KDEwMCUpIGh1ZS1yb3RhdGUoMTgwZGVnKTsgfSYjeGE7c3ZnLmdlLWV4cG9ydC1zdmctZGFyayBmb3JlaWduT2JqZWN0IGltZywmI3hhO3N2Zy5nZS1leHBvcnQtc3ZnLWRhcmsgaW1hZ2U6bm90KHN2Zy5nZS1leHBvcnQtc3ZnLWRhcmsgc3dpdGNoIGltYWdlKSwmI3hhO3N2Zy5nZS1leHBvcnQtc3ZnLWRhcmsgc3ZnOm5vdChtangtY29udGFpbmVyICZndDsgc3ZnKSYjeGE7eyBmaWx0ZXI6IGludmVydCgxMDAlKSBodWUtcm90YXRlKDE4MGRlZykgfTwvc3R5bGU+PC9kZWZzPjxnPjxnIGRhdGEtY2VsbC1pZD0iMCI+PGcgZGF0YS1jZWxsLWlkPSIxIj48ZyBkYXRhLWNlbGwtaWQ9IkI0WHVrdVk0T2NSTERVNlBqQ0Y4LTEiPjxnPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSI2MCIgaGVpZ2h0PSIzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJub25lIiBwb2ludGVyLWV2ZW50cz0iYWxsIi8+PC9nPjxnPjxnIGZpbGw9InJnYigwLCAwLCAwKSIgZm9udC1mYW1pbHk9IiZxdW90O0hlbHZldGljYSZxdW90OyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNnB4IiBvcGFjaXR5PSIwLjUiPjx0ZXh0IHg9IjI5LjUiIHk9IjIxLjUiPlByZXZpZXc8L3RleHQ+PC9nPjwvZz48L2c+PC9nPjwvZz48L2c+PC9zdmc+);">
+      <iframe id="preview" allowtransparency="true"
+        style="border:5px solid transparent;box-sizing:border-box;position:absolute;width:100%;height:100%;"></iframe>
+    </div>
+    <div style="position:relative;display:flex;align-items:center;justify-items:stretch;padding-top:10px;">
+      <button disabled="disabled" style="position:relative;margin-left:auto;" id="edit">
+        Edit Diagram
+      </button>
+    </div>
+  </div>
+  <script type="text/javascript">
+    //<![CDATA[
+    var spin = 'url(data:image/svg+xml;base64,77u/PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyMDAgMjAwJz48Y2lyY2xlIGZpbGw9JyM4MDgwODAnIHN0cm9rZT0nIzgwODA4MCcgc3Ryb2tlLXdpZHRoPScxNScgcj0nMTUnIGN4PSczNScgY3k9JzEwMCcgZGF0YS1kYXJrcmVhZGVyLWlubGluZS1maWxsPScnIGRhdGEtZGFya3JlYWRlci1pbmxpbmUtc3Ryb2tlPScnIHN0eWxlPSctLWRhcmtyZWFkZXItaW5saW5lLWZpbGw6ICNmZjZkZmY7IC0tZGFya3JlYWRlci1pbmxpbmUtc3Ryb2tlOiAjZmY2ZGZmOyc+PGFuaW1hdGUgYXR0cmlidXRlTmFtZT0nY3gnIGNhbGNNb2RlPSdzcGxpbmUnIGR1cj0nNC4yJyB2YWx1ZXM9JzM1OzE2NTsxNjU7MzU7MzUnIGtleVNwbGluZXM9JzAgLjEgLjUgMTswIC4xIC41IDE7MCAuMSAuNSAxOzAgLjEgLjUgMScgcmVwZWF0Q291bnQ9J2luZGVmaW5pdGUnIGJlZ2luPScwJz48L2FuaW1hdGU+PC9jaXJjbGU+PGNpcmNsZSBmaWxsPScjODA4MDgwJyBzdHJva2U9JyM4MDgwODAnIHN0cm9rZS13aWR0aD0nMTUnIG9wYWNpdHk9Jy44JyByPScxNScgY3g9JzM1JyBjeT0nMTAwJyBkYXRhLWRhcmtyZWFkZXItaW5saW5lLWZpbGw9JycgZGF0YS1kYXJrcmVhZGVyLWlubGluZS1zdHJva2U9Jycgc3R5bGU9Jy0tZGFya3JlYWRlci1pbmxpbmUtZmlsbDogI2ZmNmRmZjsgLS1kYXJrcmVhZGVyLWlubGluZS1zdHJva2U6ICNmZjZkZmY7Jz48YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdjeCcgY2FsY01vZGU9J3NwbGluZScgZHVyPSc0LjInIHZhbHVlcz0nMzU7MTY1OzE2NTszNTszNScga2V5U3BsaW5lcz0nMCAuMSAuNSAxOzAgLjEgLjUgMTswIC4xIC41IDE7MCAuMSAuNSAxJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScgYmVnaW49JzAuMDUnPjwvYW5pbWF0ZT48L2NpcmNsZT48Y2lyY2xlIGZpbGw9JyM4MDgwODAnIHN0cm9rZT0nIzgwODA4MCcgc3Ryb2tlLXdpZHRoPScxNScgb3BhY2l0eT0nLjYnIHI9JzE1JyBjeD0nMzUnIGN5PScxMDAnIGRhdGEtZGFya3JlYWRlci1pbmxpbmUtZmlsbD0nJyBkYXRhLWRhcmtyZWFkZXItaW5saW5lLXN0cm9rZT0nJyBzdHlsZT0nLS1kYXJrcmVhZGVyLWlubGluZS1maWxsOiAjZmY2ZGZmOyAtLWRhcmtyZWFkZXItaW5saW5lLXN0cm9rZTogI2ZmNmRmZjsnPjxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J2N4JyBjYWxjTW9kZT0nc3BsaW5lJyBkdXI9JzQuMicgdmFsdWVzPSczNTsxNjU7MTY1OzM1OzM1JyBrZXlTcGxpbmVzPScwIC4xIC41IDE7MCAuMSAuNSAxOzAgLjEgLjUgMTswIC4xIC41IDEnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJyBiZWdpbj0nLjEnPjwvYW5pbWF0ZT48L2NpcmNsZT48Y2lyY2xlIGZpbGw9JyM4MDgwODAnIHN0cm9rZT0nIzgwODA4MCcgc3Ryb2tlLXdpZHRoPScxNScgb3BhY2l0eT0nLjQnIHI9JzE1JyBjeD0nMzUnIGN5PScxMDAnIGRhdGEtZGFya3JlYWRlci1pbmxpbmUtZmlsbD0nJyBkYXRhLWRhcmtyZWFkZXItaW5saW5lLXN0cm9rZT0nJyBzdHlsZT0nLS1kYXJrcmVhZGVyLWlubGluZS1maWxsOiAjZmY2ZGZmOyAtLWRhcmtyZWFkZXItaW5saW5lLXN0cm9rZTogI2ZmNmRmZjsnPjxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J2N4JyBjYWxjTW9kZT0nc3BsaW5lJyBkdXI9JzQuMicgdmFsdWVzPSczNTsxNjU7MTY1OzM1OzM1JyBrZXlTcGxpbmVzPScwIC4xIC41IDE7MCAuMSAuNSAxOzAgLjEgLjUgMTswIC4xIC41IDEnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJyBiZWdpbj0nLjE1Jz48L2FuaW1hdGU+PC9jaXJjbGU+PGNpcmNsZSBmaWxsPScjODA4MDgwJyBzdHJva2U9JyM4MDgwODAnIHN0cm9rZS13aWR0aD0nMTUnIG9wYWNpdHk9Jy4yJyByPScxNScgY3g9JzM1JyBjeT0nMTAwJyBkYXRhLWRhcmtyZWFkZXItaW5saW5lLWZpbGw9JycgZGF0YS1kYXJrcmVhZGVyLWlubGluZS1zdHJva2U9Jycgc3R5bGU9Jy0tZGFya3JlYWRlci1pbmxpbmUtZmlsbDogI2ZmNmRmZjsgLS1kYXJrcmVhZGVyLWlubGluZS1zdHJva2U6ICNmZjZkZmY7Jz48YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdjeCcgY2FsY01vZGU9J3NwbGluZScgZHVyPSc0LjInIHZhbHVlcz0nMzU7MTY1OzE2NTszNTszNScga2V5U3BsaW5lcz0nMCAuMSAuNSAxOzAgLjEgLjUgMTswIC4xIC41IDE7MCAuMSAuNSAxJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScgYmVnaW49Jy4yJz48L2FuaW1hdGU+PC9jaXJjbGU+PC9zdmc+)';
 
-	if (idx > 0) {
-		var params = url.substring(idx + 1).split('&');
+    function generate() {
+      var engine = document.getElementById('engine').value;
+      var apikey = document.getElementById('apikey').value;
+      var prompt = document.getElementById('prompt').value;
 
-		for ( var i = 0; i < params.length; i++) {
-			idx = params[i].indexOf('=');
+      document.getElementById('edit').disabled = true;
+      document.getElementById('generate').disabled = true;
+      document.getElementById('preview').removeAttribute('src');
+      document.getElementById('preview').style.display = 'none';
+      document.getElementById('preview').parentNode.style.backgroundImage = spin;
 
-			if (idx > 0) {
-				result[params[i].substring(0, idx)] = params[i].substring(idx + 1);
-			}
-		}
-	}
+      async function sendPostRequest(url, data) {
+        try {
+          console.log('Request:', url, data);
 
-	return result;
-})(window.location.href);
+          var headers = {
+            'Content-Type': 'application/json'
+          };
 
-document.getElementById('apikey').value = urlParams['key'];
+          if (engine == 'chatgpt') {
+            headers['Authorization'] = 'Bearer ' + apikey;
+          }
 
-if (window.File != null && window.FileReader != null && window.FileList != null)
-{
-    function handleDrop(evt)
-    {
-        evt.stopPropagation();
-        evt.preventDefault();
+          var response = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(data)
+          });
 
-        if (evt.dataTransfer.files.length > 0)
-        {
-            var file = evt.dataTransfer.files[0];
+          document.getElementById('generate').disabled = false;
 
-            var reader = new FileReader();
-            reader.onload = function (e)
-            {
-                evt.target.value = e.target.result;
-            };
-            reader.readAsText(file);
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          const jsonResponse = await response.json();
+
+          console.log('Response:', jsonResponse);
+
+          return jsonResponse;
+        } catch (error) {
+          console.error('Error:', error);
+          throw error;
         }
+      };
+
+      if (engine == 'gemini') {
+        var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apikey;
+        sendPostRequest(url, {
+          contents:
+            [{
+              parts:
+                [{
+                  text: 'Write the declaration code for a ' + prompt +
+                    ' using correct MermaidJS syntax and do not provide additional text in your response'
+                }]
+            }]
+        }).then(function (response) {
+          preview(extractMermaid(response.candidates[0].content.parts[0].text));
+        }).catch(function (error) {
+          document.getElementById('generate').disabled = false;
+          document.getElementById('preview').parentNode.style.backgroundImage = 'none';
+          alert('Error:' + error);
+        });
+      }
+      else if (engine == 'chatgpt') {
+        var url = 'https://api.openai.com/v1/chat/completions';
+        sendPostRequest(url, {
+          model: 'gpt-3.5-turbo',
+          messages: [{
+            'role': 'user', 'content': 'Write the declaration code for a ' + prompt +
+              ' using correct MermaidJS syntax and do not provide additional text in your response'
+          }]
+        }).then(function (response) {
+          preview(extractMermaid(response.choices[0].message.content));
+        });
+      }
     };
 
-    function handleDragOver(evt)
-    {
+    function extractMermaid(input) {
+      return input.replace(/^```mermaid\n/, '').replace(/\n```\n$/, '').replace(/\n```$/, '');
+    };
+
+    function preview(value) {
+      var params = 'lightbox=1&dark=1&border=10';
+      var prefix = (urlParams['dev'] == '1') ? 'https://test.draw.io/?dev=1&' : 'https://www.draw.io/?' + params;
+      var link = prefix + params + '&create=' + encodeURIComponent(JSON.stringify({ type: 'mermaid', data: value }));
+      document.getElementById('preview').src = link;
+      document.getElementById('preview').style.display = 'block';
+      document.getElementById('preview').parentNode.style.backgroundImage = 'none';
+      prefix = (urlParams['dev'] == '1') ? 'https://test.draw.io/?dev=1&' : 'https://www.draw.io/?';
+      link = prefix + 'create=' + encodeURIComponent(JSON.stringify({ type: 'mermaid', data: value }));
+      document.getElementById('edit').disabled = false;
+      document.getElementById('edit').onclick = function () { window.open(link); };
+    };
+
+    var urlParams = (function (url) {
+      var result = new Object();
+      var idx = url.lastIndexOf('#');
+
+      if (idx > 0) {
+        var params = url.substring(idx + 1).split('&');
+
+        for (var i = 0; i < params.length; i++) {
+          idx = params[i].indexOf('=');
+
+          if (idx > 0) {
+            result[params[i].substring(0, idx)] = params[i].substring(idx + 1);
+          }
+        }
+      }
+
+      return result;
+    })(window.location.href);
+
+    if (urlParams['key'] != null) {
+      document.getElementById('apikey').value = urlParams['key'];
+    }
+
+    if (window.File != null && window.FileReader != null && window.FileList != null) {
+      function handleDrop(evt) {
         evt.stopPropagation();
         evt.preventDefault();
-    };
 
-    // Setup the dnd listeners.
-    var textarea = document.getElementById('prompt');
-    textarea.addEventListener('dragover', handleDragOver, false);
-    textarea.addEventListener('drop', handleDrop, false);
+        if (evt.dataTransfer.files.length > 0) {
+          var file = evt.dataTransfer.files[0];
 
-    var textarea = document.getElementById('mermaid');
-    textarea.addEventListener('dragover', handleDragOver, false);
-    textarea.addEventListener('drop', handleDrop, false);
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            evt.target.value = e.target.result;
+          };
+          reader.readAsText(file);
+        }
+      };
 
-    // Invoke generate on enter key
-    document.getElementById('prompt').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        generate();
-        e.preventDefault();
+      function handleDragOver(evt) {
+        evt.stopPropagation();
+        evt.preventDefault();
+      };
+
+      // Setup the dnd listeners.
+      var textarea = document.getElementById('prompt');
+      textarea.addEventListener('dragover', handleDragOver, false);
+      textarea.addEventListener('drop', handleDrop, false);
+
+      // Invokes generate on enter key
+      document.getElementById('prompt').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+          generate();
+          e.preventDefault();
+        }
+      });
+
+      if (urlParams['engine'] != null) {
+        document.getElementById('engine').value = urlParams['engine'];
       }
-    });
-}
-//]]>
-</script>
-</form>
+    }
+    //]]>
+  </script>
 </body>
 </html>
