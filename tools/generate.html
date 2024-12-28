@@ -5,18 +5,26 @@
   <meta charset="utf-8" />
   <style type="text/css">
     body {
-      color-scheme: dark;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans",
+        Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
       background: light-dark(rgb(255, 255, 255), rgb(18, 18, 18));
       color: light-dark(rgb(18, 18, 18), white);
       margin: 10px 5% 10px 5%;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      color-scheme: dark;
       font-size: 16px;
     }
     button {
-      padding: 10px;
       background: #1a4cad;
-      border: none;
       border-radius: 4px;
+      padding: 10px;
+      border: none;
+    }
+    button, a, input, select {
+      cursor: default;
+      opacity: 0.9;
+    }
+    button:hover:not(:disabled), a:hover, input:hover, select:hover {
+      opacity: 1;
     }
   </style>
 </head>
@@ -38,7 +46,7 @@
         fill="currentColor" />
     </svg>
     <span style="font-family:Helvetica;font-weight:700;font-size:20px;margin-left:4px;">draw.io</span>
-    <a style="margin-left:auto;" href="https://github.com/jgraph/drawio-tools/discussions/3" target="_blank">
+    <a style="margin-left:auto;" href="https://github.com/jgraph/drawio-tools/discussions/3" title="Help" target="_blank">
       <img  style="opacity:0.6;height:16px;width:16px;filter:invert(1);" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJub25lIiBkPSJNMCAwaDI0djI0SDB6Ii8+PHBhdGggZD0iTTExIDE4aDJ2LTJoLTJ2MnptMS0xNkM2LjQ4IDIgMiA2LjQ4IDIgMTJzNC40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnptMCAxOGMtNC40MSAwLTgtMy41OS04LThzMy41OS04IDgtOCA4IDMuNTkgOCA4LTMuNTkgOC04IDh6bTAtMTRjLTIuMjEgMC00IDEuNzktNCA0aDJjMC0xLjEuOS0yIDItMnMyIC45IDIgMmMwIDItMyAxLjc1LTMgNWgyYzAtMi4yNSAzLTIuNSAzLTUgMC0yLjIxLTEuNzktNC00LTR6Ii8+PC9zdmc+" border="0">
     </a>
   </div>
@@ -48,21 +56,21 @@
       placeholder="Diagram description, eg. five tier sequence diagram on how to order fast food online or graph TD; A-->B; A-->C; B-->D; C-->D;"
       spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
     <div style="position:relative;display:flex;align-items:center;justify-items:stretch;padding-top:10px;">
-      <button style="position:relative;background:rgb(56, 56, 56);color:gray;" id="create" onclick="replaceEscapes();return false;">
+      <button style="position:relative;background:rgb(56, 56, 56);color:gray;" title="Unescape" id="create" onclick="replaceEscapes();return false;">
         Unescape
       </button>
       <div style="margin-left:auto;opacity:0.5;">
         Engine:
-        <select style="padding:2px 6px;border-radius:4px;" id="engine">
+        <select style="padding:2px 6px;border-radius:4px;" title="Engine" id="engine">
           <option value="gemini">Gemini</option>
           <option value="chatgpt">ChatGPT</option>
           <option value="mermaidjs">MermaidJS</option>
         </select>
       </div>
       <div style="opacity:0.5;margin-left:20px;border-radius:4px;">
-        Key: <input style="padding:2px 6px;" id="apikey">
+        Key: <input style="padding:2px 6px;" title="API Key" id="apikey">
       </div>
-      <button style="position:relative;margin-left:20px;" id="generate" onclick="generate();return false;">
+      <button style="position:relative;margin-left:20px;" title="Preview Diagram" id="generate" onclick="generate();return false;">
         Preview Diagram
       </button>
     </div>
@@ -74,7 +82,7 @@
         style="border:5px solid transparent;box-sizing:border-box;position:absolute;width:100%;height:100%;"></iframe>
     </div>
     <div style="position:relative;display:flex;align-items:center;justify-items:stretch;padding-top:10px;">
-      <button disabled="disabled" style="position:relative;margin-left:auto;" id="edit">
+      <button disabled="disabled" style="position:relative;margin-left:auto;" title="Edit Diagram" id="edit">
         Edit Diagram
       </button>
     </div>
@@ -98,15 +106,9 @@
       var apikey = document.getElementById('apikey').value;
       var prompt = document.getElementById('prompt').value;
 
-      document.getElementById('edit').disabled = true;
-      document.getElementById('generate').disabled = true;
-      document.getElementById('preview').removeAttribute('src');
-      document.getElementById('preview').style.display = 'none';
-      document.getElementById('preview').parentNode.style.backgroundImage = spin;
-
       async function sendPostRequest(url, data) {
         try {
-          console.log('Request:', url, data);
+          console.log('Request:', [url, data]);
 
           var headers = {
             'Content-Type': 'application/json'
@@ -128,7 +130,7 @@
 
           const jsonResponse = await response.json();
 
-          console.log('Response:', jsonResponse);
+          console.log('Response:', [jsonResponse]);
 
           return jsonResponse;
         } catch (error) {
@@ -137,64 +139,93 @@
         }
       };
 
-      if (engine == 'gemini') {
-        var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apikey;
-        sendPostRequest(url, {
-          contents:
-            [{
-              parts:
-                [{
-                  text: 'Write the declaration code for a ' + prompt +
-                    ' using correct MermaidJS syntax and do not provide additional text in your response'
-                }]
-            }]
-        }).then(function (response) {
-          preview(extractMermaid(response.candidates[0].content.parts[0].text));
-        }).catch(function (error) {
-          document.getElementById('generate').disabled = false;
-          document.getElementById('preview').parentNode.style.backgroundImage = 'none';
-          alert('Error:' + error);
-        });
-      }
-      else if (engine == 'chatgpt') {
-        var url = 'https://api.openai.com/v1/chat/completions';
-        sendPostRequest(url, {
-          model: 'gpt-3.5-turbo',
-          messages: [{
-            'role': 'user', 'content': 'Write the declaration code for a ' + prompt +
-              ' using correct MermaidJS syntax and do not provide additional text in your response'
-          }]
-        }).then(function (response) {
-          preview(extractMermaid(response.choices[0].message.content));
-        });
-      }
-      else if (engine == 'mermaidjs') {
-        preview(prompt);
+      if (engine != 'mermaidjs' && apikey == '') {
+        alert('API key is required for ' + engine);
       }
       else
       {
-        document.getElementById('generate').disabled = false;
-        document.getElementById('preview').parentNode.style.backgroundImage = 'none';
-        alert('Invalid engine');
+        document.getElementById('edit').disabled = true;
+        document.getElementById('generate').disabled = true;
+        document.getElementById('preview').removeAttribute('src');
+        document.getElementById('preview').style.display = 'none';
+        document.getElementById('preview').parentNode.style.backgroundImage = spin;
+
+        var aiprompt = (engine == 'chatgpt') ? 'Write a detailed and complex MermaidJS declaration for ' +
+          (prompt != '' ? prompt : 'random diagram') + ' and return only the valid MermaidJS syntax' :
+          'Create a diagram for ' + (prompt != '' ? prompt : 'something random') +
+          ' and return only the valid MermaidJS syntax';
+        
+        console.log('Prompt:', [aiprompt]);
+
+        if (engine == 'gemini') {
+          var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apikey;
+          sendPostRequest(url, {
+            contents:
+              [{
+                parts:
+                  [{
+                    text: aiprompt
+                  }]
+              }]
+          }).then(function (response) {
+            preview(extractCode(response.candidates[0].content.parts[0].text));
+          }).catch(function (error) {
+            document.getElementById('generate').disabled = false;
+            document.getElementById('preview').parentNode.style.backgroundImage = 'none';
+            alert('Error:' + error);
+          });
+        }
+        else if (engine == 'chatgpt') {
+          var url = 'https://api.openai.com/v1/chat/completions';
+          sendPostRequest(url, {
+            model: 'gpt-3.5-turbo',
+            messages: [{
+              'role': 'user', 'content': aiprompt
+            }]
+          }).then(function (response) {
+            preview(extractCode(response.choices[0].message.content));
+          });
+        }
+        else if (engine == 'mermaidjs') {
+          preview(prompt, engine);
+        }
+        else
+        {
+          document.getElementById('generate').disabled = false;
+          document.getElementById('preview').parentNode.style.backgroundImage = 'none';
+          alert('Invalid engine');
+        }
       }
     };
 
-    function extractMermaid(input) {
-      return input.replace(/^```mermaid\n/, '').replace(/\n```\n$/, '').replace(/\n```$/, '');
+    function extractCode(input) {
+      return input.replace(/^```mermaid\n/, '').replace(/^```xml\n/, '').
+        replace(/\n```\n$/, '').replace(/\n```$/, '');
     };
 
     function preview(value) {
-      var params = 'lightbox=1&dark=1&border=10';
-      var prefix = (urlParams['dev'] == '1') ? 'https://test.draw.io/?dev=1&' : 'https://www.draw.io/?' + params;
-      var link = prefix + params + '&create=' + encodeURIComponent(JSON.stringify({ type: 'mermaid', data: value }));
+      var params = 'lightbox=1&dark=1&border=10&';
+      var prefix = (urlParams['dev'] == '1') ?
+        'https://test.draw.io/?dev=1&' :
+        'https://www.draw.io/?' + params;
+      var create = 'create=' + encodeURIComponent(
+        JSON.stringify({type: 'mermaid', data: value}));
+      var link = prefix + params + create;
+
+      console.log('Result:', [value, link]);
+
       document.getElementById('preview').src = link;
       document.getElementById('preview').style.display = 'block';
       document.getElementById('preview').parentNode.style.backgroundImage = 'none';
-      prefix = (urlParams['dev'] == '1') ? 'https://test.draw.io/?dev=1&' : 'https://www.draw.io/?';
-      link = prefix + 'create=' + encodeURIComponent(JSON.stringify({ type: 'mermaid', data: value }));
+      prefix = (urlParams['dev'] == '1') ?
+        'https://test.draw.io/?dev=1&' :
+        'https://www.draw.io/?';
+      link = prefix + create;
       document.getElementById('edit').disabled = false;
       document.getElementById('generate').disabled = false;
-      document.getElementById('edit').onclick = function () { window.open(link); };
+      document.getElementById('edit').onclick = function () {
+        window.open(link);
+      };
     };
 
     var urlParams = (function (url) {
@@ -261,6 +292,10 @@
       if (urlParams['prompt'] != null) {
         document.getElementById('prompt').value = decodeURIComponent(urlParams['prompt']);
         generate();
+      }
+      else
+      {
+        document.getElementById('prompt').focus();
       }
     }
     //]]>
