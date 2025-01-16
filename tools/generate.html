@@ -181,8 +181,7 @@
     };
 
     function preview(value) {
-      var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      var params = 'lightbox=1&dark=' + ((dark) ? '1' : '0') + '&border=10&';
+      var params = 'lightbox=1&dark=auto&border=10&';
       var prefix = (urlParams['dev'] == '1') ?
         'https://test.draw.io/?dev=1&' :
         'https://www.draw.io/?' + params;
