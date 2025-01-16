@@ -27,7 +27,6 @@
 			textarea {
 				box-sizing: border-box;
 				font-family: monospace;
-				color: lightgray;
 				resize: vertical;
 				font-size: inherit;
 				border-radius: 4px;
@@ -373,7 +372,7 @@ function actionChanged()
 </head>
 <body style="color-scheme:light dark;font-family:sans-serif;" onload="resetLink();actionChanged();document.getElementById('cells').focus();">
 	<span style="position:relative;display:inline-block;left:50%;transform:translate(-50%,0);">
-		<div style="display:flex;align-items:center;">
+		<div style="display:flex;align-items:center;opacity:0.7;">
 			<svg viewBox="24 26 68 68" style="width:28px;display:inline-block;">
 				<line y2="72.394" x2="41.061" y1="43.384" x1="58.069" stroke-miterlimit="10" stroke-width="3.5528"
 				stroke="currentColor" fill="none" />
@@ -395,7 +394,6 @@ function actionChanged()
 				<img  style="opacity:0.6;height:16px;width:16px;" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJub25lIiBkPSJNMCAwaDI0djI0SDB6Ii8+PHBhdGggZD0iTTExIDE4aDJ2LTJoLTJ2MnptMS0xNkM2LjQ4IDIgMiA2LjQ4IDIgMTJzNC40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnptMCAxOGMtNC40MSAwLTgtMy41OS04LThzMy41OS04IDgtOCA4IDMuNTkgOCA4LTMuNTkgOC04IDh6bTAtMTRjLTIuMjEgMC00IDEuNzktNCA0aDJjMC0xLjEuOS0yIDItMnMyIC45IDIgMmMwIDItMyAxLjc1LTMgNWgyYzAtMi4yNSAzLTIuNSAzLTUgMC0yLjIxLTEuNzktNC00LTR6Ii8+PC9zdmc+" border="0">
 			</a>
 		</div>
-		
 		<hr>
 		Title: <input type="text" size="16" id="title"></input>
 		<hr>
