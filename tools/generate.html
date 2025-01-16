@@ -3,33 +3,10 @@
 <head>
   <title>Generate draw.io Diagrams</title>
   <meta charset="utf-8" />
-  <style type="text/css">
-    body {
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans",
-        Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-      background: light-dark(rgb(255, 255, 255), rgb(18, 18, 18));
-      color: light-dark(rgb(18, 18, 18), white);
-      margin: 10px 5% 10px 5%;
-      color-scheme: dark;
-      font-size: 16px;
-    }
-    button {
-      background: #1a4cad;
-      border-radius: 4px;
-      padding: 10px;
-      border: none;
-    }
-    button, a, input, select {
-      cursor: default;
-      opacity: 0.9;
-    }
-    button:hover:not(:disabled), a:hover, input:hover, select:hover {
-      opacity: 1;
-    }
-  </style>
+  <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-  <div style="display:flex;opacity:0.9;align-items:center;padding:20px 20px 10px 20px;">
+  <div style="display:flex;opacity:0.9;align-items:center;padding:20px 20px 10px 20px;opacity:0.7;">
     <svg viewBox="24 26 68 68" style="width:28px;display:inline-block;">
       <line y2="72.394" x2="41.061" y1="43.384" x1="58.069" stroke-miterlimit="10" stroke-width="3.5528"
         stroke="currentColor" fill="none" />
@@ -56,7 +33,7 @@
       placeholder="Diagram description, eg. five tier sequence diagram on how to order fast food online or graph TD; A-->B; A-->C; B-->D; C-->D;"
       spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
     <div style="position:relative;display:flex;align-items:center;justify-items:stretch;padding-top:10px;">
-      <button style="position:relative;background:rgb(56, 56, 56);color:gray;" title="Unescape" id="create" onclick="replaceEscapes();return false;">
+      <button style="position:relative;" title="Unescape" id="create" onclick="replaceEscapes();return false;">
         Unescape
       </button>
       <div style="margin-left:auto;opacity:0.5;">
@@ -204,7 +181,8 @@
     };
 
     function preview(value) {
-      var params = 'lightbox=1&dark=1&border=10&';
+      var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var params = 'lightbox=1&dark=' + ((dark) ? '1' : '0') + '&border=10&';
       var prefix = (urlParams['dev'] == '1') ?
         'https://test.draw.io/?dev=1&' :
         'https://www.draw.io/?' + params;

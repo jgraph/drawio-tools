@@ -4,57 +4,7 @@
 <head>
   <title>Create Custom Link</title>
   <meta charset="utf-8"/>
-  <style type="text/css">
-		@media (prefers-color-scheme: dark) {
-			.adaptive-asset {
-				filter: invert(1);
-			}
-		}
-		@media only screen {
-			body {
-				font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans",
-					Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-				background: light-dark(rgb(255, 255, 255), rgb(18, 18, 18));
-				color: light-dark(rgb(18, 18, 18), white);
-				margin: 10px 5% 10px 5%;
-				color-scheme: dark;
-				font-size: 12px;
-			}
-			hr {
-				border: 0;
-				border-top: 1px solid light-dark(rgb(0, 0, 0), rgb(255, 255, 255));
-			}
-			textarea {
-				box-sizing: border-box;
-				font-family: monospace;
-				resize: vertical;
-				font-size: inherit;
-				border-radius: 4px;
-				padding: 4px;
-			}
-			button {
-				background: light-dark(#29b6f2, #003555);
-				border-radius: 4px;
-				padding: 10px;
-				border: none;
-			}
-			button {
-				cursor: default;
-				opacity: 0.9;
-			}
-			button:hover:not(:disabled) {
-				opacity: 1;
-			}
-			button:active:not(:disabled) {
-				filter:invert(1);
-			}
-			input {
-				padding: 2px 6px;
-				margin: 0 0 0 4px;
-				font-size: inherit;
-			}
-		}
-	</style>
+  <link rel="stylesheet" type="text/css" href="style.css">
 <script type="text/javascript">
 function add(type)
 {

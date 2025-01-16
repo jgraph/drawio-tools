@@ -4,7 +4,7 @@
 <head>
   <title>Inflate/deflate, URL encode/decode</title>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <link rel="stylesheet" type="text/css" href="style.css">
   <script type="text/javascript" src="deflate/pako.min.js"></script>
 <script type="text/javascript">
 //<![CDATA[
@@ -460,79 +460,101 @@ function download()
 //]]>
 </script>
 </head>
-<body style="color-scheme:light dark;">
-  <h2>Inflate/deflate, URL encode/decode</h2>
-  <textarea rows="40" cols="120" id="textarea" placeholder="Drop files here or enter text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
-  <br/><br/>
-  <form>
-    <input type="checkbox" id="encodeCheckbox" checked="checked" /> URL Encode&nbsp;
-    <input type="checkbox" id="deflateCheckbox" checked="checked" /> Deflate&nbsp;
-    <input type="checkbox" id="base64Checkbox" checked="checked" /> Base64&nbsp;&nbsp;
-    <button onclick="removeLinebreaks(document.getElementById('textarea').value);return false;">Remove linebreaks</button>&nbsp;
-    <button onclick="document.getElementById('textarea').value = encodeURIComponent(document.getElementById('textarea').value);return false;">URL Encode</button>&nbsp;
-    <button onclick="decodeFromUri();return false;">URL Decode</button>&nbsp;
-    <button onclick="encode(document.getElementById('textarea').value);return false;">Encode</button>&nbsp;
-    <button onclick="decode(document.getElementById('textarea').value);return false;">Decode</button>&nbsp;
-    (<span id="count">0</span> chars)
+<body>
+  <span style="position:relative;display:inline-block;left:50%;transform:translate(-50%,0);">
+    <div style="display:flex;align-items:center;opacity:0.7;">
+      <svg viewBox="24 26 68 68" style="width:28px;display:inline-block;">
+        <line y2="72.394" x2="41.061" y1="43.384" x1="58.069" stroke-miterlimit="10" stroke-width="3.5528"
+        stroke="currentColor" fill="none" />
+        <line y2="72.394" x2="75.076" y1="43.384" x1="58.068" stroke-miterlimit="10" stroke-width="3.5008"
+        stroke="currentColor" fill="none" />
+        <path
+        d="M52.773,77.084c0,1.954-1.599,3.553-3.553,3.553H36.999c-1.954,0-3.553-1.599-3.553-3.553v-9.379c0-1.954,1.599-3.553,3.553-3.553h12.222c1.954,0,3.553,1.599,3.553,3.553V77.084z"
+        fill="currentColor" />
+        <path
+        d="M67.762,48.074c0,1.954-1.599,3.553-3.553,3.553H51.988c-1.954,0-3.553-1.599-3.553-3.553v-9.379c0-1.954,1.599-3.553,3.553-3.553H64.21c1.954,0,3.553,1.599,3.553,3.553V48.074z"
+        fill="currentColor" />
+        <path
+        d="M82.752,77.084c0,1.954-1.599,3.553-3.553,3.553H66.977c-1.954,0-3.553-1.599-3.553-3.553v-9.379c0-1.954,1.599-3.553,3.553-3.553h12.222c1.954,0,3.553,1.599,3.553,3.553V77.084z"
+        fill="currentColor" />
+      </svg>
+      <span style="font-family:Helvetica;font-weight:700;font-size:20px;margin-left:4px;">draw.io</span>
+      <h2 style="text-align:center;width:100%;margin:10px;">Inflate/deflate, URL encode/decode</h2>
+    </div>
+    <hr>
     <br>
-    <button onclick="document.getElementById('textarea').value=escape(document.getElementById('textarea').value);return false;">Escape</button>&nbsp;
-    <button onclick="document.getElementById('textarea').value=unescape(document.getElementById('textarea').value);return false;">Unescape</button>&nbsp;
-    <button onclick="document.getElementById('textarea').value=btoa(document.getElementById('textarea').value);return false;">btoa</button>
-    <button onclick="document.getElementById('textarea').value=atob(document.getElementById('textarea').value);return false;">atob</button>
-    <button onclick="normalizeXml();return false;">Normalize XML</button>
-    <button onclick="formatXml();return false;">Format XML</button>
-    <button onclick="formatJson(2);return false;">Format JSON</button>
-    <button onclick="formatJson();return false;">Normalize JSON</button>
-    <button onclick="jsVar();return false;">JS variable</button>
-    <br>
-    <button onclick="checkMxFile();return false;">Check mxFile</button>
-    <button onclick="correctMxFile();return false;">Correct mxFile</button>
-    <button onclick="download();return false;">Download</button>
-<script type="text/javascript">
-//<![CDATA[
-// Enables dropping files
-if (window.File != null && window.FileReader != null && window.FileList != null)
-{
-    function handleDrop(evt)
-    {
-        evt.stopPropagation();
-        evt.preventDefault();
+    <textarea rows="40" cols="120" id="textarea" placeholder="Drop files here or enter text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+    <br/><br/>
+    <form>
+      <input type="checkbox" id="encodeCheckbox" checked="checked" /> URL Encode&nbsp;
+      <input type="checkbox" id="deflateCheckbox" checked="checked" /> Deflate&nbsp;
+      <input type="checkbox" id="base64Checkbox" checked="checked" /> Base64&nbsp;&nbsp;
+      <button onclick="removeLinebreaks(document.getElementById('textarea').value);return false;">Remove linebreaks</button>&nbsp;
+      <button onclick="document.getElementById('textarea').value = encodeURIComponent(document.getElementById('textarea').value);return false;">URL Encode</button>&nbsp;
+      <button onclick="decodeFromUri();return false;">URL Decode</button>&nbsp;
+      <button onclick="encode(document.getElementById('textarea').value);return false;">Encode</button>&nbsp;
+      <button onclick="decode(document.getElementById('textarea').value);return false;">Decode</button>&nbsp;
+      (<span id="count">0</span> chars)
+      <br>
+      <button onclick="document.getElementById('textarea').value=escape(document.getElementById('textarea').value);return false;">Escape</button>&nbsp;
+      <button onclick="document.getElementById('textarea').value=unescape(document.getElementById('textarea').value);return false;">Unescape</button>&nbsp;
+      <button onclick="document.getElementById('textarea').value=btoa(document.getElementById('textarea').value);return false;">btoa</button>
+      <button onclick="document.getElementById('textarea').value=atob(document.getElementById('textarea').value);return false;">atob</button>
+      <button onclick="normalizeXml();return false;">Normalize XML</button>
+      <button onclick="formatXml();return false;">Format XML</button>
+      <button onclick="formatJson(2);return false;">Format JSON</button>
+      <button onclick="formatJson();return false;">Normalize JSON</button>
+      <button onclick="jsVar();return false;">JS variable</button>
+      <br>
+      <button onclick="checkMxFile();return false;">Check mxFile</button>
+      <button onclick="correctMxFile();return false;">Correct mxFile</button>
+      <button onclick="download();return false;">Download</button>
+      <script type="text/javascript">
+      //<![CDATA[
+      // Enables dropping files
+      if (window.File != null && window.FileReader != null && window.FileList != null)
+      {
+          function handleDrop(evt)
+          {
+              evt.stopPropagation();
+              evt.preventDefault();
 
-        if (evt.dataTransfer.files.length > 0)
-        {
-            var file = evt.dataTransfer.files[0];
+              if (evt.dataTransfer.files.length > 0)
+              {
+                  var file = evt.dataTransfer.files[0];
 
-            var reader = new FileReader();
-            reader.onload = function (e)
-            {
-                evt.target.value = e.target.result;
-            };
-            reader.readAsText(file);
-        }
-    };
+                  var reader = new FileReader();
+                  reader.onload = function (e)
+                  {
+                      evt.target.value = e.target.result;
+                  };
+                  reader.readAsText(file);
+              }
+          };
 
-    function handleDragOver(evt)
-    {
-        evt.stopPropagation();
-        evt.preventDefault();
-    };
+          function handleDragOver(evt)
+          {
+              evt.stopPropagation();
+              evt.preventDefault();
+          };
 
-    // Setup the dnd listeners.
-    var textarea = document.getElementById('textarea');
+          // Setup the dnd listeners.
+          var textarea = document.getElementById('textarea');
 
-    textarea.addEventListener('dragover', handleDragOver, false);
-    textarea.addEventListener('drop', handleDrop, false);
-    var span = document.getElementById('count')
+          textarea.addEventListener('dragover', handleDragOver, false);
+          textarea.addEventListener('drop', handleDrop, false);
+          var span = document.getElementById('count')
 
-	  function updateCount()
-	  {
-		  span.innerHTML = textarea.value.length;
-	  }
+          function updateCount()
+          {
+            span.innerHTML = textarea.value.length;
+          }
 
-    textarea.addEventListener('input', updateCount, false);
-}
-//]]>
-</script>
-</form>
+          textarea.addEventListener('input', updateCount, false);
+      }
+      //]]>
+      </script>
+    </form>
+  </span>
 </body>
 </html>
