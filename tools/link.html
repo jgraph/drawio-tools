@@ -1,347 +1,281 @@
-<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge" ><![endif]-->
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
 <head>
-  <title>Create Custom Link</title>
-  <meta charset="utf-8"/>
-  <link rel="stylesheet" type="text/css" href="style.css">
-<script type="text/javascript">
-function add(type)
-{
-	try
-	{
-		var link = document.getElementById('link').value;
-		var obj = JSON.parse(link.substring(link.indexOf(',') + 1));
+	<title>Create Custom Link</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<script type="text/javascript">
+		function add(type) {
+			try {
+				var link = document.getElementById('link').value;
+				var obj = JSON.parse(link.substring(link.indexOf(',') + 1));
 
-		var title = document.getElementById('title').value;
+				var title = document.getElementById('title').value;
 
-		if (title != '')
-		{
-			obj.title = title;
-		}
-
-		if (obj.actions == null)
-		{
-			obj.actions = [];
-		}
-
-		if (type == 'link')
-		{
-			obj.actions.push({open: document.getElementById('href').value});
-		}
-		else if (type == 'wait')
-		{
-			var wait = document.getElementById('wait').value;
-			obj.actions.push({wait: (wait != '') ? wait : 1000});
-		}
-		else if (type == 'viewbox')
-		{
-			var tokens = document.getElementById('viewbox').value.split(' ');
-
-			if (tokens.length > 3)
-			{
-				var action = {};
-				action.viewbox = {x: parseInt(tokens[0]), y: parseInt(tokens[1]),
-					width: parseInt(tokens[2]), height: parseInt(tokens[3])};
-
-				if (tokens.length > 4)
-				{
-					action.border = parseInt(tokens[4]);
+				if (title != '') {
+					obj.title = title;
 				}
 
-				obj.actions.push(action);
-			}
-			else
-			{
-				showMessage('Missing arguments');
-			}
-		}
-		else if (type == 'tags')
-		{
-			var toggle = document.getElementById('toggleTags').value.split(' ');
-			var hidden = document.getElementById('hiddenTags').value.split(' ');
-			var visible = document.getElementById('visibleTags').value.split(' ');
+				if (obj.actions == null) {
+					obj.actions = [];
+				}
 
-			if (toggle.length > 0 || hidden.length > 0 || visible.length > 0)
-			{
-				var action = {};
-				var add = false;
+				if (type == 'link') {
+					obj.actions.push({ open: document.getElementById('href').value });
+				}
+				else if (type == 'wait') {
+					var wait = document.getElementById('wait').value;
+					obj.actions.push({ wait: (wait != '') ? wait : 1000 });
+				}
+				else if (type == 'viewbox') {
+					var tokens = document.getElementById('viewbox').value.split(' ');
 
-				if (toggle.length > 0)
-				{
-					if (toggle[0] == '*')
-					{
-						action.toggle = [];
-						add = true;
+					if (tokens.length > 3) {
+						var action = {};
+						action.viewbox = {
+							x: parseInt(tokens[0]), y: parseInt(tokens[1]),
+							width: parseInt(tokens[2]), height: parseInt(tokens[3])
+						};
+
+						if (tokens.length > 4) {
+							action.border = parseInt(tokens[4]);
+						}
+
+						obj.actions.push(action);
 					}
-					else if (toggle[0] != '')
-					{
-						action.toggle = toggle;
-						add = true;
+					else {
+						showMessage('Missing arguments');
+					}
+				}
+				else if (type == 'tags') {
+					var toggle = document.getElementById('toggleTags').value.split(' ');
+					var hidden = document.getElementById('hiddenTags').value.split(' ');
+					var visible = document.getElementById('visibleTags').value.split(' ');
+
+					if (toggle.length > 0 || hidden.length > 0 || visible.length > 0) {
+						var action = {};
+						var add = false;
+
+						if (toggle.length > 0) {
+							if (toggle[0] == '*') {
+								action.toggle = [];
+								add = true;
+							}
+							else if (toggle[0] != '') {
+								action.toggle = toggle;
+								add = true;
+							}
+						}
+
+						if (hidden.length > 0) {
+							if (hidden[0] == '*') {
+								action.visible = [];
+								add = true;
+							}
+							else if (hidden[0] != '') {
+								action.hidden = hidden;
+								add = true;
+							}
+						}
+
+						if (visible.length > 0) {
+							if (visible[0] == '*') {
+								action.hidden = [];
+								add = true;
+							}
+							else if (visible[0] != '') {
+								action.visible = visible;
+								add = true;
+							}
+						}
+
+						if (add) {
+							obj.actions.push({ tags: action });
+						}
+						else {
+							showMessage('Missing arguments');
+						}
+					}
+				}
+				else {
+					var action = document.getElementById('parallel').checked && obj.actions.length > 0 ?
+						obj.actions[obj.actions.length - 1] : {};
+					var selector = {};
+					var cells = document.getElementById('cells').value;
+					var exclude = document.getElementById('exclude').value;
+					var name = document.getElementById('action').value;
+
+					if (cells.length > 0) {
+						selector['cells'] = cells.split(' ');
+					}
+
+					if (exclude.length > 0) {
+						selector['excludeCells'] = exclude.split(' ');
+					}
+
+					var tags = document.getElementById('tags').value;
+
+					if (tags == '*') {
+						selector['tags'] = [''];
+					}
+					else if (tags.length > 0) {
+						selector['tags'] = tags.split(' ');
+					}
+
+					if (name == 'style' || name == 'toggleStyle') {
+						var key = document.getElementById('key').value;
+						selector.key = (key != '') ? key : 'flowAnimation';
+					}
+
+					if (name == 'style' || name == 'opacity') {
+						var value = document.getElementById('value').value;
+						selector.value = (value != '') ? value : '1';
+					}
+
+					if (name == 'fadeIn' || name == 'fadeOut') {
+						selector.delay = 1000;
+					}
+
+					if (name == 'wipeIn' || name == 'wipeOut') {
+						action.delay = 30;
+						action.steps = 30;
+					}
+
+					action[name] = selector;
+
+					if (!document.getElementById('parallel').checked) {
+						obj.actions.push(action);
 					}
 				}
 
-				if (hidden.length > 0)
-				{
-					if (hidden[0] == '*')
-					{
-						action.visible = [];
-						add = true;
-					}
-					else if (hidden[0] != '')
-					{
-						action.hidden = hidden;
-						add = true;
-					}
+				document.getElementById('link').value = 'data:action/json,' + JSON.stringify(obj, null, 2);
+
+				var href = getLink();
+				document.getElementById('anchor').href = href;
+				document.getElementById('anchor').innerHTML = href.replace(/&/g, "&amp;")
+					.replace(/</g, "&lt;")
+					.replace(/>/g, "&gt;")
+					.replace(/"/g, "&quot;")
+					.replace(/'/g, "&#39;");
+			}
+			catch (e) {
+				showMessage(e);
+			}
+		};
+
+		function clearInput() {
+			document.getElementById('action').value = 'toggle';
+			document.getElementById('key').value = '';
+			document.getElementById('value').value = '';
+			document.getElementById('cells').value = '';
+			document.getElementById('exclude').value = '';
+			document.getElementById('tags').value = '';
+			document.getElementById('href').value = '';
+			document.getElementById('wait').value = '';
+			document.getElementById('viewbox').value = '';
+			document.getElementById('parallel').checked = false;
+			actionChanged();
+		};
+
+		function resetLink() {
+			document.getElementById('link').value = 'data:action/json,' + JSON.stringify({}, null, 2);
+		};
+
+		function validateLink(quiet) {
+			try {
+				var href = document.getElementById('link').value;
+				var start = href.indexOf('data:action/json,');
+				var link = JSON.parse(href.substring(start + 17));
+
+				if (link.actions == null || link.actions.length == 0) {
+					throw 'No actions';
+				}
+				else if (!quiet) {
+					document.getElementById('link').value = 'data:action/json,' + JSON.stringify(link, null, 2);
+					showMessage('Link is valid');
 				}
 
-				if (visible.length > 0)
-				{
-					if (visible[0] == '*')
-					{
-						action.hidden = [];
-						add = true;
-					}
-					else if (visible[0] != '')
-					{
-						action.visible = visible;
-						add = true;
-					}
+				return true;
+			}
+			catch (e) {
+				var index = (e.message != null) ? e.message.indexOf(' at position ') : 0;
+
+				if (index > 0) {
+					var pos = parseInt(e.message.substring(index + 13));
+					setCaretPosition('link', pos + 14);
 				}
 
-				if (add)
-				{
-					obj.actions.push({tags: action});
+				showMessage('Error: ' + e);
+			}
+		};
+
+		function showMessage(message) {
+			var confirmation = document.getElementById('confirmation');
+			confirmation.style.display = '';
+			confirmation.innerHTML = message;
+
+			window.setTimeout(function () {
+				confirmation.style.display = 'none';
+			}, 3000);
+		};
+
+		function setCaretPosition(elemId, caretPos) {
+			var elem = document.getElementById(elemId);
+
+			if (elem != null) {
+				elem.focus();
+
+				if (elem.createTextRange) {
+					var range = elem.createTextRange();
+					range.move('character', caretPos);
+					range.select();
 				}
-				else
-				{
-					showMessage('Missing arguments');
+				else if (elem.selectionStart) {
+					elem.setSelectionRange(caretPos, caretPos);
 				}
 			}
-		}
-		else
-		{
-			var action = document.getElementById('parallel').checked && obj.actions.length > 0 ?
-				obj.actions[obj.actions.length - 1] : {};
-			var selector = {};
-			var cells = document.getElementById('cells').value;
-			var exclude = document.getElementById('exclude').value;
-			var name = document.getElementById('action').value;
+		};
 
-			if (cells.length > 0)
-			{
-				selector['cells'] = cells.split(' ');
+		function getLink() {
+			return 'data:action/json,' + JSON.stringify(JSON.parse(link.value.substring(17)));
+		};
+
+		function copyLink() {
+			try {
+				if (validateLink(true)) {
+					var link = document.getElementById('link');
+					var prev = link.value;
+					link.value = getLink();
+					link.focus();
+					link.select();
+					document.execCommand('copy');
+					link.value = prev;
+					showMessage('Link Copied');
+				}
 			}
-
-			if (exclude.length > 0)
-			{
-				selector['excludeCells'] = exclude.split(' ');
+			catch (e) {
+				showMessage('Error: ' + e);
 			}
+		};
 
-			var tags = document.getElementById('tags').value;
-
-			if (tags == '*')
-			{
-				selector['tags'] = [''];
-			}
-			else if (tags.length > 0)
-			{
-				selector['tags'] = tags.split(' ');
-			}
-
-			if (name == 'style' || name == 'toggleStyle')
-			{
-				var key = document.getElementById('key').value;
-				selector.key = (key != '') ? key : 'flowAnimation';
-			}
-
-			if (name == 'style' || name == 'opacity')
-			{
-				var value = document.getElementById('value').value;
-				selector.value = (value != '') ? value : '1';
-			}
-
-			if (name == 'fadeIn' || name == 'fadeOut')
-			{
-				selector.delay = 1000;
-			}
-
-			if (name == 'wipeIn' || name == 'wipeOut')
-			{
-				action.delay = 30;
-				action.steps = 30;
-			}
-
-			action[name] = selector;
-
-			if (!document.getElementById('parallel').checked)
-			{
-				obj.actions.push(action);
-			}
-		}
-
-		document.getElementById('link').value = 'data:action/json,' + JSON.stringify(obj, null, 2);
-
-		var href = getLink();
-		document.getElementById('anchor').href = href;
-		document.getElementById('anchor').innerHTML = href.replace(/&/g, "&amp;")
-			.replace(/</g, "&lt;")
-			.replace(/>/g, "&gt;")
-			.replace(/"/g, "&quot;")
-			.replace(/'/g, "&#39;");
-	}
-	catch (e)
-	{
-		showMessage(e);
-	}
-};
-
-function clearInput()
-{
-	document.getElementById('action').value = 'toggle';
-	document.getElementById('key').value = '';
-	document.getElementById('value').value = '';
-	document.getElementById('cells').value = '';
-	document.getElementById('exclude').value = '';
-	document.getElementById('tags').value = '';
-	document.getElementById('href').value = '';
-	document.getElementById('wait').value = '';
-	document.getElementById('viewbox').value = '';
-	document.getElementById('parallel').checked = false;
-	actionChanged();
-};
-
-function resetLink()
-{
-	document.getElementById('link').value = 'data:action/json,' + JSON.stringify({}, null, 2);
-};
-
-function validateLink(quiet)
-{
-	try
-	{
-		var href = document.getElementById('link').value;
-		var start = href.indexOf('data:action/json,');
-		var link = JSON.parse(href.substring(start + 17));
-
-		if (link.actions == null || link.actions.length == 0)
-		{
-			throw 'No actions';
-		}
-		else if (!quiet)
-		{
-			document.getElementById('link').value = 'data:action/json,' + JSON.stringify(link, null, 2);
-			showMessage('Link is valid');
-		}
-
-		return true;
-	}
-	catch (e)
-	{
-		var index = (e.message != null) ? e.message.indexOf(' at position ') : 0;
-
-		if (index > 0)
-		{
-			var pos = parseInt(e.message.substring(index + 13));
-			setCaretPosition('link', pos + 14);
-		}
-		
-		showMessage('Error: ' + e);
-	}
-};
-
-function showMessage(message)
-{
-	var confirmation = document.getElementById('confirmation');
-	confirmation.style.display = '';
-	confirmation.innerHTML = message;
-
-	window.setTimeout(function()
-	{
-		confirmation.style.display = 'none';
-	}, 3000);
-};
-
-function setCaretPosition(elemId, caretPos)
-{
-    var elem = document.getElementById(elemId);
-
-    if (elem != null)
-	{
-		elem.focus();
-
-        if (elem.createTextRange)
-		{
-            var range = elem.createTextRange();
-            range.move('character', caretPos);
-            range.select();
-        }
-        else if (elem.selectionStart)
-		{
-			elem.setSelectionRange(caretPos, caretPos);
-		}
-    }
-};
-
-function getLink()
-{
-	return 'data:action/json,' + JSON.stringify(JSON.parse(link.value.substring(17)));
-};
-
-function copyLink()
-{
-	try
-	{
-		if (validateLink(true))
-		{
-			var link = document.getElementById('link');
-			var prev = link.value;
-			link.value = getLink();
-			link.focus();
-			link.select();
-			document.execCommand('copy');
-			link.value = prev;
-			showMessage('Link Copied');
-		}
-	}
-	catch (e)
-	{
-		showMessage('Error: ' + e);
-	}
-};
-
-function actionChanged()
-{
-	var action = document.getElementById('action').value;
-	document.getElementById('keyBox').style.display =
-		(action == 'style' || action == 'toggleStyle') ? '' : 'none';
-	document.getElementById('valueBox').style.display =
-		(action == 'style' || action == 'opacity') ? '' : 'none';
-};
-</script>
+		function actionChanged() {
+			var action = document.getElementById('action').value;
+			document.getElementById('keyBox').style.display =
+				(action == 'style' || action == 'toggleStyle') ? '' : 'none';
+			document.getElementById('valueBox').style.display =
+				(action == 'style' || action == 'opacity') ? '' : 'none';
+		};
+	</script>
 </head>
-<body style="color-scheme:light dark;font-family:sans-serif;" onload="resetLink();actionChanged();document.getElementById('cells').focus();">
+<body onload="resetLink();actionChanged();document.getElementById('cells').focus();">
 	<span style="position:relative;display:inline-block;left:50%;transform:translate(-50%,0);">
 		<div style="display:flex;align-items:center;opacity:0.7;">
-			<svg viewBox="24 26 68 68" style="width:28px;display:inline-block;">
-				<line y2="72.394" x2="41.061" y1="43.384" x1="58.069" stroke-miterlimit="10" stroke-width="3.5528"
-				stroke="currentColor" fill="none" />
-				<line y2="72.394" x2="75.076" y1="43.384" x1="58.068" stroke-miterlimit="10" stroke-width="3.5008"
-				stroke="currentColor" fill="none" />
-				<path
-				d="M52.773,77.084c0,1.954-1.599,3.553-3.553,3.553H36.999c-1.954,0-3.553-1.599-3.553-3.553v-9.379c0-1.954,1.599-3.553,3.553-3.553h12.222c1.954,0,3.553,1.599,3.553,3.553V77.084z"
-				fill="currentColor" />
-				<path
-				d="M67.762,48.074c0,1.954-1.599,3.553-3.553,3.553H51.988c-1.954,0-3.553-1.599-3.553-3.553v-9.379c0-1.954,1.599-3.553,3.553-3.553H64.21c1.954,0,3.553,1.599,3.553,3.553V48.074z"
-				fill="currentColor" />
-				<path
-				d="M82.752,77.084c0,1.954-1.599,3.553-3.553,3.553H66.977c-1.954,0-3.553-1.599-3.553-3.553v-9.379c0-1.954,1.599-3.553,3.553-3.553h12.222c1.954,0,3.553,1.599,3.553,3.553V77.084z"
-				fill="currentColor" />
-			</svg>
+			<img src="logo.svg" style="width:28px;" />
 			<span style="font-family:Helvetica;font-weight:700;font-size:20px;margin-left:4px;">draw.io</span>
 			<h2 style="text-align:center;width:100%;margin:10px;">Create Custom Link</h2>
-			<a style="position:absolute;right:0px;" class="adaptive-asset" href="https://www.diagrams.net/doc/faq/custom-links" title="Help" target="_blank">
-				<img  style="opacity:0.6;height:16px;width:16px;" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJub25lIiBkPSJNMCAwaDI0djI0SDB6Ii8+PHBhdGggZD0iTTExIDE4aDJ2LTJoLTJ2MnptMS0xNkM2LjQ4IDIgMiA2LjQ4IDIgMTJzNC40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnptMCAxOGMtNC40MSAwLTgtMy41OS04LThzMy41OS04IDgtOCA4IDMuNTkgOCA4LTMuNTkgOC04IDh6bTAtMTRjLTIuMjEgMC00IDEuNzktNCA0aDJjMC0xLjEuOS0yIDItMnMyIC45IDIgMmMwIDItMyAxLjc1LTMgNWgyYzAtMi4yNSAzLTIuNSAzLTUgMC0yLjIxLTEuNzktNC00LTR6Ii8+PC9zdmc+" border="0">
+			<a style="position:absolute;right:0px;" class="adaptive-asset"
+				href="https://www.diagrams.net/doc/faq/custom-links" title="Help" target="_blank">
+				<img src="help.svg" style="width:16px;" />
 			</a>
 		</div>
 		<hr>
@@ -366,30 +300,38 @@ function actionChanged()
 		<span id="keyBox">Key: <input type="text" size="20" id="key" placeholder="flowAnimation"></input></span>
 		<span id="valueBox">Value: <input type="text" size="20" id="value" placeholder="1"></input></span>
 		<br><br>
-		2. Cells/Layers: <input type="text" size="60" id="cells" placeholder="1 2 3"></input> Space-separated list of cell or layer IDs, * for all
+		2. Cells/Layers: <input type="text" size="60" id="cells" placeholder="1 2 3"></input> Space-separated list of
+		cell or layer IDs, * for all
 		<br><br>
-		3. Tags: <input type="text" size="60" id="tags" placeholder="water pipes"></input> Space-separated list of tags, * for all
+		3. Tags: <input type="text" size="60" id="tags" placeholder="water pipes"></input> Space-separated list of tags,
+		* for all
 		<br>
 		<small>This will find all cells with <i>all</i> given tags and change their visible state.<br>
-		Use <i>Add Tags</i> below to set the visible state of the tags instead.</small>
+			Use <i>Add Tags</i> below to set the visible state of the tags instead.</small>
 		<br><br>
-		4. Exclude Cells/Layers: <input type="text" size="60" id="exclude" placeholder="1 2 3"></input> Space-separated list of cell or layer IDs
+		4. Exclude Cells/Layers: <input type="text" size="60" id="exclude" placeholder="1 2 3"></input> Space-separated
+		list of cell or layer IDs
 		<br><br>
 		5. <button onclick="add();return false;" style="font-weight:bold;">Add Action</button>
 		<input type="checkbox" id="parallel"> Run at the same time
-		<br><hr>
+		<br>
+		<hr>
 		Or <button onclick="add('link');return false;" style="font-weight:bold;">Add Link:</button>
-		&nbsp;<input type="text" size="60" id="href" placeholder="data:page/id,d77c2f53-a0fe-16b8-c644-547af6ee0c87"></input>
+		&nbsp;<input type="text" size="60" id="href"
+			placeholder="data:page/id,d77c2f53-a0fe-16b8-c644-547af6ee0c87"></input>
 		Custom link or hyperlink
-		<br><hr>
+		<br>
+		<hr>
 		Or <button onclick="add('wait');return false;" style="font-weight:bold;">Add Wait:</button>
 		&nbsp;<input type="text" size="5" id="wait" placeholder="1000"></input>
 		milliseconds
-		<br><hr>
+		<br>
+		<hr>
 		Or <button onclick="add('viewbox');return false;" style="font-weight:bold;">Add Viewbox:</button>
 		&nbsp;<input type="text" size="60" id="viewbox"></input>
 		x y width height border
-		<br><hr>
+		<br>
+		<hr>
 		Or <button onclick="add('tags');return false;" style="font-weight:bold;">Add Tags:</button>
 		&nbsp;Toggle: <input type="text" size="16" id="toggleTags"></input>
 		&nbsp;Hidden: <input type="text" size="16" id="hiddenTags"></input>
@@ -398,10 +340,12 @@ function actionChanged()
 		<small>This will set the visible state of the given tags in the current view.</small>
 		<hr>
 		<button onclick="clearInput();return false;">Clear Input</button>
-		<br><hr>
+		<br>
+		<hr>
 		Custom Link:
 		<br>
-		<textarea rows="12" cols="100" id="link" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+		<textarea rows="12" cols="100" id="link" spellcheck="false" autocomplete="off" autocorrect="off"
+			autocapitalize="off"></textarea>
 		<br>
 		<button onclick="validateLink();return false;">Validate</button>
 		<button onclick="resetLink();return false;">Reset Link</button>
@@ -411,4 +355,5 @@ function actionChanged()
 		<a id="anchor" href="#" onclick="copyLink();return false;"></a>
 	</span>
 </body>
+
 </html>

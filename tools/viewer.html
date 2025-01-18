@@ -1,100 +1,79 @@
-<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge" ><![endif]-->
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
 <head>
-  <title>Online Diagram Viewer</title>
-  <meta charset="utf-8"/>
-  <link rel="stylesheet" type="text/css" href="style.css">
-<script type="text/javascript">
-function create()
-{
-	var url = document.getElementById('url').value;
-	
-	if (url.length == 0 || url.substring(0, 4) != 'http')
-	{
-		alert("Please enter a valid URL");
-		document.getElementById('url').focus();
-	}
-	else
-	{
-		var area = document.getElementById('textarea');
-		var a = document.getElementById('result');
-		area.style.display = 'none';
-		area.innerHTML = '';
-		a.innerHTML = '';
+	<title>Online Diagram Viewer</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<script type="text/javascript">
+		function create() {
+			var url = document.getElementById('url').value;
 
-		if (url.substring(0, 32) == 'https://drive.google.com/file/d/')
-		{
-			var id = url.substring(32, url.lastIndexOf('/'));
-			url = 'https://drive.google.com/uc?id=' + id + '&export=download';
-		}
-		
-		if (document.getElementById('iframe').checked)
-		{
-			var link = 'https://viewer.diagrams.net';
-			area.style.display = '';
-			area.appendChild(document.createTextNode(
-				'<iframe frameborder="0" style="width:100%;height:' +
-				document.getElementById('height').value + ';" src="' +
-				link + '?#U' + encodeURIComponent(url) + '"></iframe>'));
-			area.focus();
-			document.execCommand('selectAll');
-		}
-		else
-		{
-			var link = 'https://app.diagrams.net';
-
-			if (document.getElementById('lightbox').checked)
-			{
-				link += '?lightbox=1&edit=_blank';
+			if (url.length == 0 || url.substring(0, 4) != 'http') {
+				alert("Please enter a valid URL");
+				document.getElementById('url').focus();
 			}
-	
-			link += '#U' + encodeURIComponent(url);
-			a.setAttribute('href', link);
-			a.appendChild(document.createTextNode(link));
+			else {
+				var area = document.getElementById('textarea');
+				var a = document.getElementById('result');
+				area.style.display = 'none';
+				area.innerHTML = '';
+				a.innerHTML = '';
+
+				if (url.substring(0, 32) == 'https://drive.google.com/file/d/') {
+					var id = url.substring(32, url.lastIndexOf('/'));
+					url = 'https://drive.google.com/uc?id=' + id + '&export=download';
+				}
+
+				if (document.getElementById('iframe').checked) {
+					var link = 'https://viewer.diagrams.net';
+					area.style.display = '';
+					area.appendChild(document.createTextNode(
+						'<iframe frameborder="0" style="width:100%;height:' +
+						document.getElementById('height').value + ';" src="' +
+						link + '?#U' + encodeURIComponent(url) + '"></iframe>'));
+					area.focus();
+					document.execCommand('selectAll');
+				}
+				else {
+					var link = 'https://app.diagrams.net';
+
+					if (document.getElementById('lightbox').checked) {
+						link += '?lightbox=1&edit=_blank';
+					}
+
+					link += '#U' + encodeURIComponent(url);
+					a.setAttribute('href', link);
+					a.appendChild(document.createTextNode(link));
+				}
+			}
 		}
-	}
-}
-</script>
+	</script>
 </head>
 <body onload="document.getElementById('url').focus();">
-  <span style="position:relative;display:inline-block;left:50%;transform:translate(-50%,0);">
-	<div style="display:flex;align-items:center;opacity:0.7;">
-		<svg viewBox="24 26 68 68" style="width:28px;display:inline-block;">
-			<line y2="72.394" x2="41.061" y1="43.384" x1="58.069" stroke-miterlimit="10" stroke-width="3.5528"
-			stroke="currentColor" fill="none" />
-			<line y2="72.394" x2="75.076" y1="43.384" x1="58.068" stroke-miterlimit="10" stroke-width="3.5008"
-			stroke="currentColor" fill="none" />
-			<path
-			d="M52.773,77.084c0,1.954-1.599,3.553-3.553,3.553H36.999c-1.954,0-3.553-1.599-3.553-3.553v-9.379c0-1.954,1.599-3.553,3.553-3.553h12.222c1.954,0,3.553,1.599,3.553,3.553V77.084z"
-			fill="currentColor" />
-			<path
-			d="M67.762,48.074c0,1.954-1.599,3.553-3.553,3.553H51.988c-1.954,0-3.553-1.599-3.553-3.553v-9.379c0-1.954,1.599-3.553,3.553-3.553H64.21c1.954,0,3.553,1.599,3.553,3.553V48.074z"
-			fill="currentColor" />
-			<path
-			d="M82.752,77.084c0,1.954-1.599,3.553-3.553,3.553H66.977c-1.954,0-3.553-1.599-3.553-3.553v-9.379c0-1.954,1.599-3.553,3.553-3.553h12.222c1.954,0,3.553,1.599,3.553,3.553V77.084z"
-			fill="currentColor" />
-		</svg>
-		<span style="font-family:Helvetica;font-weight:700;font-size:20px;margin-left:4px;">draw.io</span>
-		<h2 style="text-align:center;width:100%;margin:10px;">Online Diagram Viewer</h2>
-	</div>
-	<hr>
-	<br>
-	View public VSDX, Gliffy, Lucidchart and draw.io diagrams (Google Link Sharing Links supported):
-	<br><br>
-	1. Link to Diagram: <input type="text" id="url" size="80" value="" placeholder="https://www.example.com/diagram.xml"></input>
-	<br><br>
-	2. Choose Mode:
-	<input type="radio" name="option" id="lightbox" checked="checked"/> Full Screen Mode&nbsp;
-	<input type="radio" name="option"/> Editor&nbsp;
-	<input type="radio" name="option" id="iframe"/> IFrame
-	&nbsp;Height: <input type="text" id="height" size="10" value="400px"/>
-	<br><br>
-	<button onclick="create();return false;" style="font-weight:bold;">3. Click Here!</button>
-	<br><br>
-	<a href="" target="_blank" id="result"></a>
-	<textarea style="display:none;" rows="4" cols="100" id="textarea"
-		spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
-  </span>
+	<span style="position:relative;display:inline-block;left:50%;transform:translate(-50%,0);">
+		<div style="display:flex;align-items:center;opacity:0.7;">
+			<img src="logo.svg" style="width:28px;" />
+			<span style="font-family:Helvetica;font-weight:700;font-size:20px;margin-left:4px;">draw.io</span>
+			<h2 style="text-align:center;width:100%;margin:10px;">Online Diagram Viewer</h2>
+		</div>
+		<hr>
+		<br>
+		View public VSDX, Gliffy, Lucidchart and draw.io diagrams (Google Link Sharing Links supported):
+		<br><br>
+		1. Link to Diagram: <input type="text" id="url" size="80" value=""
+			placeholder="https://www.example.com/diagram.xml"></input>
+		<br><br>
+		2. Choose Mode:
+		<input type="radio" name="option" id="lightbox" checked="checked" /> Full Screen Mode&nbsp;
+		<input type="radio" name="option" /> Editor&nbsp;
+		<input type="radio" name="option" id="iframe" /> IFrame
+		&nbsp;Height: <input type="text" id="height" size="10" value="400px" />
+		<br><br>
+		<button onclick="create();return false;" style="font-weight:bold;">3. Click Here!</button>
+		<br><br>
+		<a href="" target="_blank" id="result"></a>
+		<textarea style="display:none;" rows="4" cols="100" id="textarea" spellcheck="false" autocomplete="off"
+			autocorrect="off" autocapitalize="off"></textarea>
+	</span>
 </body>
 </html>
