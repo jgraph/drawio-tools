@@ -7,6 +7,12 @@ body {
     margin: 10px 5% 10px 5%;
     font-size: 12px;
 }
+@media (prefers-color-scheme: dark) {
+    _::-webkit-full-page-media, _:future, :root img
+    {
+        filter: invert(1);
+    }
+}
 hr {
     border: 0;
     border-top: 1px solid light-dark(rgb(0, 0, 0), rgb(255, 255, 255));
