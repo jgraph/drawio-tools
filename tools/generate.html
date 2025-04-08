@@ -26,14 +26,7 @@
       spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
     <div
       style="position:relative;display:flex;align-items:center;justify-items:stretch;padding-top:10px;white-space:nowrap;">
-      <div style="margin-left:auto;opacity:0.5;">
-        Engine:
-        <select style="padding:2px 2px;border-radius:4px;" title="Engine" id="engine">
-          <option value="mermaidjs">Mermaid</option>
-          <option value="chatgpt">ChatGPT</option>
-          <option value="gemini">Gemini</option>
-        </select>
-      </div>
+      <div style="margin-left:auto;"></div>
       <div style="opacity:0.5;margin-left:20px;display:none;" id="modelSection">
         Model:
         <select style="padding:2px 2px;border-radius:4px;" title="Model" id="model">
@@ -43,11 +36,19 @@
           <option value="gpt-4.5-preview">GPT-4.5</option>
         </select>
       </div>
-      <div style="opacity:0.5;margin-left:20px;">
+      <div style="opacity:0.5;margin-left:20px;" id="keySection">
         Key: <input style="padding:2px 2px;" title="API Key" id="apikey">
       </div>
       <div style="opacity:0.5;margin-left:20px;display:flex;align-items:center;flex-grow:1;" id="promptSection">
         Prompt: <input style="padding:2px 2px;flex-grow:1;" title="Prompt" id="aiPrompt">
+      </div>
+      <div style="margin-left:20px;opacity:0.5;">
+        Engine:
+        <select style="padding:2px 2px;border-radius:4px;" title="Engine" id="engine">
+          <option value="mermaidjs">Mermaid</option>
+          <option value="chatgpt">ChatGPT</option>
+          <option value="gemini">Gemini</option>
+        </select>
       </div>
       <button style="position:relative;margin-left:20px;" title="Generate Diagram" id="generate"
         onclick="generate();return false;">
@@ -313,17 +314,30 @@
         document.getElementById('engine').value = urlParams['engine'];
       }
 
-      if (document.getElementById('engine').value == 'gemini') {
-        document.getElementById('aiPrompt').value = 'Create a diagram for "%prompt%" and return only the valid MermaidJS syntax';
-      }
-      else if (document.getElementById('engine').value == 'chatgpt') {
-        document.getElementById('modelSection').style.display = '';
-        document.getElementById('aiPrompt').value = 'Write a detailed and complex MermaidJS declaration for ' +
-          '"%prompt%" and return only the valid MermaidJS syntax without any other text';
-      }
-      else {
-        document.getElementById('promptSection').style.display = 'none';
-      }
+      function engineChanged()
+      {
+        document.getElementById('promptSection').style.display = 'flex';
+        document.getElementById('modelSection').style.display = 'none';
+        document.getElementById('keySection').style.display = '';
+
+        if (document.getElementById('engine').value == 'gemini') {
+          document.getElementById('aiPrompt').value = 'Create a diagram for "%prompt%" ' +
+            'and return only the valid MermaidJS syntax';
+        }
+        else if (document.getElementById('engine').value == 'chatgpt') {
+          document.getElementById('modelSection').style.display = '';
+          document.getElementById('aiPrompt').value = 'Write a detailed and complex MermaidJS declaration for ' +
+            '"%prompt%" and return only the valid MermaidJS syntax without any other text';
+        }
+        else
+        {
+          document.getElementById('promptSection').style.display = 'none';
+          document.getElementById('keySection').style.display = 'none';
+        }
+      };
+
+      engineChanged();
+      document.getElementById('engine').addEventListener('change', engineChanged, false);
 
       if (urlParams['prompt'] != null) {
         document.getElementById('prompt').value = decodeURIComponent(urlParams['prompt']);
