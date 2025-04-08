@@ -11,20 +11,21 @@
   <div style="display:flex;opacity:0.9;align-items:center;padding:20px 20px 10px 20px;opacity:0.7;">
     <img src="logo.svg" style="width:28px;" />
     <span style="font-family:Helvetica;font-weight:700;font-size:20px;margin-left:4px;">draw.io</span>
-    <a style="margin-left:auto;" class="adaptive-asset" href="https://github.com/jgraph/drawio-tools/discussions/3"
-      title="Help" target="_blank">
+    <button style="position:relative;margin-left:auto;margin-right:10px;padding:4px 6px;" title="Unescape" id="create"
+      onclick="replaceEscapes();return false;">
+      Unescape
+    </button>
+    <a class="adaptive-asset" href="https://github.com/jgraph/drawio-tools/discussions/3" title="Help" target="_blank">
       <img src="help.svg" style="width:16px;" />
     </a>
   </div>
-  <div style="display:block;align-items:center;padding:20px;">
+  <div style="display:block;align-items:center;padding:0 20px 20px 20px;">
     <textarea id="prompt"
       style="width:100%;height:60px;font-family:inherit;font-size:inherit;padding:10px;box-sizing:border-box;resize:vertical;"
       placeholder="Diagram description, eg. five tier sequence diagram on how to order fast food online or graph TD; A-->B; A-->C; B-->D; C-->D;"
       spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
-    <div style="position:relative;display:flex;align-items:center;justify-items:stretch;padding-top:10px;white-space:nowrap;">
-      <button style="position:relative;margin-right:20px;" title="Unescape" id="create" onclick="replaceEscapes();return false;">
-        Unescape
-      </button>
+    <div
+      style="position:relative;display:flex;align-items:center;justify-items:stretch;padding-top:10px;white-space:nowrap;">
       <div style="margin-left:auto;opacity:0.5;">
         Engine:
         <select style="padding:2px 2px;border-radius:4px;" title="Engine" id="engine">
@@ -45,24 +46,27 @@
       <div style="opacity:0.5;margin-left:20px;">
         Key: <input style="padding:2px 2px;" title="API Key" id="apikey">
       </div>
-      <div style="opacity:0.5;margin-left:20px;" id="promptSection">
-        Prompt: <input style="padding:2px 2px;" title="Prompt" id="aiPrompt">
+      <div style="opacity:0.5;margin-left:20px;display:flex;align-items:center;flex-grow:1;" id="promptSection">
+        Prompt: <input style="padding:2px 2px;flex-grow:1;" title="Prompt" id="aiPrompt">
       </div>
-      <button style="position:relative;margin-left:20px;" title="Preview Diagram" id="generate"
+      <button style="position:relative;margin-left:20px;" title="Generate Diagram" id="generate"
         onclick="generate();return false;">
-        Preview Diagram
+        Generate
       </button>
     </div>
   </div>
-  <div style="display:block;align-items:center;padding:20px;">
+  <div style="display:block;align-items:center;padding:0 20px 20px 20px;">
     <div
-      style="position:relative;height:640px;border:1px solid rgb(133, 133, 133);resize:vertical;overflow:auto;box-sizing:border-box;background-repeat:no-repeat;background-position:center center;background-image:url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPCFET0NUWVBFIHN2ZyBQVUJMSUMgIi0vL1czQy8vRFREIFNWRyAxLjEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkIj4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHdpZHRoPSI2MHB4IiBoZWlnaHQ9IjMwcHgiIHZpZXdCb3g9Ii0wLjUgLTAuNSA2MCAzMCIgY2xhc3M9ImdlLWV4cG9ydC1zdmctZGFyayI+PGRlZnM+PHN0eWxlIHR5cGU9InRleHQvY3NzIj5zdmcuZ2UtZXhwb3J0LXN2Zy1kYXJrOm5vdChtangtY29udGFpbmVyICZndDsgc3ZnKSB7IGZpbHRlcjogaW52ZXJ0KDEwMCUpIGh1ZS1yb3RhdGUoMTgwZGVnKTsgfSYjeGE7c3ZnLmdlLWV4cG9ydC1zdmctZGFyayBmb3JlaWduT2JqZWN0IGltZywmI3hhO3N2Zy5nZS1leHBvcnQtc3ZnLWRhcmsgaW1hZ2U6bm90KHN2Zy5nZS1leHBvcnQtc3ZnLWRhcmsgc3dpdGNoIGltYWdlKSwmI3hhO3N2Zy5nZS1leHBvcnQtc3ZnLWRhcmsgc3ZnOm5vdChtangtY29udGFpbmVyICZndDsgc3ZnKSYjeGE7eyBmaWx0ZXI6IGludmVydCgxMDAlKSBodWUtcm90YXRlKDE4MGRlZykgfTwvc3R5bGU+PC9kZWZzPjxnPjxnIGRhdGEtY2VsbC1pZD0iMCI+PGcgZGF0YS1jZWxsLWlkPSIxIj48ZyBkYXRhLWNlbGwtaWQ9IkI0WHVrdVk0T2NSTERVNlBqQ0Y4LTEiPjxnPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSI2MCIgaGVpZ2h0PSIzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJub25lIiBwb2ludGVyLWV2ZW50cz0iYWxsIi8+PC9nPjxnPjxnIGZpbGw9InJnYigwLCAwLCAwKSIgZm9udC1mYW1pbHk9IiZxdW90O0hlbHZldGljYSZxdW90OyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNnB4IiBvcGFjaXR5PSIwLjUiPjx0ZXh0IHg9IjI5LjUiIHk9IjIxLjUiPlByZXZpZXc8L3RleHQ+PC9nPjwvZz48L2c+PC9nPjwvZz48L2c+PC9zdmc+);">
+      style="position:relative;height:540px;border:1px solid rgb(133, 133, 133);resize:vertical;overflow:auto;box-sizing:border-box;background-repeat:no-repeat;background-position:center center;background-image:url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPCFET0NUWVBFIHN2ZyBQVUJMSUMgIi0vL1czQy8vRFREIFNWRyAxLjEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkIj4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHdpZHRoPSI2MHB4IiBoZWlnaHQ9IjMwcHgiIHZpZXdCb3g9Ii0wLjUgLTAuNSA2MCAzMCIgY2xhc3M9ImdlLWV4cG9ydC1zdmctZGFyayI+PGRlZnM+PHN0eWxlIHR5cGU9InRleHQvY3NzIj5zdmcuZ2UtZXhwb3J0LXN2Zy1kYXJrOm5vdChtangtY29udGFpbmVyICZndDsgc3ZnKSB7IGZpbHRlcjogaW52ZXJ0KDEwMCUpIGh1ZS1yb3RhdGUoMTgwZGVnKTsgfSYjeGE7c3ZnLmdlLWV4cG9ydC1zdmctZGFyayBmb3JlaWduT2JqZWN0IGltZywmI3hhO3N2Zy5nZS1leHBvcnQtc3ZnLWRhcmsgaW1hZ2U6bm90KHN2Zy5nZS1leHBvcnQtc3ZnLWRhcmsgc3dpdGNoIGltYWdlKSwmI3hhO3N2Zy5nZS1leHBvcnQtc3ZnLWRhcmsgc3ZnOm5vdChtangtY29udGFpbmVyICZndDsgc3ZnKSYjeGE7eyBmaWx0ZXI6IGludmVydCgxMDAlKSBodWUtcm90YXRlKDE4MGRlZykgfTwvc3R5bGU+PC9kZWZzPjxnPjxnIGRhdGEtY2VsbC1pZD0iMCI+PGcgZGF0YS1jZWxsLWlkPSIxIj48ZyBkYXRhLWNlbGwtaWQ9IkI0WHVrdVk0T2NSTERVNlBqQ0Y4LTEiPjxnPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSI2MCIgaGVpZ2h0PSIzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJub25lIiBwb2ludGVyLWV2ZW50cz0iYWxsIi8+PC9nPjxnPjxnIGZpbGw9InJnYigwLCAwLCAwKSIgZm9udC1mYW1pbHk9IiZxdW90O0hlbHZldGljYSZxdW90OyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNnB4IiBvcGFjaXR5PSIwLjUiPjx0ZXh0IHg9IjI5LjUiIHk9IjIxLjUiPlByZXZpZXc8L3RleHQ+PC9nPjwvZz48L2c+PC9nPjwvZz48L2c+PC9zdmc+);">
       <iframe id="preview" allowtransparency="true"
         style="border:5px solid transparent;box-sizing:border-box;position:absolute;width:100%;height:100%;"></iframe>
     </div>
     <div style="position:relative;display:flex;align-items:center;justify-items:stretch;padding-top:10px;">
-      <button disabled="disabled" style="position:relative;margin-left:auto;" title="Edit Diagram" id="edit">
-        Edit Diagram
+      <div id="info"
+        style="display:flex;align-items:center;justify-items:end;margin-left:auto;margin-right:20px;opacity:0.5;">
+      </div>
+      <button disabled="disabled" style="position:relative;" title="Edit Diagram" id="edit">
+        Edit
       </button>
     </div>
   </div>
@@ -87,8 +91,7 @@
       var prompt = document.getElementById('prompt').value;
 
 
-      if (prompt == '')
-      {
+      if (prompt == '') {
         prompt = 'a random diagram';
       }
 
@@ -98,6 +101,8 @@
       async function sendPostRequest(url, data) {
         try {
           console.log('Request:', [url, data]);
+          document.getElementById('info').innerText = '';
+          var t0 = Date.now();
 
           var headers = {
             'Content-Type': 'application/json'
@@ -120,6 +125,7 @@
           const jsonResponse = await response.json();
 
           console.log('Response:', [jsonResponse]);
+          document.getElementById('info').innerText = 'Response time: ' + (Date.now() - t0) + 'ms';
 
           return jsonResponse;
         } catch (error) {
@@ -192,8 +198,23 @@
     };
 
     function extractCode(input) {
+
+      console.log('Extract:', input);
+
+      if (input.indexOf('```mermaid') >= 0) {
+        input = input.substring(input.indexOf('```mermaid') + 11);
+      }
+      else if (input.indexOf('```xml') >= 0) {
+        input = input.substring(input.indexOf('```xml') + 7);
+      }
+      
+      if (input.indexOf('```') >= 0) {
+        input = input.substring(0, input.indexOf('```'));
+      }
+
       return input.replace(/^```mermaid\n/, '').replace(/^```xml\n/, '').
-        replace(/\n```\n$/, '').replace(/\n```$/, '');
+        replace(/\n```\n$/, '').replace(/\n```$/, '').
+        replace(/<\?xml[^>]+\?>\s*/, '');
     };
 
     function preview(value) {
@@ -201,10 +222,20 @@
       var prefix = (urlParams['dev'] == '1') ?
         'https://test.draw.io/?dev=1&' :
         'https://www.draw.io/?' + params;
-      var create = 'create=' + encodeURIComponent(
-        JSON.stringify({ type: 'mermaid', data: value }));
-      var link = prefix + params + create;
+      var create = '';
 
+      if (value.substring(0, 8) == '<mxfile ') {
+
+        console.log('XML:', value);
+
+        create = '#R' + encodeURIComponent(value);
+      }
+      else {
+        create = 'create=' + encodeURIComponent(
+          JSON.stringify({ type: 'mermaid', data: value }));
+      }
+
+      var link = prefix + params + create;
       console.log('Result:', [value, link]);
 
       document.getElementById('preview').src = link;
@@ -281,7 +312,7 @@
       if (urlParams['engine'] != null) {
         document.getElementById('engine').value = urlParams['engine'];
       }
-      
+
       if (document.getElementById('engine').value == 'gemini') {
         document.getElementById('aiPrompt').value = 'Create a diagram for "%prompt%" and return only the valid MermaidJS syntax';
       }
@@ -290,8 +321,7 @@
         document.getElementById('aiPrompt').value = 'Write a detailed and complex MermaidJS declaration for ' +
           '"%prompt%" and return only the valid MermaidJS syntax without any other text';
       }
-      else
-      {
+      else {
         document.getElementById('promptSection').style.display = 'none';
       }
 
