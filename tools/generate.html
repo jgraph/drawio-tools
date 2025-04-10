@@ -401,12 +401,10 @@
           document.getElementById('apikey').value = keystore[engine];
         }
 
-        document.getElementById('aiPrompt').value = 'Write a detailed and complex MermaidJS declaration for ' +
+        document.getElementById('aiPrompt').value = 'Write a MermaidJS declaration for ' +
           '"%prompt%" and return only the valid MermaidJS syntax without any other text';
 
         if (engine == 'gemini') {
-          document.getElementById('aiPrompt').value = 'Write a MermaidJS declaration for ' +
-            '"%prompt%" and return only the valid MermaidJS syntax without any other text';
           document.getElementById('model').value = 'gemini-2.0-flash';
         }
         else if (engine == 'chatgpt') {
