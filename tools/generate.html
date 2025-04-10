@@ -11,7 +11,7 @@
 <body>
   <div style="display:flex;opacity:0.9;align-items:center;padding:20px 20px 10px 20px;opacity:0.7;">
     <img src="logo.svg" style="width:28px;" />
-    <span style="font-family:Helvetica;font-weight:700;font-size:20px;margin-left:4px;">draw.io</span>
+    <span style="font-family:Helvetica;font-weight:700;font-size:20px;margin-left:4px;">draw.io labs</span>
     <button style="position:relative;margin-left:auto;margin-right:10px;padding:4px 6px;" title="Unescape" id="create"
       onclick="replaceEscapes();return false;">
       Unescape
@@ -28,19 +28,30 @@
     <div
       style="position:relative;display:flex;align-items:center;justify-items:stretch;padding-top:10px;white-space:nowrap;">
       <div style="margin-left:auto;"></div>
-      <div style="opacity:0.5;margin-left:20px;" id="keySection">
-        Key: <input style="padding:2px 2px;" title="API Key" id="apikey">
+      <div style="opacity:0.5;" id="keySection">
+        Key: <input style="padding:2px;" title="API Key" id="apikey">
       </div>
-      <div style="opacity:0.5;margin-left:20px;display:flex;align-items:center;flex-grow:1;" id="promptSection">
-        Prompt: <input style="padding:2px 2px;flex-grow:1;" title="Prompt" id="aiPrompt">
+      <div style="opacity:0.5;margin-left:10px;display:flex;align-items:center;flex-grow:1;" id="promptSection">
+        Prompt:&nbsp;
+        <select style="padding:2px;border-radius:4px;" title="Type" id="aiPromptSelect">
+          <option id="mermaidOption"
+            value="Write a MermaidJS declaration for &quot;%prompt%&quot; and return only the valid MermaidJS syntax without any other text do not return a gantt chart unless specifically requested"
+            selected>Mermaid</option>
+          <option id="drawioOption"
+            value="Write a draw.io file for &quot;%prompt%&quot; and return only the valid XML syntax without any other text">
+            draw.io</option>
+        </select>
+        <input style="padding:2px;flex-grow:1;" title="Prompt" id="aiPrompt">
       </div>
-      <div style="opacity:0.5;margin-left:20px;display:none;" id="modelSection">
+      <div style="opacity:0.5;margin-left:10px;display:none;" id="modelSection">
         Model:
-        <select style="padding:2px 2px;border-radius:4px;" title="Model" id="model">
-          <option value="gpt-4.5-preview">GPT-4.5</option>
+        <select style="padding:2px;border-radius:4px;" title="Model" id="model">
+          <option value="gpt-4.5-preview">GPT-4.5 Preview</option>
           <option value="gpt-4o" selected>GPT-4o</option>
           <option value="gpt-4o-mini">GPT-4o mini</option>
-          <option value="gpt-3.5-turbo">GPT-3.5</option>
+          <option value="gpt-4-turbo">GPT-4 Turbo</option>
+          <option value="gpt-4">GPT-4</option>
+          <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
           <option value="gemini-2.5-pro-exp-03-25">Gemini 2.5 Pro 03-25</option>
           <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
           <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash-Lite</option>
@@ -54,12 +65,13 @@
           <option value="claude-3-haiku-20240307">Claude 3 Haiku</option>
         </select>
       </div>
-      <div style="margin-left:20px;opacity:0.5;">
+      <div style="margin-left:10px;opacity:0.5;">
         Engine:
-        <select style="padding:2px 2px;border-radius:4px;" title="Engine" id="engine">
+        <select style="padding:2px;border-radius:4px;" title="Engine" id="engine">
           <option value="chatgpt">ChatGPT</option>
           <option value="gemini">Gemini</option>
           <option value="mermaidjs">Mermaid</option>
+          <option value="drawio">draw.io</option>
         </select>
       </div>
       <button style="position:relative;margin-left:20px;" title="Generate Diagram" id="generate"
@@ -90,233 +102,6 @@
     //<![CDATA[
     var spin = 'url(data:image/svg+xml;base64,77u/PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyMDAgMjAwJz48Y2lyY2xlIGZpbGw9JyM4MDgwODAnIHN0cm9rZT0nIzgwODA4MCcgc3Ryb2tlLXdpZHRoPScxNScgcj0nMTUnIGN4PSczNScgY3k9JzEwMCcgZGF0YS1kYXJrcmVhZGVyLWlubGluZS1maWxsPScnIGRhdGEtZGFya3JlYWRlci1pbmxpbmUtc3Ryb2tlPScnIHN0eWxlPSctLWRhcmtyZWFkZXItaW5saW5lLWZpbGw6ICNmZjZkZmY7IC0tZGFya3JlYWRlci1pbmxpbmUtc3Ryb2tlOiAjZmY2ZGZmOyc+PGFuaW1hdGUgYXR0cmlidXRlTmFtZT0nY3gnIGNhbGNNb2RlPSdzcGxpbmUnIGR1cj0nNC4yJyB2YWx1ZXM9JzM1OzE2NTsxNjU7MzU7MzUnIGtleVNwbGluZXM9JzAgLjEgLjUgMTswIC4xIC41IDE7MCAuMSAuNSAxOzAgLjEgLjUgMScgcmVwZWF0Q291bnQ9J2luZGVmaW5pdGUnIGJlZ2luPScwJz48L2FuaW1hdGU+PC9jaXJjbGU+PGNpcmNsZSBmaWxsPScjODA4MDgwJyBzdHJva2U9JyM4MDgwODAnIHN0cm9rZS13aWR0aD0nMTUnIG9wYWNpdHk9Jy44JyByPScxNScgY3g9JzM1JyBjeT0nMTAwJyBkYXRhLWRhcmtyZWFkZXItaW5saW5lLWZpbGw9JycgZGF0YS1kYXJrcmVhZGVyLWlubGluZS1zdHJva2U9Jycgc3R5bGU9Jy0tZGFya3JlYWRlci1pbmxpbmUtZmlsbDogI2ZmNmRmZjsgLS1kYXJrcmVhZGVyLWlubGluZS1zdHJva2U6ICNmZjZkZmY7Jz48YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdjeCcgY2FsY01vZGU9J3NwbGluZScgZHVyPSc0LjInIHZhbHVlcz0nMzU7MTY1OzE2NTszNTszNScga2V5U3BsaW5lcz0nMCAuMSAuNSAxOzAgLjEgLjUgMTswIC4xIC41IDE7MCAuMSAuNSAxJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScgYmVnaW49JzAuMDUnPjwvYW5pbWF0ZT48L2NpcmNsZT48Y2lyY2xlIGZpbGw9JyM4MDgwODAnIHN0cm9rZT0nIzgwODA4MCcgc3Ryb2tlLXdpZHRoPScxNScgb3BhY2l0eT0nLjYnIHI9JzE1JyBjeD0nMzUnIGN5PScxMDAnIGRhdGEtZGFya3JlYWRlci1pbmxpbmUtZmlsbD0nJyBkYXRhLWRhcmtyZWFkZXItaW5saW5lLXN0cm9rZT0nJyBzdHlsZT0nLS1kYXJrcmVhZGVyLWlubGluZS1maWxsOiAjZmY2ZGZmOyAtLWRhcmtyZWFkZXItaW5saW5lLXN0cm9rZTogI2ZmNmRmZjsnPjxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J2N4JyBjYWxjTW9kZT0nc3BsaW5lJyBkdXI9JzQuMicgdmFsdWVzPSczNTsxNjU7MTY1OzM1OzM1JyBrZXlTcGxpbmVzPScwIC4xIC41IDE7MCAuMSAuNSAxOzAgLjEgLjUgMTswIC4xIC41IDEnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJyBiZWdpbj0nLjEnPjwvYW5pbWF0ZT48L2NpcmNsZT48Y2lyY2xlIGZpbGw9JyM4MDgwODAnIHN0cm9rZT0nIzgwODA4MCcgc3Ryb2tlLXdpZHRoPScxNScgb3BhY2l0eT0nLjQnIHI9JzE1JyBjeD0nMzUnIGN5PScxMDAnIGRhdGEtZGFya3JlYWRlci1pbmxpbmUtZmlsbD0nJyBkYXRhLWRhcmtyZWFkZXItaW5saW5lLXN0cm9rZT0nJyBzdHlsZT0nLS1kYXJrcmVhZGVyLWlubGluZS1maWxsOiAjZmY2ZGZmOyAtLWRhcmtyZWFkZXItaW5saW5lLXN0cm9rZTogI2ZmNmRmZjsnPjxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J2N4JyBjYWxjTW9kZT0nc3BsaW5lJyBkdXI9JzQuMicgdmFsdWVzPSczNTsxNjU7MTY1OzM1OzM1JyBrZXlTcGxpbmVzPScwIC4xIC41IDE7MCAuMSAuNSAxOzAgLjEgLjUgMTswIC4xIC41IDEnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJyBiZWdpbj0nLjE1Jz48L2FuaW1hdGU+PC9jaXJjbGU+PGNpcmNsZSBmaWxsPScjODA4MDgwJyBzdHJva2U9JyM4MDgwODAnIHN0cm9rZS13aWR0aD0nMTUnIG9wYWNpdHk9Jy4yJyByPScxNScgY3g9JzM1JyBjeT0nMTAwJyBkYXRhLWRhcmtyZWFkZXItaW5saW5lLWZpbGw9JycgZGF0YS1kYXJrcmVhZGVyLWlubGluZS1zdHJva2U9Jycgc3R5bGU9Jy0tZGFya3JlYWRlci1pbmxpbmUtZmlsbDogI2ZmNmRmZjsgLS1kYXJrcmVhZGVyLWlubGluZS1zdHJva2U6ICNmZjZkZmY7Jz48YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdjeCcgY2FsY01vZGU9J3NwbGluZScgZHVyPSc0LjInIHZhbHVlcz0nMzU7MTY1OzE2NTszNTszNScga2V5U3BsaW5lcz0nMCAuMSAuNSAxOzAgLjEgLjUgMTswIC4xIC41IDE7MCAuMSAuNSAxJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScgYmVnaW49Jy4yJz48L2FuaW1hdGU+PC9jaXJjbGU+PC9zdmc+)';
 
-    // Adds claude as an engine option for localhost
-    // where a proxy server must be running
-    if (window.location.hostname == 'localhost') {
-      var option = document.createElement('option');
-      option.value = 'claude';
-      option.text = 'Claude';
-      document.getElementById('engine').appendChild(option);
-    }
-
-    function replaceEscapes() {
-      var input = document.getElementById('prompt').value;
-      // Replace Unicode escape sequences
-      input = input.replace(/\\u([0-9A-Fa-f]{4})/g, (match, group) =>
-        String.fromCharCode(parseInt(group, 16))
-      );
-      // Replace newline escape sequences
-      document.getElementById('prompt').value = input.replace(/\\n/g, '\n');
-    };
-
-    function generate() {
-      var engine = document.getElementById('engine').value;
-      var apikey = document.getElementById('apikey').value;
-      var model = document.getElementById('model').value;
-      var prompt = document.getElementById('prompt').value;
-
-      if (prompt == '') {
-        prompt = 'a random diagram';
-      }
-
-      var aiprompt = document.getElementById('aiPrompt').value;
-      aiprompt = aiprompt.replace(/%prompt%/g, prompt);
-
-      async function sendPostRequest(url, data) {
-        try {
-          var body = JSON.stringify(data);
-          console.log('Request:', url.length, 'url bytes', body.length,
-            'body bytes', ['url', url, 'data', data]);
-          document.getElementById('info').innerText = '';
-          var t0 = Date.now();
-
-          var headers = {
-            'Content-Type': 'application/json'
-          };
-
-          if (engine == 'chatgpt') {
-            headers['Authorization'] = 'Bearer ' + apikey;
-          }
-          else if (engine == 'claude') {
-            headers['x-api-key'] = apikey;
-            headers['model'] = model;
-          }
-
-          var response = await fetch(url, {
-            method: 'POST',
-            headers: headers,
-            body: body
-          });
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-
-          const jsonResponse = await response.json();
-
-          var dt = Date.now() - t0;
-          console.log('Response:', dt, 'ms', ['jsonResponse', jsonResponse]);
-          document.getElementById('info').innerText = 'Response time: ' + dt + 'ms';
-
-          return jsonResponse;
-        } catch (error) {
-          console.error('Error:', error);
-          throw error;
-        }
-      };
-
-      if (engine != 'mermaidjs' && apikey == '') {
-        alert('API key is required for ' + engine);
-      }
-      else {
-        document.getElementById('edit').disabled = true;
-        document.getElementById('view').disabled = true;
-        document.getElementById('generate').disabled = true;
-        document.getElementById('preview').removeAttribute('src');
-        document.getElementById('preview').style.display = 'none';
-        document.getElementById('preview').parentNode.style.backgroundImage = spin;
-
-        console.log('Prompt:', prompt.length, 'bytes', ['engine', engine,
-          'model', model, 'prompt', prompt, 'aiprompt', aiprompt]);
-
-        function handleError(error) {
-          document.getElementById('generate').disabled = false;
-          document.getElementById('preview').parentNode.style.backgroundImage = 'none';
-          console.error('Error:', error);
-          alert('Error:' + error);
-        };
-
-        try {
-          if (engine == 'gemini') {
-            var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apikey;
-            sendPostRequest(url, {
-              contents:
-                [{
-                  parts:
-                    [{
-                      text: aiprompt
-                    }]
-                }]
-            }).then(function (response) {
-              preview(extractCode(response.candidates[0].content.parts[0].text));
-            }).catch(function (error) {
-              handleError(error);
-            });
-          }
-          else if (engine == 'claude') {
-            var url = 'http://localhost:3000/api/claude';
-            sendPostRequest(url, {
-              model: 'claude-3-sonnet',//model // or claude-3-sonnet, claude-3-haiku
-              max_tokens: 1024,
-              // temperature: 0.7,
-              messages: [{
-                'role': 'user', 'content': aiprompt
-              }]
-            }).then(function (response) {
-              preview(extractCode(response.content[0].text));
-            }).catch(function (error) {
-              handleError(error);
-            });
-          }
-
-          else if (engine == 'chatgpt') {
-            var url = 'https://api.openai.com/v1/chat/completions';
-            sendPostRequest(url, {
-              model: model,
-              messages: [{
-                'role': 'user', 'content': aiprompt
-              }]
-            }).then(function (response) {
-              preview(extractCode(response.choices[0].message.content));
-            }).catch(function (error) {
-              handleError(error);
-            });
-          }
-          else if (engine == 'mermaidjs') {
-            preview(prompt);
-          }
-          else {
-            document.getElementById('generate').disabled = false;
-            document.getElementById('preview').parentNode.style.backgroundImage = 'none';
-            alert('Invalid engine');
-          }
-        }
-        catch (error) {
-          handleError(error);
-        }
-      }
-    };
-
-    function extractCode(input) {
-
-      result = input;
-
-      if (result.indexOf('```mermaid') >= 0) {
-        result = result.substring(result.indexOf('```mermaid') + 11);
-      }
-      else if (result.indexOf('```xml') >= 0) {
-        result = result.substring(result.indexOf('```xml') + 7);
-      }
-      else {
-        var start = result.indexOf('```');
-
-        if (start == 0)
-          result = result.substring(3);
-        else if (start > 0)
-          result = result.substring(0, start + 3);
-      }
-
-      result = result.replace(/^```mermaid\n/, '').replace(/^```xml\n/, '').
-        replace(/\n```\n$/, '').replace(/\n```$/, '').
-        replace(/<\?xml[^>]+\?>\s*/, '');
-
-
-      console.log('Extract Code', input.length, 'bytes', result.length,
-        'bytes extracted', ['input', input, 'result', result]);
-
-      return result;
-    };
-
-    function preview(value) {
-      var params = 'lightbox=1&dark=auto&border=10&edit=_blank';
-      var prefix = (urlParams['dev'] == '1') ?
-        'https://test.draw.io/?dev=1&' :
-        'https://www.draw.io/?' + params;
-      var create = '';
-      var data = value;
-
-      var createObj = {
-        type: (data.startsWith('<')) ? 'xml' : 'mermaid',
-        data: compressData(data),
-        compressed: true
-      };
-
-      create = '#create=' + encodeURIComponent(
-        JSON.stringify(createObj));
-
-      var link = prefix + params + create;
-      console.log('Preview:', link.length, 'url bytes',
-        data.length, 'data bytes', value.length, 'value bytes',
-        ['link', link, 'value', value, 'data', data, 'createObj', createObj]);
-
-      document.getElementById('preview').src = link;
-      document.getElementById('preview').style.display = 'block';
-      document.getElementById('preview').parentNode.style.backgroundImage = 'none';
-      prefix = (urlParams['dev'] == '1') ?
-        'https://test.draw.io/?dev=1&' :
-        'https://www.draw.io/?';
-      link = prefix + create;
-      document.getElementById('edit').disabled = false;
-      document.getElementById('view').disabled = false;
-      document.getElementById('generate').disabled = false;
-      document.getElementById('view').onclick = function () {
-        window.open(prefix + params + create);
-      };
-      document.getElementById('edit').onclick = function () {
-        window.open(link);
-      };
-    };
-
     var urlParams = (function (url) {
       var result = new Object();
       var idx = url.lastIndexOf('#');
@@ -342,6 +127,287 @@
     if (urlParams['key'] != null) {
       document.getElementById('apikey').value = urlParams['key'];
     }
+
+    if (window.location.hostname == 'localhost') {
+      // Adds claude as an engine option for localhost
+      // where a proxy server must be running
+      var option = document.createElement('option');
+      option.value = 'claude';
+      option.text = 'Claude';
+      document.getElementById('engine').insertBefore(option,
+        document.getElementById('engine').options[0]);
+
+      // Adds automatic option for local testing
+      if (keystore != null &&
+        keystore['claude'] != null &&
+        keystore['chatgpt'] != null) {
+        var option = document.createElement('option');
+        option.value = 'auto';
+        option.text = 'Automatic';
+        document.getElementById('engine').insertBefore(option,
+          document.getElementById('engine').options[0]);
+      }
+    }
+
+    function replaceEscapes() {
+      var input = document.getElementById('prompt').value;
+      // Replace Unicode escape sequences
+      input = input.replace(/\\u([0-9A-Fa-f]{4})/g, (match, group) =>
+        String.fromCharCode(parseInt(group, 16))
+      );
+      // Replace newline escape sequences
+      document.getElementById('prompt').value = input.replace(/\\n/g, '\n');
+    };
+
+    async function sendPostRequest(url, data, engine, model, apikey) {
+      try {
+        var body = JSON.stringify(data);
+        console.log('sendPostRequest.request', url.length, 'url bytes', body.length,
+          'body bytes', ['url', url, 'data', data]);
+        document.getElementById('info').innerText = '';
+        document.getElementById('info').innerText = 'Engine: ' +
+          engine + ' Model: ' + model + ' Waiting...';
+        var t0 = Date.now();
+
+        var headers = {
+          'Content-Type': 'application/json'
+        };
+
+        if (engine == 'chatgpt') {
+          headers['Authorization'] = 'Bearer ' + apikey;
+        }
+        else if (engine == 'claude') {
+          headers['x-api-key'] = apikey;
+          headers['model'] = model;
+        }
+
+        var response = await fetch(url, {
+          method: 'POST',
+          headers: headers,
+          body: body
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const jsonResponse = await response.json();
+
+        var dt = Date.now() - t0;
+        console.log('sendPostRequest.response', dt, 'ms', 'jsonResponse', [jsonResponse]);
+        document.getElementById('info').innerText = 'Engine: ' +
+          engine + ' Model: ' + model + ' Time: ' + dt + 'ms';
+
+        return jsonResponse;
+      } catch (error) {
+        console.error('Error:', error);
+        throw error;
+      }
+    };
+
+    function doGenerate(engine, model, aiprompt) {
+      var apikey = (engine != null) ? keystore[engine] :
+        document.getElementById('apikey').value;
+      engine = (engine != null) ? engine :
+        document.getElementById('engine').value;
+      model = (model != null) ? model :
+        document.getElementById('model').value;
+      var prompt = document.getElementById('prompt').value;
+
+      if (prompt == '') {
+        prompt = 'a random diagram';
+      }
+
+      if (aiprompt == null) {
+        aiprompt = document.getElementById('aiPrompt').value;
+        aiprompt = aiprompt.replace(/%prompt%/g, prompt);
+      }
+
+      if (engine != 'mermaidjs' && engine != 'drawio' &&
+        engine != 'auto' && apikey == '') {
+        alert('API key is required for ' + engine);
+      }
+      else {
+        document.getElementById('edit').disabled = true;
+        document.getElementById('view').disabled = true;
+        document.getElementById('generate').disabled = true;
+        document.getElementById('preview').removeAttribute('src');
+        document.getElementById('preview').style.display = 'none';
+        document.getElementById('preview').parentNode.style.backgroundImage = spin;
+
+        console.log('doGenerate', prompt.length, 'bytes', 'engine', engine,
+          'model', model, 'prompt', [prompt], 'aiprompt', [aiprompt]);
+
+        function handleError(error) {
+          document.getElementById('generate').disabled = false;
+          document.getElementById('preview').parentNode.style.backgroundImage = 'none';
+          console.error('Error:', error);
+          alert('Error:' + error);
+        };
+
+        try {
+          if (engine == 'gemini') {
+            var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apikey;
+            sendPostRequest(url, {
+              contents:
+                [{
+                  parts:
+                    [{
+                      text: aiprompt
+                    }]
+                }]
+            }, engine, model, apikey).then(function (response) {
+              preview(extractCode(response.candidates[0].content.parts[0].text));
+            }).catch(function (error) {
+              handleError(error);
+            });
+          }
+          else if (engine == 'claude') {
+            var url = 'http://localhost:3000/api/claude';
+            sendPostRequest(url, {
+              model: 'claude-3-sonnet',
+              messages: [{
+                'role': 'user', 'content': aiprompt
+              }]
+            }, engine, model, apikey).then(function (response) {
+              preview(extractCode(response.content[0].text));
+            }).catch(function (error) {
+              handleError(error);
+            });
+          }
+          else if (engine == 'chatgpt') {
+            var url = 'https://api.openai.com/v1/chat/completions';
+            sendPostRequest(url, {
+              model: model,
+              messages: [{
+                'role': 'user', 'content': aiprompt
+              }]
+            }, engine, model, apikey).then(function (response) {
+              preview(extractCode(response.choices[0].message.content));
+            }).catch(function (error) {
+              handleError(error);
+            });
+          }
+          else if (engine == 'mermaidjs' || engine == 'drawio') {
+            preview(prompt);
+          }
+          else {
+            document.getElementById('generate').disabled = false;
+            document.getElementById('preview').parentNode.style.backgroundImage = 'none';
+            alert('Invalid engine');
+          }
+        }
+        catch (error) {
+          handleError(error);
+        }
+      }
+    };
+
+    function generate() {
+      if (document.getElementById('engine').value == 'auto') {
+        var prompt = document.getElementById('prompt').value;
+        var typePrompt = '"' + prompt + '" if this prompt describes a UI mockup or a floorplan ' +
+          'then respond with the string "xml", else if it is a complex diagram respond with ' +
+          '"mermaid-complex" or else respond with "mermaid"';
+
+        var url = 'https://api.openai.com/v1/chat/completions';
+        sendPostRequest(url, {
+          model: 'gpt-4o-mini',
+          messages: [{
+            'role': 'user', 'content': typePrompt
+          }]
+        }, 'chatgpt', null, keystore['chatgpt']).then(function (response) {
+          var type = response.choices[0].message.content;
+          console.log('generate', 'type', type);
+
+          if (type == 'xml') {
+            doGenerate('chatgpt', 'gpt-4.5-preview',
+              document.getElementById('drawioOption').value.replace(/%prompt%/g, prompt));
+          }
+          else if (type == 'mermaid-complex') {
+            doGenerate('claude', 'claude-3-7-sonnet-latest',
+              document.getElementById('mermaidOption').value.replace(/%prompt%/g, prompt));
+          }
+          else {
+            doGenerate('chatgpt', 'gpt-4o-mini');
+          }
+        },).catch(function (error) {
+          handleError(error);
+        });
+      }
+      else {
+        doGenerate();
+      }
+    };
+
+    function extractCode(input) {
+      result = input;
+
+      if (result.indexOf('```mermaid') >= 0) {
+        result = result.substring(result.indexOf('```mermaid') + 11);
+      }
+      else if (result.indexOf('```xml') >= 0) {
+        result = result.substring(result.indexOf('```xml') + 7);
+      }
+      else {
+        var start = result.indexOf('```');
+
+        if (start == 0)
+          result = result.substring(3);
+        else if (start > 0)
+          result = result.substring(0, start + 3);
+      }
+
+      result = result.replace(/^```mermaid\n/, '').replace(/^```xml\n/, '').
+        replace(/\n```\n$/, '').replace(/\n```$/, '').
+        replace(/<\?xml[^>]+\?>\s*/, '');
+
+      console.log('extractCode', input.length, 'bytes', result.length,
+        'bytes extracted', 'input', [input], 'result', [result]);
+
+      return result;
+    };
+
+    function preview(value) {
+      var params = 'lightbox=1&dark=auto&border=10&edit=_blank';
+      var prefix = (urlParams['dev'] == '1') ?
+        'https://test.draw.io/?dev=1&' :
+        'https://www.draw.io/?' + params;
+      var data = compressData(value);
+      var create = '';
+
+      var createObj = {
+        type: (value.startsWith('<')) ? 'xml' : 'mermaid',
+        compressed: true,
+        data: data
+      };
+
+      create = '#create=' + encodeURIComponent(
+        JSON.stringify(createObj));
+
+      var link = prefix + params + create;
+      console.log('preview', link.length, 'url bytes',
+        data.length, 'data bytes', value.length, 'value bytes',
+        'link', [link], 'value', [value], 'data', [data],
+        'createObj', [createObj]);
+
+      document.getElementById('preview').src = link;
+      document.getElementById('preview').style.display = 'block';
+      document.getElementById('preview').parentNode.style.backgroundImage = 'none';
+      prefix = (urlParams['dev'] == '1') ?
+        'https://test.draw.io/?dev=1&' :
+        'https://www.draw.io/?';
+      link = prefix + create;
+      document.getElementById('edit').disabled = false;
+      document.getElementById('view').disabled = false;
+      document.getElementById('generate').disabled = false;
+      document.getElementById('view').onclick = function () {
+        window.open(prefix + params + create);
+      };
+      document.getElementById('edit').onclick = function () {
+        window.open(link);
+      };
+    };
 
     if (window.File != null && window.FileReader != null && window.FileList != null) {
       function handleDrop(evt) {
@@ -401,9 +467,6 @@
           document.getElementById('apikey').value = keystore[engine];
         }
 
-        document.getElementById('aiPrompt').value = 'Write a MermaidJS declaration for ' +
-          '"%prompt%" and return only the valid MermaidJS syntax without any other text';
-
         if (engine == 'gemini') {
           document.getElementById('model').value = 'gemini-2.0-flash';
         }
@@ -436,20 +499,33 @@
         var result = data;
 
         if (typeof (pako) !== 'undefined' &&
-          data != null && data.length) {
+          data != null && data.length > 0) {
           var tmp = (false) ? pako.deflate(encodeURIComponent(data)) :
             pako.deflateRaw(encodeURIComponent(data));
           result = btoa(arrayBufferToString(new Uint8Array(tmp)));
         }
 
-        console.log('Compress', data.length, 'bytes', result.length,
-          'bytes compressed', ['data', data, 'result', result]);
+        console.log('compressData', data.length, 'bytes', result.length,
+          'bytes compressed', 'data', [data], 'result', [result]);
 
         return result;
       };
 
       engineChanged();
       document.getElementById('engine').addEventListener('change', engineChanged, false);
+
+      function promptChanged() {
+        document.getElementById('aiPrompt').value = document.getElementById('aiPromptSelect').value;
+      };
+
+      document.getElementById('aiPromptSelect').addEventListener('change', promptChanged, false);
+
+      if (urlParams['aiprompt'] != null) {
+        document.getElementById('aiPrompt').value = decodeURIComponent(urlParams['aiprompt']);
+      }
+      else {
+        promptChanged();
+      }
 
       if (urlParams['prompt'] != null) {
         document.getElementById('prompt').value = decodeURIComponent(urlParams['prompt']);
