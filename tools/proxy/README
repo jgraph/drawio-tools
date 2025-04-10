@@ -1,0 +1,8 @@
+Install:
+
+  npm init -y
+  npm install express cors axios
+
+Run:
+
+  node server.js

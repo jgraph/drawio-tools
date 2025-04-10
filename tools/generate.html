@@ -5,6 +5,7 @@
   <title>Generate draw.io Diagrams</title>
   <meta charset="utf-8" />
   <link rel="stylesheet" type="text/css" href="style.css">
+  <script type="text/javascript" src="deflate/pako.min.js"></script>
 </head>
 
 <body>
@@ -27,27 +28,38 @@
     <div
       style="position:relative;display:flex;align-items:center;justify-items:stretch;padding-top:10px;white-space:nowrap;">
       <div style="margin-left:auto;"></div>
-      <div style="opacity:0.5;margin-left:20px;display:none;" id="modelSection">
-        Model:
-        <select style="padding:2px 2px;border-radius:4px;" title="Model" id="model">
-          <option value="gpt-3.5-turbo">GPT-3.5</option>
-          <option value="gpt-4o-mini">GPT-4o mini</option>
-          <option value="gpt-4o" selected>GPT-4o</option>
-          <option value="gpt-4.5-preview">GPT-4.5</option>
-        </select>
-      </div>
       <div style="opacity:0.5;margin-left:20px;" id="keySection">
         Key: <input style="padding:2px 2px;" title="API Key" id="apikey">
       </div>
       <div style="opacity:0.5;margin-left:20px;display:flex;align-items:center;flex-grow:1;" id="promptSection">
         Prompt: <input style="padding:2px 2px;flex-grow:1;" title="Prompt" id="aiPrompt">
       </div>
+      <div style="opacity:0.5;margin-left:20px;display:none;" id="modelSection">
+        Model:
+        <select style="padding:2px 2px;border-radius:4px;" title="Model" id="model">
+          <option value="gpt-4.5-preview">GPT-4.5</option>
+          <option value="gpt-4o" selected>GPT-4o</option>
+          <option value="gpt-4o-mini">GPT-4o mini</option>
+          <option value="gpt-3.5-turbo">GPT-3.5</option>
+          <option value="gemini-2.5-pro-exp-03-25">Gemini 2.5 Pro 03-25</option>
+          <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+          <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash-Lite</option>
+          <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+          <option value="claude-3-7-sonnet-latest">Claude 3.7 Sonnet</option>
+          <option value="claude-3-5-haiku-latest">Claude 3.5 Haiku</option>
+          <option value="claude-3-5-sonnet-latest">Claude 3.5 Sonnet v2</option>
+          <option value="claude-3-5-sonnet-20240620">Claude 3.5 Sonnet</option>
+          <option value="claude-3-opus-20240229">Claude 3 Opus</option>
+          <option value="claude-3-sonnet-20240229">Claude 3 Sonnet</option>
+          <option value="claude-3-haiku-20240307">Claude 3 Haiku</option>
+        </select>
+      </div>
       <div style="margin-left:20px;opacity:0.5;">
         Engine:
         <select style="padding:2px 2px;border-radius:4px;" title="Engine" id="engine">
-          <option value="mermaidjs">Mermaid</option>
           <option value="chatgpt">ChatGPT</option>
           <option value="gemini">Gemini</option>
+          <option value="mermaidjs">Mermaid</option>
         </select>
       </div>
       <button style="position:relative;margin-left:20px;" title="Generate Diagram" id="generate"
@@ -66,7 +78,10 @@
       <div id="info"
         style="display:flex;align-items:center;justify-items:end;margin-left:auto;margin-right:20px;opacity:0.5;">
       </div>
-      <button disabled="disabled" style="position:relative;" title="Edit Diagram" id="edit">
+      <button disabled="disabled" style="position:relative;" title="View Diagram" id="view">
+        View
+      </button>
+      <button disabled="disabled" style="position:relative;margin-left:10px;" title="Edit Diagram" id="edit">
         Edit
       </button>
     </div>
@@ -74,6 +89,15 @@
   <script type="text/javascript">
     //<![CDATA[
     var spin = 'url(data:image/svg+xml;base64,77u/PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyMDAgMjAwJz48Y2lyY2xlIGZpbGw9JyM4MDgwODAnIHN0cm9rZT0nIzgwODA4MCcgc3Ryb2tlLXdpZHRoPScxNScgcj0nMTUnIGN4PSczNScgY3k9JzEwMCcgZGF0YS1kYXJrcmVhZGVyLWlubGluZS1maWxsPScnIGRhdGEtZGFya3JlYWRlci1pbmxpbmUtc3Ryb2tlPScnIHN0eWxlPSctLWRhcmtyZWFkZXItaW5saW5lLWZpbGw6ICNmZjZkZmY7IC0tZGFya3JlYWRlci1pbmxpbmUtc3Ryb2tlOiAjZmY2ZGZmOyc+PGFuaW1hdGUgYXR0cmlidXRlTmFtZT0nY3gnIGNhbGNNb2RlPSdzcGxpbmUnIGR1cj0nNC4yJyB2YWx1ZXM9JzM1OzE2NTsxNjU7MzU7MzUnIGtleVNwbGluZXM9JzAgLjEgLjUgMTswIC4xIC41IDE7MCAuMSAuNSAxOzAgLjEgLjUgMScgcmVwZWF0Q291bnQ9J2luZGVmaW5pdGUnIGJlZ2luPScwJz48L2FuaW1hdGU+PC9jaXJjbGU+PGNpcmNsZSBmaWxsPScjODA4MDgwJyBzdHJva2U9JyM4MDgwODAnIHN0cm9rZS13aWR0aD0nMTUnIG9wYWNpdHk9Jy44JyByPScxNScgY3g9JzM1JyBjeT0nMTAwJyBkYXRhLWRhcmtyZWFkZXItaW5saW5lLWZpbGw9JycgZGF0YS1kYXJrcmVhZGVyLWlubGluZS1zdHJva2U9Jycgc3R5bGU9Jy0tZGFya3JlYWRlci1pbmxpbmUtZmlsbDogI2ZmNmRmZjsgLS1kYXJrcmVhZGVyLWlubGluZS1zdHJva2U6ICNmZjZkZmY7Jz48YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdjeCcgY2FsY01vZGU9J3NwbGluZScgZHVyPSc0LjInIHZhbHVlcz0nMzU7MTY1OzE2NTszNTszNScga2V5U3BsaW5lcz0nMCAuMSAuNSAxOzAgLjEgLjUgMTswIC4xIC41IDE7MCAuMSAuNSAxJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScgYmVnaW49JzAuMDUnPjwvYW5pbWF0ZT48L2NpcmNsZT48Y2lyY2xlIGZpbGw9JyM4MDgwODAnIHN0cm9rZT0nIzgwODA4MCcgc3Ryb2tlLXdpZHRoPScxNScgb3BhY2l0eT0nLjYnIHI9JzE1JyBjeD0nMzUnIGN5PScxMDAnIGRhdGEtZGFya3JlYWRlci1pbmxpbmUtZmlsbD0nJyBkYXRhLWRhcmtyZWFkZXItaW5saW5lLXN0cm9rZT0nJyBzdHlsZT0nLS1kYXJrcmVhZGVyLWlubGluZS1maWxsOiAjZmY2ZGZmOyAtLWRhcmtyZWFkZXItaW5saW5lLXN0cm9rZTogI2ZmNmRmZjsnPjxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J2N4JyBjYWxjTW9kZT0nc3BsaW5lJyBkdXI9JzQuMicgdmFsdWVzPSczNTsxNjU7MTY1OzM1OzM1JyBrZXlTcGxpbmVzPScwIC4xIC41IDE7MCAuMSAuNSAxOzAgLjEgLjUgMTswIC4xIC41IDEnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJyBiZWdpbj0nLjEnPjwvYW5pbWF0ZT48L2NpcmNsZT48Y2lyY2xlIGZpbGw9JyM4MDgwODAnIHN0cm9rZT0nIzgwODA4MCcgc3Ryb2tlLXdpZHRoPScxNScgb3BhY2l0eT0nLjQnIHI9JzE1JyBjeD0nMzUnIGN5PScxMDAnIGRhdGEtZGFya3JlYWRlci1pbmxpbmUtZmlsbD0nJyBkYXRhLWRhcmtyZWFkZXItaW5saW5lLXN0cm9rZT0nJyBzdHlsZT0nLS1kYXJrcmVhZGVyLWlubGluZS1maWxsOiAjZmY2ZGZmOyAtLWRhcmtyZWFkZXItaW5saW5lLXN0cm9rZTogI2ZmNmRmZjsnPjxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J2N4JyBjYWxjTW9kZT0nc3BsaW5lJyBkdXI9JzQuMicgdmFsdWVzPSczNTsxNjU7MTY1OzM1OzM1JyBrZXlTcGxpbmVzPScwIC4xIC41IDE7MCAuMSAuNSAxOzAgLjEgLjUgMTswIC4xIC41IDEnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJyBiZWdpbj0nLjE1Jz48L2FuaW1hdGU+PC9jaXJjbGU+PGNpcmNsZSBmaWxsPScjODA4MDgwJyBzdHJva2U9JyM4MDgwODAnIHN0cm9rZS13aWR0aD0nMTUnIG9wYWNpdHk9Jy4yJyByPScxNScgY3g9JzM1JyBjeT0nMTAwJyBkYXRhLWRhcmtyZWFkZXItaW5saW5lLWZpbGw9JycgZGF0YS1kYXJrcmVhZGVyLWlubGluZS1zdHJva2U9Jycgc3R5bGU9Jy0tZGFya3JlYWRlci1pbmxpbmUtZmlsbDogI2ZmNmRmZjsgLS1kYXJrcmVhZGVyLWlubGluZS1zdHJva2U6ICNmZjZkZmY7Jz48YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdjeCcgY2FsY01vZGU9J3NwbGluZScgZHVyPSc0LjInIHZhbHVlcz0nMzU7MTY1OzE2NTszNTszNScga2V5U3BsaW5lcz0nMCAuMSAuNSAxOzAgLjEgLjUgMTswIC4xIC41IDE7MCAuMSAuNSAxJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScgYmVnaW49Jy4yJz48L2FuaW1hdGU+PC9jaXJjbGU+PC9zdmc+)';
+
+    // Adds claude as an engine option for localhost
+    // where a proxy server must be running
+    if (window.location.hostname == 'localhost') {
+      var option = document.createElement('option');
+      option.value = 'claude';
+      option.text = 'Claude';
+      document.getElementById('engine').appendChild(option);
+    }
 
     function replaceEscapes() {
       var input = document.getElementById('prompt').value;
@@ -91,7 +115,6 @@
       var model = document.getElementById('model').value;
       var prompt = document.getElementById('prompt').value;
 
-
       if (prompt == '') {
         prompt = 'a random diagram';
       }
@@ -101,7 +124,9 @@
 
       async function sendPostRequest(url, data) {
         try {
-          console.log('Request:', [url, data]);
+          var body = JSON.stringify(data);
+          console.log('Request:', url.length, 'url bytes', body.length,
+            'body bytes', ['url', url, 'data', data]);
           document.getElementById('info').innerText = '';
           var t0 = Date.now();
 
@@ -112,11 +137,15 @@
           if (engine == 'chatgpt') {
             headers['Authorization'] = 'Bearer ' + apikey;
           }
+          else if (engine == 'claude') {
+            headers['x-api-key'] = apikey;
+            headers['model'] = model;
+          }
 
           var response = await fetch(url, {
             method: 'POST',
             headers: headers,
-            body: JSON.stringify(data)
+            body: body
           });
 
           if (!response.ok) {
@@ -125,8 +154,9 @@
 
           const jsonResponse = await response.json();
 
-          console.log('Response:', [jsonResponse]);
-          document.getElementById('info').innerText = 'Response time: ' + (Date.now() - t0) + 'ms';
+          var dt = Date.now() - t0;
+          console.log('Response:', dt, 'ms', ['jsonResponse', jsonResponse]);
+          document.getElementById('info').innerText = 'Response time: ' + dt + 'ms';
 
           return jsonResponse;
         } catch (error) {
@@ -140,22 +170,25 @@
       }
       else {
         document.getElementById('edit').disabled = true;
+        document.getElementById('view').disabled = true;
         document.getElementById('generate').disabled = true;
         document.getElementById('preview').removeAttribute('src');
         document.getElementById('preview').style.display = 'none';
         document.getElementById('preview').parentNode.style.backgroundImage = spin;
 
-        console.log('Prompt:', [aiprompt]);
+        console.log('Prompt:', prompt.length, 'bytes', ['engine', engine,
+          'model', model, 'prompt', prompt, 'aiprompt', aiprompt]);
 
         function handleError(error) {
           document.getElementById('generate').disabled = false;
           document.getElementById('preview').parentNode.style.backgroundImage = 'none';
+          console.error('Error:', error);
           alert('Error:' + error);
         };
 
         try {
           if (engine == 'gemini') {
-            var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apikey;
+            var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apikey;
             sendPostRequest(url, {
               contents:
                 [{
@@ -170,6 +203,22 @@
               handleError(error);
             });
           }
+          else if (engine == 'claude') {
+            var url = 'http://localhost:3000/api/claude';
+            sendPostRequest(url, {
+              model: 'claude-3-sonnet',//model // or claude-3-sonnet, claude-3-haiku
+              max_tokens: 1024,
+              // temperature: 0.7,
+              messages: [{
+                'role': 'user', 'content': aiprompt
+              }]
+            }).then(function (response) {
+              preview(extractCode(response.content[0].text));
+            }).catch(function (error) {
+              handleError(error);
+            });
+          }
+
           else if (engine == 'chatgpt') {
             var url = 'https://api.openai.com/v1/chat/completions';
             sendPostRequest(url, {
@@ -184,7 +233,7 @@
             });
           }
           else if (engine == 'mermaidjs') {
-            preview(prompt, engine);
+            preview(prompt);
           }
           else {
             document.getElementById('generate').disabled = false;
@@ -200,44 +249,55 @@
 
     function extractCode(input) {
 
-      console.log('Extract:', input);
+      result = input;
 
-      if (input.indexOf('```mermaid') >= 0) {
-        input = input.substring(input.indexOf('```mermaid') + 11);
+      if (result.indexOf('```mermaid') >= 0) {
+        result = result.substring(result.indexOf('```mermaid') + 11);
       }
-      else if (input.indexOf('```xml') >= 0) {
-        input = input.substring(input.indexOf('```xml') + 7);
+      else if (result.indexOf('```xml') >= 0) {
+        result = result.substring(result.indexOf('```xml') + 7);
       }
-      
-      if (input.indexOf('```') >= 0) {
-        input = input.substring(0, input.indexOf('```'));
+      else {
+        var start = result.indexOf('```');
+
+        if (start == 0)
+          result = result.substring(3);
+        else if (start > 0)
+          result = result.substring(0, start + 3);
       }
 
-      return input.replace(/^```mermaid\n/, '').replace(/^```xml\n/, '').
+      result = result.replace(/^```mermaid\n/, '').replace(/^```xml\n/, '').
         replace(/\n```\n$/, '').replace(/\n```$/, '').
         replace(/<\?xml[^>]+\?>\s*/, '');
+
+
+      console.log('Extract Code', input.length, 'bytes', result.length,
+        'bytes extracted', ['input', input, 'result', result]);
+
+      return result;
     };
 
     function preview(value) {
-      var params = 'lightbox=1&dark=auto&border=10&';
+      var params = 'lightbox=1&dark=auto&border=10&edit=_blank';
       var prefix = (urlParams['dev'] == '1') ?
         'https://test.draw.io/?dev=1&' :
         'https://www.draw.io/?' + params;
       var create = '';
+      var data = value;
 
-      if (value.substring(0, 8) == '<mxfile ') {
+      var createObj = {
+        type: (data.startsWith('<')) ? 'xml' : 'mermaid',
+        data: compressData(data),
+        compressed: true
+      };
 
-        console.log('XML:', value);
-
-        create = '#R' + encodeURIComponent(value);
-      }
-      else {
-        create = 'create=' + encodeURIComponent(
-          JSON.stringify({ type: 'mermaid', data: value }));
-      }
+      create = '#create=' + encodeURIComponent(
+        JSON.stringify(createObj));
 
       var link = prefix + params + create;
-      console.log('Result:', [value, link]);
+      console.log('Preview:', link.length, 'url bytes',
+        data.length, 'data bytes', value.length, 'value bytes',
+        ['link', link, 'value', value, 'data', data, 'createObj', createObj]);
 
       document.getElementById('preview').src = link;
       document.getElementById('preview').style.display = 'block';
@@ -247,7 +307,11 @@
         'https://www.draw.io/?';
       link = prefix + create;
       document.getElementById('edit').disabled = false;
+      document.getElementById('view').disabled = false;
       document.getElementById('generate').disabled = false;
+      document.getElementById('view').onclick = function () {
+        window.open(prefix + params + create);
+      };
       document.getElementById('edit').onclick = function () {
         window.open(link);
       };
@@ -271,6 +335,9 @@
 
       return result;
     })(window.location.href);
+
+    var keystore = (urlParams['keys'] != null) ?
+      JSON.parse(decodeURIComponent(urlParams['keys'])) : null;
 
     if (urlParams['key'] != null) {
       document.getElementById('apikey').value = urlParams['key'];
@@ -314,26 +381,73 @@
         document.getElementById('engine').value = urlParams['engine'];
       }
 
-      function engineChanged()
-      {
+      function engineChanged() {
         document.getElementById('promptSection').style.display = 'flex';
-        document.getElementById('modelSection').style.display = 'none';
+        document.getElementById('modelSection').style.display = '';
         document.getElementById('keySection').style.display = '';
 
-        if (document.getElementById('engine').value == 'gemini') {
-          document.getElementById('aiPrompt').value = 'Create a diagram for "%prompt%" ' +
-            'and return only the valid MermaidJS syntax';
+        var engine = document.getElementById('engine').value;
+        var prefix = (engine == 'chatgpt') ? 'gpt' : engine;
+
+        // Hide all elements in the model dropdown that do not begin with gpt or gemini depening on the engine
+        var modelOptions = document.getElementById('model').options;
+
+        for (var i = 0; i < modelOptions.length; i++) {
+          var option = modelOptions[i];
+          option.style.display = (option.value.startsWith(prefix)) ? '' : 'none';
         }
-        else if (document.getElementById('engine').value == 'chatgpt') {
-          document.getElementById('modelSection').style.display = '';
-          document.getElementById('aiPrompt').value = 'Write a detailed and complex MermaidJS declaration for ' +
+
+        if (keystore != null && keystore[engine] != null) {
+          document.getElementById('apikey').value = keystore[engine];
+        }
+
+        document.getElementById('aiPrompt').value = 'Write a detailed and complex MermaidJS declaration for ' +
+          '"%prompt%" and return only the valid MermaidJS syntax without any other text';
+
+        if (engine == 'gemini') {
+          document.getElementById('aiPrompt').value = 'Write a MermaidJS declaration for ' +
             '"%prompt%" and return only the valid MermaidJS syntax without any other text';
+          document.getElementById('model').value = 'gemini-2.0-flash';
         }
-        else
-        {
+        else if (engine == 'chatgpt') {
+          document.getElementById('model').value = 'gpt-4o-mini';
+        }
+        else if (engine == 'claude') {
+          document.getElementById('model').value = 'claude-3-5-haiku-latest';
+        }
+        else {
           document.getElementById('promptSection').style.display = 'none';
+          document.getElementById('modelSection').style.display = 'none';
           document.getElementById('keySection').style.display = 'none';
         }
+      };
+
+      function arrayBufferToString(buffer) {
+        var binary = '';
+        var bytes = new Uint8Array(buffer);
+        var len = bytes.byteLength;
+
+        for (var i = 0; i < len; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+
+        return binary;
+      };
+
+      function compressData(data) {
+        var result = data;
+
+        if (typeof (pako) !== 'undefined' &&
+          data != null && data.length) {
+          var tmp = (false) ? pako.deflate(encodeURIComponent(data)) :
+            pako.deflateRaw(encodeURIComponent(data));
+          result = btoa(arrayBufferToString(new Uint8Array(tmp)));
+        }
+
+        console.log('Compress', data.length, 'bytes', result.length,
+          'bytes compressed', ['data', data, 'result', result]);
+
+        return result;
       };
 
       engineChanged();
