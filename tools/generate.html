@@ -159,11 +159,9 @@
       document.getElementById('prompt').value = input.replace(/\\n/g, '\n');
     };
 
-    async function sendPostRequest(url, data, engine, model, apikey) {
+    async function sendPostRequest(url, data, engine, model, apikey, max_tokens) {
       try {
         var body = JSON.stringify(data);
-        console.log('sendPostRequest.request', url.length, 'url bytes', body.length,
-          'body bytes', ['url', url, 'data', data]);
         document.getElementById('info').innerText = '';
         document.getElementById('info').innerText = 'Engine: ' +
           engine + ' Model: ' + model + ' Waiting...';
@@ -178,11 +176,17 @@
         }
         else if (engine == 'claude') {
           headers['x-api-key'] = apikey;
+          headers['max_tokens'] = (max_tokens != null) ? max_tokens : 1024;
           headers['model'] = model;
         }
 
         var controller = new AbortController();
-        var timeoutId = setTimeout(() => controller.abort(), 30000);
+        var timeoutId = setTimeout(() => controller.abort(), 60000);
+
+
+
+        console.log('sendPostRequest.request', url.length, 'url bytes', body.length,
+          'body bytes', 'url', [url], 'headers', headers, 'data', [data]);
 
         var response = await fetch(url, {
           method: 'POST',
@@ -212,7 +216,7 @@
       }
     };
 
-    function doGenerate(engine, model, aiprompt) {
+    function doGenerate(engine, model, aiprompt, mediaType, base64Image) {
       var apikey = (engine != null) ? keystore[engine] :
         document.getElementById('apikey').value;
       engine = (engine != null) ? engine :
@@ -268,7 +272,7 @@
             }).catch(function (error) {
               console.log('doGenerate.failed', 'engine',
                 engine, 'model', model, 'error', error);
-              
+
               if (keystore['chatgpt'] != null) {
                 doGenerate('chatgpt', 'gpt-4o-mini', aiprompt);
               }
@@ -280,17 +284,31 @@
           else if (engine == 'claude') {
             var url = 'http://localhost:3000/api/claude';
             sendPostRequest(url, {
-              model: 'claude-3-sonnet',
+              model: model,
               messages: [{
-                'role': 'user', 'content': aiprompt
+                'role': 'user', 'content': (base64Image != null) ?
+                  [
+                    {
+                      type: 'image',
+                      source: {
+                        type: 'base64',
+                        media_type: mediaType,
+                        data: base64Image,
+                      },
+                    },
+                    {
+                      type: 'text',
+                      text: aiprompt,
+                    },
+                  ] : aiprompt
               }]
-            }, engine, model, apikey).then(function (response) {
+            }, engine, model, apikey, (base64Image != null) ? 10000 : 1024).then(function (response) {
               preview(extractCode(response.content[0].text));
             }).catch(function (error) {
               console.log('doGenerate.failed', 'engine',
                 engine, 'model', model, 'error', error);
 
-              if (keystore['chatgpt'] != null) {
+              if (keystore['chatgpt'] != null && base64Image == null) {
                 doGenerate('chatgpt', 'gpt-4o-mini', aiprompt);
               }
               else {
@@ -334,40 +352,51 @@
     };
 
     function generate() {
+      var prompt = document.getElementById('prompt').value;
+
       if (document.getElementById('engine').value == 'auto') {
-        var prompt = document.getElementById('prompt').value;
-        var typePrompt = '"' + prompt + '" classify this prompt for a diagram by returning ' +
-          '"xml" for floorplans, mockups and network diagrams, "mermaid-complex" for detailed ' +
-          'or complex diagram descriptions or mindmaps and "mermaid" for all other cases do ' +
-          'not return any other text or explanation just the string with no quotes';
+        if (prompt.startsWith('data:image/')) {
+          var mediaType = prompt.substring(5, prompt.indexOf(';'));
+          doGenerate('claude', 'claude-3-7-sonnet-latest',
+            'Turn this into a draw.io diagram and return only ' +
+            'the XML with no additional text or explanation make sure ' +
+            'that the draw.io file is valid and does not contain any errors',
+            mediaType, prompt.substring(prompt.indexOf(',') + 1));
+        }
+        else {
+          var typePrompt = '"' + prompt + '" classify this prompt for a diagram by returning ' +
+            '"xml" for floorplans, mockups and network diagrams, "mermaid-complex" for detailed ' +
+            'or complex diagram descriptions or mindmaps and "mermaid" for all other cases do ' +
+            'not return any other text or explanation just the string with no quotes';
 
-        var url = 'https://api.openai.com/v1/chat/completions';
-        sendPostRequest(url, {
-          model: 'gpt-4o-mini',
-          messages: [{
-            'role': 'user', 'content': typePrompt
-          }]
-        }, 'chatgpt', null, keystore['chatgpt']).then(function (response) {
-          var type = response.choices[0].message.content;
+          var url = 'https://api.openai.com/v1/chat/completions';
+          sendPostRequest(url, {
+            model: 'gpt-4o-mini',
+            messages: [{
+              'role': 'user', 'content': typePrompt
+            }]
+          }, 'chatgpt', null, keystore['chatgpt']).then(function (response) {
+            var type = response.choices[0].message.content;
 
-          // Removes all leading and trailing quotes
-          console.log('generate', 'type', type);
-          type = type.replace(/^[\"\'\s]+/, '').replace(/[\"\'\s]+$/, '');
+            // Removes all leading and trailing quotes
+            console.log('generate', 'type', type);
+            type = type.replace(/^[\"\'\s]+/, '').replace(/[\"\'\s]+$/, '');
 
-          if (type == 'xml') {
-            doGenerate('chatgpt', 'gpt-4.5-preview',
-              document.getElementById('drawioOption').value.replace(/%prompt%/g, prompt));
-          }
-          else if (type == 'mermaid-complex') {
-            doGenerate('claude', 'claude-3-7-sonnet-latest',
-              document.getElementById('mermaidOption').value.replace(/%prompt%/g, prompt));
-          }
-          else {
-            doGenerate('chatgpt', 'gpt-4o-mini');
-          }
-        },).catch(function (error) {
-          handleError(error);
-        });
+            if (type == 'xml') {
+              doGenerate('chatgpt', 'gpt-4.5-preview',
+                document.getElementById('drawioOption').value.replace(/%prompt%/g, prompt));
+            }
+            else if (type == 'mermaid-complex') {
+              doGenerate('claude', 'claude-3-7-sonnet-latest',
+                document.getElementById('mermaidOption').value.replace(/%prompt%/g, prompt));
+            }
+            else {
+              doGenerate('chatgpt', 'gpt-4o-mini');
+            }
+          }).catch(function (error) {
+            handleError(error);
+          });
+        }
       }
       else {
         doGenerate();
@@ -455,7 +484,14 @@
           reader.onload = function (e) {
             evt.target.value = e.target.result;
           };
-          reader.readAsText(file);
+
+          // Reads images as data URL
+          if (file.type.startsWith('image/')) {
+            reader.readAsDataURL(file);
+          }
+          else {
+            reader.readAsText(file);
+          }
         }
       };
 

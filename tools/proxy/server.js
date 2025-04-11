@@ -18,8 +18,8 @@ app.post('/api/claude', async (req, res) => {
     const result = await axios.post(
       'https://api.anthropic.com/v1/messages',
       {
+        max_tokens: parseInt(req.headers['max_tokens']),
         model: req.headers['model'],
-        max_tokens: 1024,
         messages: messages,
       },
       {
