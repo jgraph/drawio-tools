@@ -181,10 +181,14 @@
           headers['model'] = model;
         }
 
+        var controller = new AbortController();
+        var timeoutId = setTimeout(() => controller.abort(), 30000);
+
         var response = await fetch(url, {
           method: 'POST',
           headers: headers,
-          body: body
+          body: body,
+          signal: controller.signal
         });
 
         if (!response.ok) {
@@ -202,6 +206,9 @@
       } catch (error) {
         console.error('Error:', error);
         throw error;
+      }
+      finally {
+        clearTimeout(timeoutId);
       }
     };
 
@@ -259,7 +266,15 @@
             }, engine, model, apikey).then(function (response) {
               preview(extractCode(response.candidates[0].content.parts[0].text));
             }).catch(function (error) {
-              handleError(error);
+              console.log('doGenerate.failed', 'engine',
+                engine, 'model', model, 'error', error);
+              
+              if (keystore['chatgpt'] != null) {
+                doGenerate('chatgpt', 'gpt-4o-mini', aiprompt);
+              }
+              else {
+                handleError(error);
+              }
             });
           }
           else if (engine == 'claude') {
@@ -272,7 +287,15 @@
             }, engine, model, apikey).then(function (response) {
               preview(extractCode(response.content[0].text));
             }).catch(function (error) {
-              handleError(error);
+              console.log('doGenerate.failed', 'engine',
+                engine, 'model', model, 'error', error);
+
+              if (keystore['chatgpt'] != null) {
+                doGenerate('chatgpt', 'gpt-4o-mini', aiprompt);
+              }
+              else {
+                handleError(error);
+              }
             });
           }
           else if (engine == 'chatgpt') {
@@ -285,7 +308,14 @@
             }, engine, model, apikey).then(function (response) {
               preview(extractCode(response.choices[0].message.content));
             }).catch(function (error) {
-              handleError(error);
+              console.log('doGenerate.failed', 'engine',
+                engine, 'model', model, 'error', error);
+              if (model == 'gpt-4o-mini') {
+                handleError(error);
+              }
+              else {
+                doGenerate('chatgpt', 'gpt-4o-mini', aiprompt);
+              }
             });
           }
           else if (engine == 'mermaidjs' || engine == 'drawio') {
@@ -306,9 +336,10 @@
     function generate() {
       if (document.getElementById('engine').value == 'auto') {
         var prompt = document.getElementById('prompt').value;
-        var typePrompt = '"' + prompt + '" if this prompt describes a UI mockup or a floorplan ' +
-          'then respond with the string "xml", else if it is a complex diagram respond with ' +
-          '"mermaid-complex" or else respond with "mermaid"';
+        var typePrompt = '"' + prompt + '" classify this prompt for a diagram by returning ' +
+          '"xml" for floorplans, mockups and network diagrams, "mermaid-complex" for detailed ' +
+          'or complex diagram descriptions or mindmaps and "mermaid" for all other cases do ' +
+          'not return any other text or explanation just the string with no quotes';
 
         var url = 'https://api.openai.com/v1/chat/completions';
         sendPostRequest(url, {
@@ -318,7 +349,10 @@
           }]
         }, 'chatgpt', null, keystore['chatgpt']).then(function (response) {
           var type = response.choices[0].message.content;
+
+          // Removes all leading and trailing quotes
           console.log('generate', 'type', type);
+          type = type.replace(/^[\"\'\s]+/, '').replace(/[\"\'\s]+$/, '');
 
           if (type == 'xml') {
             doGenerate('chatgpt', 'gpt-4.5-preview',
