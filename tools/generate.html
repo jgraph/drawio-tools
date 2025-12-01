@@ -176,15 +176,12 @@
         }
         else if (engine == 'claude') {
           headers['x-api-key'] = apikey;
-          headers['max_tokens'] = (max_tokens != null) ? max_tokens : 1024;
-          headers['model'] = model;
+          headers['anthropic-version'] = '2023-06-01';
+          headers['anthropic-dangerous-direct-browser-access'] = 'true';
         }
 
         var controller = new AbortController();
         var timeoutId = setTimeout(() => controller.abort(), 60000);
-
-
-
         console.log('sendPostRequest.request', url.length, 'url bytes', body.length,
           'body bytes', 'url', [url], 'headers', headers, 'data', [data]);
 
@@ -282,8 +279,9 @@
             });
           }
           else if (engine == 'claude') {
-            var url = 'http://localhost:3000/api/claude';
+            var url = 'https://api.anthropic.com/v1/messages';
             sendPostRequest(url, {
+              max_tokens: 1024,
               model: model,
               messages: [{
                 'role': 'user', 'content': (base64Image != null) ?
