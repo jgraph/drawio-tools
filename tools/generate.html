@@ -46,28 +46,18 @@
       <div style="opacity:0.5;margin-left:10px;display:none;" id="modelSection">
         Model:
         <select style="padding:2px;border-radius:4px;" title="Model" id="model">
+          <option value="claude-opus-4-5" selected>Claude 4.5 Opus</option>
+          <option value="claude-haiku-4-5">Claude 4.5 Haiku</option>
+          <option value="gemini-3-pro-preview">Gemini 3 Pro Preview</option>
+          <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
           <option value="gpt-4.5-preview">GPT-4.5 Preview</option>
-          <option value="gpt-4o" selected>GPT-4o</option>
-          <option value="gpt-4o-mini">GPT-4o mini</option>
-          <option value="gpt-4-turbo">GPT-4 Turbo</option>
-          <option value="gpt-4">GPT-4</option>
-          <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-          <option value="gemini-2.5-pro-exp-03-25">Gemini 2.5 Pro 03-25</option>
-          <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
-          <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash-Lite</option>
-          <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-          <option value="claude-3-7-sonnet-latest">Claude 3.7 Sonnet</option>
-          <option value="claude-3-5-haiku-latest">Claude 3.5 Haiku</option>
-          <option value="claude-3-5-sonnet-latest">Claude 3.5 Sonnet v2</option>
-          <option value="claude-3-5-sonnet-20240620">Claude 3.5 Sonnet</option>
-          <option value="claude-3-opus-20240229">Claude 3 Opus</option>
-          <option value="claude-3-sonnet-20240229">Claude 3 Sonnet</option>
-          <option value="claude-3-haiku-20240307">Claude 3 Haiku</option>
+          <option value="gpt-4o">GPT-4o</option>
         </select>
       </div>
       <div style="margin-left:10px;opacity:0.5;">
         Engine:
         <select style="padding:2px;border-radius:4px;" title="Engine" id="engine">
+          <option value="claude">Claude</option>
           <option value="chatgpt">ChatGPT</option>
           <option value="gemini">Gemini</option>
           <option value="mermaidjs">Mermaid</option>
@@ -128,25 +118,15 @@
       document.getElementById('apikey').value = urlParams['key'];
     }
 
-    if (window.location.hostname == 'localhost') {
-      // Adds claude as an engine option for localhost
-      // where a proxy server must be running
+    // Adds automatic option for local testing
+    if (keystore != null &&
+      keystore['claude'] != null &&
+      keystore['chatgpt'] != null) {
       var option = document.createElement('option');
-      option.value = 'claude';
-      option.text = 'Claude';
+      option.value = 'auto';
+      option.text = 'Automatic';
       document.getElementById('engine').insertBefore(option,
         document.getElementById('engine').options[0]);
-
-      // Adds automatic option for local testing
-      if (keystore != null &&
-        keystore['claude'] != null &&
-        keystore['chatgpt'] != null) {
-        var option = document.createElement('option');
-        option.value = 'auto';
-        option.text = 'Automatic';
-        document.getElementById('engine').insertBefore(option,
-          document.getElementById('engine').options[0]);
-      }
     }
 
     function replaceEscapes() {
@@ -536,13 +516,13 @@
         }
 
         if (engine == 'gemini') {
-          document.getElementById('model').value = 'gemini-2.0-flash';
+          document.getElementById('model').value = 'gemini-2.5-pro ';
         }
         else if (engine == 'chatgpt') {
-          document.getElementById('model').value = 'gpt-4o-mini';
+          document.getElementById('model').value = 'gpt-4.5-preview';
         }
         else if (engine == 'claude') {
-          document.getElementById('model').value = 'claude-3-5-haiku-latest';
+          document.getElementById('model').value = 'claude-opus-4-5';
         }
         else {
           document.getElementById('promptSection').style.display = 'none';
