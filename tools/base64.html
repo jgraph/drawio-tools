@@ -1,61 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Base64 encode image</title>
-	<meta charset="utf-8" />
-	<link rel="stylesheet" type="text/css" href="style.css">
-	<script type="text/javascript">
-		//<![CDATA[
-		function main() {
-			var dropZone = document.getElementById('dropZone');
-			var result = document.getElementById('result');
-
-			dropZone.addEventListener('dragover', function (evt) {
-				evt.stopPropagation();
-				evt.preventDefault();
-			}, false);
-
-			dropZone.addEventListener('drop', function (evt) {
-				evt.stopPropagation();
-				evt.preventDefault();
-
-				if (evt.dataTransfer.files.length > 0) {
-					try {
-						var reader = new FileReader();
-
-						reader.onload = function (e) {
-							result.value = e.target.result;
-						};
-
-						reader.readAsDataURL(evt.dataTransfer.files[0]);
-					}
-					catch (e) {
-						alert('error:' + e);
-					}
-				}
-			}, false);
-		}
-		//]]>
-	</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Convert images to Base64 data URLs for embedding in draw.io diagrams">
+  <title>Base64 Images - draw.io Tools</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../styles/main.css">
+  <style>
+    .image-preview {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+    }
+  </style>
 </head>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="container">
+        <div class="header__inner">
+          <a href="../" class="header__brand">
+            <img src="../assets/logo.svg" alt="draw.io" class="header__logo">
+            <span class="header__title">draw.io Tools</span>
+          </a>
+          <nav class="header__nav">
+            <a href="../" class="header__link">All Tools</a>
+            <a href="https://github.com/jgraph/drawio-tools" class="header__link" target="_blank">GitHub</a>
+          </nav>
+        </div>
+      </div>
+    </header>
 
-<body onload="main();">
-	<span
-		style="position:relative;display:inline-block;left:50%;transform:translate(-50%,0);width:50%;min-width:500px;">
-		<div style="display:flex;align-items:center;opacity:0.7;">
-			<img src="logo.svg" style="width:28px;" />
-			<span style="font-family:Helvetica;font-weight:700;font-size:20px;margin-left:4px;">draw.io</span>
-			<h2 style="text-align:center;width:100%;margin:10px;">Base64 encode image</h2>
-		</div>
-		<hr>
-		<br>
-		<div id="dropZone" style="width:100%;height:200px;border:1px dashed gray;">Drag image here</div>
-		<br />
-		Result:
-		<br />
-		<textarea style="width:100%;height:200px;border:1px dashed gray;" id="result" placeholder="No image yet"
-			style="outline:none;"></textarea>
-	</span>
+    <main class="main-content">
+      <div class="container tool-page">
+        <nav class="breadcrumb">
+          <a href="../" class="breadcrumb__link">Tools</a>
+          <span class="breadcrumb__separator">/</span>
+          <span class="breadcrumb__current">Base64 Images</span>
+        </nav>
+
+        <div class="tool-header">
+          <h1 class="tool-header__title">
+            <svg class="tool-header__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <path d="M21 15l-5-5L5 21"/>
+            </svg>
+            Base64 Images
+          </h1>
+          <p class="tool-header__description">
+            Convert images to Base64 data URLs for embedding directly in draw.io diagrams or web pages.
+            Simply drag and drop an image to encode it.
+          </p>
+        </div>
+
+        <!-- Drop Zone -->
+        <div class="card mb-lg">
+          <div class="card__body">
+            <div class="drop-zone" id="dropZone">
+              <svg class="drop-zone__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <path d="M21 15l-5-5L5 21"/>
+              </svg>
+              <p class="drop-zone__text">Drop an image here or click to browse</p>
+              <p class="drop-zone__hint">Supports PNG, JPG, GIF, SVG, WebP</p>
+              <input type="file" id="fileInput" accept="image/*" style="display: none;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview -->
+        <div class="card mb-lg" id="previewCard" style="display: none;">
+          <div class="card__header">
+            <h3 class="card__title">Image Preview</h3>
+          </div>
+          <div class="card__body text-center">
+            <img id="imagePreview" class="image-preview" alt="Preview">
+            <div class="mt-md text-muted" id="imageInfo"></div>
+          </div>
+        </div>
+
+        <!-- Result -->
+        <div class="card" id="resultCard" style="display: none;">
+          <div class="card__header">
+            <h3 class="card__title">Base64 Data URL</h3>
+          </div>
+          <div class="card__body">
+            <div class="textarea-container">
+              <textarea
+                id="result"
+                rows="8"
+                readonly
+                placeholder="Base64 encoded image will appear here..."
+              ></textarea>
+              <div class="textarea-footer">
+                <span><span id="charCount">0</span> characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="card__footer">
+            <div class="btn-group">
+              <button type="button" class="btn btn--primary" id="copyBtn">Copy to Clipboard</button>
+              <button type="button" class="btn btn--secondary" id="clearBtn">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="alertContainer" class="mt-lg"></div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__inner">
+          <span>&copy; 2026 JGraph Ltd. Apache-2.0 License.</span>
+          <div class="footer__links">
+            <a href="https://www.drawio.com">draw.io</a>
+            <a href="https://github.com/jgraph/drawio-tools">GitHub</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="../utils/drawio-tools.js"></script>
+  <script>
+    (function() {
+      var DT = window.DrawioTools;
+
+      var dropZone = document.getElementById('dropZone');
+      var fileInput = document.getElementById('fileInput');
+      var previewCard = document.getElementById('previewCard');
+      var imagePreview = document.getElementById('imagePreview');
+      var imageInfo = document.getElementById('imageInfo');
+      var resultCard = document.getElementById('resultCard');
+      var result = document.getElementById('result');
+      var charCount = document.getElementById('charCount');
+      var alertContainer = document.getElementById('alertContainer');
+
+      function showAlert(message, type) {
+        type = type || 'info';
+        var alert = document.createElement('div');
+        alert.className = 'alert alert--' + type;
+        alert.textContent = message;
+        alertContainer.innerHTML = '';
+        alertContainer.appendChild(alert);
+        setTimeout(function() { alert.remove(); }, 3000);
+      }
+
+      function formatBytes(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+      }
+
+      function processFile(file) {
+        if (!file.type.startsWith('image/')) {
+          showAlert('Please select an image file', 'error');
+          return;
+        }
+
+        DT.readFileAsDataURL(file).then(function(dataUrl) {
+          imagePreview.src = dataUrl;
+          imagePreview.onload = function() {
+            imageInfo.textContent = file.name + ' • ' + imagePreview.naturalWidth + '×' + imagePreview.naturalHeight + ' • ' + formatBytes(file.size);
+          };
+          previewCard.style.display = '';
+
+          result.value = dataUrl;
+          charCount.textContent = dataUrl.length.toLocaleString();
+          resultCard.style.display = '';
+
+          showAlert('Image encoded successfully', 'success');
+        }).catch(function(error) {
+          showAlert('Failed to encode image: ' + error.message, 'error');
+        });
+      }
+
+      dropZone.addEventListener('click', function() { fileInput.click(); });
+
+      dropZone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        dropZone.classList.add('drop-zone--active');
+      });
+
+      dropZone.addEventListener('dragleave', function() {
+        dropZone.classList.remove('drop-zone--active');
+      });
+
+      dropZone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        dropZone.classList.remove('drop-zone--active');
+        if (e.dataTransfer.files.length > 0) {
+          processFile(e.dataTransfer.files[0]);
+        }
+      });
+
+      fileInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+          processFile(e.target.files[0]);
+        }
+      });
+
+      document.getElementById('copyBtn').addEventListener('click', function() {
+        DT.copyToClipboard(result.value).then(function(success) {
+          showAlert(success ? 'Copied to clipboard' : 'Failed to copy', success ? 'success' : 'error');
+        });
+      });
+
+      document.getElementById('clearBtn').addEventListener('click', function() {
+        result.value = '';
+        charCount.textContent = '0';
+        previewCard.style.display = 'none';
+        resultCard.style.display = 'none';
+      });
+    })();
+  </script>
 </body>
-
 </html>

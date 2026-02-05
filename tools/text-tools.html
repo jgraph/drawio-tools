@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Compress, decompress, encode, and decode text for draw.io diagrams">
+  <title>Text Tools - draw.io Tools</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../styles/main.css">
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="container">
+        <div class="header__inner">
+          <a href="../" class="header__brand">
+            <img src="../assets/logo.svg" alt="draw.io" class="header__logo">
+            <span class="header__title">draw.io Tools</span>
+          </a>
+          <nav class="header__nav">
+            <a href="../" class="header__link">All Tools</a>
+            <a href="https://github.com/jgraph/drawio-tools" class="header__link" target="_blank">GitHub</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="container tool-page">
+        <nav class="breadcrumb">
+          <a href="../" class="breadcrumb__link">Tools</a>
+          <span class="breadcrumb__separator">/</span>
+          <span class="breadcrumb__current">Text Tools</span>
+        </nav>
+
+        <div class="tool-header">
+          <h1 class="tool-header__title">
+            <svg class="tool-header__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 7V4h16v3M9 20h6M12 4v16"/>
+            </svg>
+            Text Tools
+          </h1>
+          <p class="tool-header__description">
+            Compress, decompress, encode, and decode text. Supports the full draw.io encoding pipeline:
+            URL encoding → Deflate compression → Base64 encoding.
+          </p>
+        </div>
+
+        <div class="card mb-lg">
+          <div class="card__body">
+            <div class="textarea-container textarea-container--large">
+              <label for="textarea">Input / Output</label>
+              <textarea
+                id="textarea"
+                placeholder="Drop a file here or paste text to encode/decode..."
+                spellcheck="false"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+              ></textarea>
+              <div class="textarea-footer">
+                <span><span id="charCount">0</span> characters</span>
+                <button type="button" class="btn btn--sm btn--secondary" id="clearBtn">Clear</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="options-panel mb-lg">
+          <div class="options-panel__title">Encoding Options</div>
+          <div class="options-panel__row">
+            <label class="checkbox">
+              <input type="checkbox" id="urlEncodeCheck" checked>
+              <span>URL Encode</span>
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" id="deflateCheck" checked>
+              <span>Deflate</span>
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" id="base64Check" checked>
+              <span>Base64</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card mb-lg">
+          <div class="card__header">
+            <h3 class="card__title">Full Pipeline</h3>
+          </div>
+          <div class="card__body">
+            <p class="text-muted mb-md">
+              Apply the complete draw.io encoding/decoding pipeline based on selected options.
+            </p>
+            <div class="btn-group">
+              <button type="button" class="btn btn--primary" id="encodeBtn">Encode</button>
+              <button type="button" class="btn btn--primary" id="decodeBtn">Decode</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-lg">
+          <div class="card__header">
+            <h3 class="card__title">Individual Operations</h3>
+          </div>
+          <div class="card__body">
+            <p class="text-muted mb-md">
+              Apply individual transformations to the text.
+            </p>
+
+            <div class="mb-md">
+              <h4 class="text-muted" style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-sm);">URL Encoding</h4>
+              <div class="btn-group">
+                <button type="button" class="btn btn--secondary" id="urlEncodeOnlyBtn">URL Encode</button>
+                <button type="button" class="btn btn--secondary" id="urlDecodeOnlyBtn">URL Decode</button>
+              </div>
+            </div>
+
+            <div class="mb-md">
+              <h4 class="text-muted" style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-sm);">Base64</h4>
+              <div class="btn-group">
+                <button type="button" class="btn btn--secondary" id="btoaBtn">btoa (Encode)</button>
+                <button type="button" class="btn btn--secondary" id="atobBtn">atob (Decode)</button>
+              </div>
+            </div>
+
+            <div class="mb-md">
+              <h4 class="text-muted" style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-sm);">Escape Sequences</h4>
+              <div class="btn-group">
+                <button type="button" class="btn btn--secondary" id="escapeBtn">Escape</button>
+                <button type="button" class="btn btn--secondary" id="unescapeBtn">Unescape</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-lg">
+          <div class="card__header">
+            <h3 class="card__title">Text Transformations</h3>
+          </div>
+          <div class="card__body">
+            <div class="btn-group">
+              <button type="button" class="btn btn--secondary" id="removeLinebreaksBtn">Remove Linebreaks</button>
+              <button type="button" class="btn btn--secondary" id="jsVarBtn">JS Variable</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-lg">
+          <div class="card__header">
+            <h3 class="card__title">Format & Normalize</h3>
+          </div>
+          <div class="card__body">
+            <div class="mb-md">
+              <h4 class="text-muted" style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-sm);">XML</h4>
+              <div class="btn-group">
+                <button type="button" class="btn btn--secondary" id="formatXmlBtn">Format XML</button>
+                <button type="button" class="btn btn--secondary" id="normalizeXmlBtn">Normalize XML</button>
+              </div>
+            </div>
+
+            <div>
+              <h4 class="text-muted" style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-sm);">JSON</h4>
+              <div class="btn-group">
+                <button type="button" class="btn btn--secondary" id="formatJsonBtn">Format JSON</button>
+                <button type="button" class="btn btn--secondary" id="normalizeJsonBtn">Normalize JSON</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <h3 class="card__title">Download</h3>
+          </div>
+          <div class="card__body">
+            <div class="btn-group">
+              <button type="button" class="btn btn--primary" id="downloadBtn">Download as .drawio</button>
+              <button type="button" class="btn btn--secondary" id="copyBtn">Copy to Clipboard</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="alertContainer" class="mt-lg"></div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__inner">
+          <span>&copy; 2026 JGraph Ltd. Apache-2.0 License.</span>
+          <div class="footer__links">
+            <a href="https://www.drawio.com">draw.io</a>
+            <a href="https://github.com/jgraph/drawio-tools">GitHub</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+  <script src="../utils/drawio-tools.js"></script>
+  <script>
+    (function() {
+      var DT = window.DrawioTools;
+
+      var textarea = document.getElementById('textarea');
+      var charCount = document.getElementById('charCount');
+      var alertContainer = document.getElementById('alertContainer');
+
+      var urlEncodeCheck = document.getElementById('urlEncodeCheck');
+      var deflateCheck = document.getElementById('deflateCheck');
+      var base64Check = document.getElementById('base64Check');
+
+      function updateCharCount() {
+        charCount.textContent = textarea.value.length.toLocaleString();
+      }
+      textarea.addEventListener('input', updateCharCount);
+
+      function showAlert(message, type) {
+        type = type || 'info';
+        var alert = document.createElement('div');
+        alert.className = 'alert alert--' + type;
+        alert.textContent = message;
+        alertContainer.innerHTML = '';
+        alertContainer.appendChild(alert);
+        setTimeout(function() { alert.remove(); }, 5000);
+      }
+
+      function handleResult(result, successMsg) {
+        if (result.success) {
+          textarea.value = result.data;
+          updateCharCount();
+          if (successMsg) showAlert(successMsg, 'success');
+        } else {
+          showAlert('Error: ' + result.error, 'error');
+        }
+      }
+
+      document.getElementById('encodeBtn').addEventListener('click', function() {
+        var options = {
+          urlEncode: urlEncodeCheck.checked,
+          deflate: deflateCheck.checked,
+          base64: base64Check.checked
+        };
+        handleResult(DT.encode(textarea.value, options), 'Encoded successfully');
+      });
+
+      document.getElementById('decodeBtn').addEventListener('click', function() {
+        var options = {
+          urlDecode: urlEncodeCheck.checked,
+          inflate: deflateCheck.checked,
+          base64: base64Check.checked
+        };
+        handleResult(DT.decode(textarea.value, options), 'Decoded successfully');
+      });
+
+      document.getElementById('urlEncodeOnlyBtn').addEventListener('click', function() {
+        handleResult(DT.urlEncode(textarea.value));
+      });
+
+      document.getElementById('urlDecodeOnlyBtn').addEventListener('click', function() {
+        handleResult(DT.urlDecode(textarea.value));
+      });
+
+      document.getElementById('btoaBtn').addEventListener('click', function() {
+        handleResult(DT.base64Encode(textarea.value));
+      });
+
+      document.getElementById('atobBtn').addEventListener('click', function() {
+        handleResult(DT.base64Decode(textarea.value));
+      });
+
+      document.getElementById('escapeBtn').addEventListener('click', function() {
+        textarea.value = DT.escapeString(textarea.value);
+        updateCharCount();
+      });
+
+      document.getElementById('unescapeBtn').addEventListener('click', function() {
+        textarea.value = DT.unescapeString(textarea.value);
+        updateCharCount();
+      });
+
+      document.getElementById('removeLinebreaksBtn').addEventListener('click', function() {
+        textarea.value = DT.removeLinebreaks(textarea.value);
+        updateCharCount();
+        showAlert('Linebreaks removed', 'success');
+      });
+
+      document.getElementById('jsVarBtn').addEventListener('click', function() {
+        textarea.value = DT.toJsVariable(textarea.value);
+        updateCharCount();
+        showAlert('Converted to JS variable', 'success');
+      });
+
+      document.getElementById('formatXmlBtn').addEventListener('click', function() {
+        handleResult(DT.formatXml(textarea.value), 'XML formatted');
+      });
+
+      document.getElementById('normalizeXmlBtn').addEventListener('click', function() {
+        textarea.value = DT.normalizeXml(textarea.value);
+        updateCharCount();
+        showAlert('XML normalized', 'success');
+      });
+
+      document.getElementById('formatJsonBtn').addEventListener('click', function() {
+        handleResult(DT.formatJson(textarea.value, 2), 'JSON formatted');
+      });
+
+      document.getElementById('normalizeJsonBtn').addEventListener('click', function() {
+        handleResult(DT.normalizeJson(textarea.value), 'JSON normalized');
+      });
+
+      document.getElementById('downloadBtn').addEventListener('click', function() {
+        DT.downloadFile(textarea.value, 'download.drawio');
+        showAlert('File downloaded', 'success');
+      });
+
+      document.getElementById('copyBtn').addEventListener('click', function() {
+        DT.copyToClipboard(textarea.value).then(function(success) {
+          showAlert(success ? 'Copied to clipboard' : 'Failed to copy', success ? 'success' : 'error');
+        });
+      });
+
+      document.getElementById('clearBtn').addEventListener('click', function() {
+        textarea.value = '';
+        updateCharCount();
+      });
+
+      DT.setupDropZone(
+        textarea,
+        function(content) {
+          textarea.value = content;
+          updateCharCount();
+          showAlert('File loaded', 'success');
+        },
+        {
+          onDragEnter: function() { textarea.classList.add('drop-zone--active'); },
+          onDragLeave: function() { textarea.classList.remove('drop-zone--active'); }
+        }
+      );
+    })();
+  </script>
+</body>
+</html>

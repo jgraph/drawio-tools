@@ -1,79 +1,254 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Online Diagram Viewer</title>
-	<meta charset="utf-8" />
-	<link rel="stylesheet" type="text/css" href="style.css">
-	<script type="text/javascript">
-		function create() {
-			var url = document.getElementById('url').value;
-
-			if (url.length == 0 || url.substring(0, 4) != 'http') {
-				alert("Please enter a valid URL");
-				document.getElementById('url').focus();
-			}
-			else {
-				var area = document.getElementById('textarea');
-				var a = document.getElementById('result');
-				area.style.display = 'none';
-				area.innerHTML = '';
-				a.innerHTML = '';
-
-				if (url.substring(0, 32) == 'https://drive.google.com/file/d/') {
-					var id = url.substring(32, url.lastIndexOf('/'));
-					url = 'https://drive.google.com/uc?id=' + id + '&export=download';
-				}
-
-				if (document.getElementById('iframe').checked) {
-					var link = 'https://viewer.diagrams.net';
-					area.style.display = '';
-					area.appendChild(document.createTextNode(
-						'<iframe frameborder="0" style="width:100%;height:' +
-						document.getElementById('height').value + ';" src="' +
-						link + '?#U' + encodeURIComponent(url) + '"></iframe>'));
-					area.focus();
-					document.execCommand('selectAll');
-				}
-				else {
-					var link = 'https://app.diagrams.net';
-
-					if (document.getElementById('lightbox').checked) {
-						link += '?lightbox=1&edit=_blank';
-					}
-
-					link += '#U' + encodeURIComponent(url);
-					a.setAttribute('href', link);
-					a.appendChild(document.createTextNode(link));
-				}
-			}
-		}
-	</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="View draw.io diagrams from public URLs and generate embeddable links">
+  <title>Diagram Viewer - draw.io Tools</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../styles/main.css">
 </head>
-<body onload="document.getElementById('url').focus();">
-	<span style="position:relative;display:inline-block;left:50%;transform:translate(-50%,0);">
-		<div style="display:flex;align-items:center;opacity:0.7;">
-			<img src="logo.svg" style="width:28px;" />
-			<span style="font-family:Helvetica;font-weight:700;font-size:20px;margin-left:4px;">draw.io</span>
-			<h2 style="text-align:center;width:100%;margin:10px;">Online Diagram Viewer</h2>
-		</div>
-		<hr>
-		<br>
-		View public VSDX, Gliffy, Lucidchart and draw.io diagrams (Google Link Sharing Links supported):
-		<br><br>
-		1. Link to Diagram: <input type="text" id="url" size="80" value=""
-			placeholder="https://www.example.com/diagram.xml"></input>
-		<br><br>
-		2. Choose Mode:
-		<input type="radio" name="option" id="lightbox" checked="checked" /> Full Screen Mode&nbsp;
-		<input type="radio" name="option" /> Editor&nbsp;
-		<input type="radio" name="option" id="iframe" /> IFrame
-		&nbsp;Height: <input type="text" id="height" size="10" value="400px" />
-		<br><br>
-		<button onclick="create();return false;" style="font-weight:bold;">3. Click Here!</button>
-		<br><br>
-		<a href="" target="_blank" id="result"></a>
-		<textarea style="display:none;" rows="4" cols="100" id="textarea" spellcheck="false" autocomplete="off"
-			autocorrect="off" autocapitalize="off"></textarea>
-	</span>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="container">
+        <div class="header__inner">
+          <a href="../" class="header__brand">
+            <img src="../assets/logo.svg" alt="draw.io" class="header__logo">
+            <span class="header__title">draw.io Tools</span>
+          </a>
+          <nav class="header__nav">
+            <a href="../" class="header__link">All Tools</a>
+            <a href="https://github.com/jgraph/drawio-tools" class="header__link" target="_blank">GitHub</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="container tool-page">
+        <nav class="breadcrumb">
+          <a href="../" class="breadcrumb__link">Tools</a>
+          <span class="breadcrumb__separator">/</span>
+          <span class="breadcrumb__current">Diagram Viewer</span>
+        </nav>
+
+        <div class="tool-header">
+          <h1 class="tool-header__title">
+            <svg class="tool-header__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            Diagram Viewer
+          </h1>
+          <p class="tool-header__description">
+            View public VSDX, Gliffy, Lucidchart, and draw.io diagrams from any URL.
+            Generate embeddable links and iframe code for sharing.
+          </p>
+        </div>
+
+        <!-- URL Input -->
+        <div class="card mb-lg">
+          <div class="card__header">
+            <h3 class="card__title">Step 1: Enter Diagram URL</h3>
+          </div>
+          <div class="card__body">
+            <label for="url">Link to Diagram</label>
+            <input
+              type="url"
+              id="url"
+              placeholder="https://www.example.com/diagram.xml"
+              autocomplete="off"
+            >
+            <p class="text-muted mt-sm" style="font-size: var(--font-size-xs);">
+              Supports Google Drive sharing links. For Google Sheets, use:
+              <code>https://docs.google.com/spreadsheets/d/{fileId}/export?format=csv&usp=sharing</code>
+            </p>
+          </div>
+        </div>
+
+        <!-- Mode Selection -->
+        <div class="card mb-lg">
+          <div class="card__header">
+            <h3 class="card__title">Step 2: Choose View Mode</h3>
+          </div>
+          <div class="card__body">
+            <div class="options-panel__row">
+              <label class="radio">
+                <input type="radio" name="mode" id="lightbox" checked>
+                <span>Full Screen Mode</span>
+              </label>
+              <label class="radio">
+                <input type="radio" name="mode" id="editor">
+                <span>Editor Mode</span>
+              </label>
+              <label class="radio">
+                <input type="radio" name="mode" id="iframe">
+                <span>Embed (IFrame)</span>
+              </label>
+            </div>
+
+            <div id="iframeOptions" style="display: none; margin-top: var(--spacing-md);">
+              <label for="height">IFrame Height</label>
+              <input type="text" id="height" value="400px" style="width: 120px;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Generate Button -->
+        <div class="card mb-lg">
+          <div class="card__header">
+            <h3 class="card__title">Step 3: Generate Link</h3>
+          </div>
+          <div class="card__body">
+            <button type="button" class="btn btn--primary btn--lg" id="createBtn">
+              Generate Viewer Link
+            </button>
+          </div>
+        </div>
+
+        <!-- Result -->
+        <div class="card" id="resultCard" style="display: none;">
+          <div class="card__header">
+            <h3 class="card__title">Result</h3>
+          </div>
+          <div class="card__body">
+            <div id="linkResult">
+              <a href="" target="_blank" id="resultLink" style="word-break: break-all;"></a>
+            </div>
+            <div id="iframeResult" style="display: none;">
+              <div class="textarea-container">
+                <label>Embed Code</label>
+                <textarea id="iframeCode" rows="4" readonly></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="card__footer">
+            <div class="btn-group">
+              <button type="button" class="btn btn--primary" id="openBtn">Open in New Tab</button>
+              <button type="button" class="btn btn--secondary" id="copyBtn">Copy Link</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="alertContainer" class="mt-lg"></div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__inner">
+          <span>&copy; 2026 JGraph Ltd. Apache-2.0 License.</span>
+          <div class="footer__links">
+            <a href="https://www.drawio.com">draw.io</a>
+            <a href="https://github.com/jgraph/drawio-tools">GitHub</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="../utils/drawio-tools.js"></script>
+  <script>
+    (function() {
+      var DT = window.DrawioTools;
+
+      var urlInput = document.getElementById('url');
+      var lightboxRadio = document.getElementById('lightbox');
+      var editorRadio = document.getElementById('editor');
+      var iframeRadio = document.getElementById('iframe');
+      var iframeOptions = document.getElementById('iframeOptions');
+      var heightInput = document.getElementById('height');
+      var resultCard = document.getElementById('resultCard');
+      var linkResult = document.getElementById('linkResult');
+      var iframeResult = document.getElementById('iframeResult');
+      var resultLink = document.getElementById('resultLink');
+      var iframeCode = document.getElementById('iframeCode');
+      var alertContainer = document.getElementById('alertContainer');
+
+      var generatedUrl = '';
+
+      function showAlert(message, type) {
+        type = type || 'info';
+        var alert = document.createElement('div');
+        alert.className = 'alert alert--' + type;
+        alert.textContent = message;
+        alertContainer.innerHTML = '';
+        alertContainer.appendChild(alert);
+        setTimeout(function() { alert.remove(); }, 3000);
+      }
+
+      [lightboxRadio, editorRadio, iframeRadio].forEach(function(radio) {
+        radio.addEventListener('change', function() {
+          iframeOptions.style.display = iframeRadio.checked ? '' : 'none';
+        });
+      });
+
+      document.getElementById('createBtn').addEventListener('click', function() {
+        var url = urlInput.value.trim();
+
+        if (!url || !url.startsWith('http')) {
+          showAlert('Please enter a valid URL starting with http:// or https://', 'error');
+          urlInput.focus();
+          return;
+        }
+
+        if (url.startsWith('https://drive.google.com/file/d/')) {
+          var id = url.substring(32, url.lastIndexOf('/'));
+          url = 'https://drive.google.com/uc?id=' + id + '&export=download';
+        }
+
+        resultCard.style.display = '';
+
+        if (iframeRadio.checked) {
+          var height = heightInput.value || '400px';
+          var viewerUrl = 'https://viewer.diagrams.net/?#U' + encodeURIComponent(url);
+          var code = '<iframe frameborder="0" style="width:100%;height:' + height + ';" src="' + viewerUrl + '"></iframe>';
+
+          linkResult.style.display = 'none';
+          iframeResult.style.display = '';
+          iframeCode.value = code;
+          generatedUrl = code;
+
+          showAlert('Embed code generated', 'success');
+        } else {
+          var link = 'https://app.diagrams.net';
+
+          if (lightboxRadio.checked) {
+            link += '?lightbox=1&edit=_blank';
+          }
+
+          link += '#U' + encodeURIComponent(url);
+
+          linkResult.style.display = '';
+          iframeResult.style.display = 'none';
+          resultLink.href = link;
+          resultLink.textContent = link;
+          generatedUrl = link;
+
+          showAlert('Link generated', 'success');
+        }
+      });
+
+      document.getElementById('openBtn').addEventListener('click', function() {
+        if (iframeRadio.checked) {
+          var match = generatedUrl.match(/src="([^"]+)"/);
+          if (match) {
+            window.open(match[1], '_blank');
+          }
+        } else if (generatedUrl) {
+          window.open(generatedUrl, '_blank');
+        }
+      });
+
+      document.getElementById('copyBtn').addEventListener('click', function() {
+        DT.copyToClipboard(generatedUrl).then(function(success) {
+          showAlert(success ? 'Copied to clipboard' : 'Failed to copy', success ? 'success' : 'error');
+        });
+      });
+
+      urlInput.focus();
+    })();
+  </script>
 </body>
 </html>

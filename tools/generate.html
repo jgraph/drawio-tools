@@ -1,610 +1,489 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <title>Generate draw.io Diagrams</title>
-  <meta charset="utf-8" />
-  <link rel="stylesheet" type="text/css" href="style.css">
-  <script type="text/javascript" src="deflate/pako.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Generate draw.io diagrams from natural language descriptions using AI">
+  <title>AI Generate - draw.io Tools</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../styles/main.css">
+  <style>
+    .preview-container {
+      position: relative;
+      height: 500px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--color-bg-secondary);
+    }
+    .preview-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .preview-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-secondary);
+    }
+    .preview-loading {
+      background: var(--color-bg-secondary) url('data:image/svg+xml;base64,77u/PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyMDAgMjAwJz48Y2lyY2xlIGZpbGw9JyM4MDgwODAnIHN0cm9rZT0nIzgwODA4MCcgc3Ryb2tlLXdpZHRoPScxNScgcj0nMTUnIGN4PSczNScgY3k9JzEwMCc+PGFuaW1hdGUgYXR0cmlidXRlTmFtZT0nY3gnIGNhbGNNb2RlPSdzcGxpbmUnIGR1cj0nNC4yJyB2YWx1ZXM9JzM1OzE2NTsxNjU7MzU7MzUnIGtleVNwbGluZXM9JzAgLjEgLjUgMTswIC4xIC41IDE7MCAuMSAuNSAxOzAgLjEgLjUgMScgcmVwZWF0Q291bnQ9J2luZGVmaW5pdGUnIGJlZ2luPScwJz48L2FuaW1hdGU+PC9jaXJjbGU+PC9zdmc+') no-repeat center center;
+    }
+    .engine-info {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+      margin-top: var(--spacing-sm);
+    }
+    .config-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+      align-items: flex-end;
+    }
+    .config-field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xs);
+    }
+    .config-field label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+    }
+    .config-field select,
+    .config-field input {
+      padding: var(--spacing-xs) var(--spacing-sm);
+      font-size: var(--font-size-sm);
+    }
+  </style>
 </head>
-
 <body>
-  <div style="display:flex;opacity:0.9;align-items:center;padding:20px 20px 10px 20px;opacity:0.7;">
-    <img src="logo.svg" style="width:28px;" />
-    <span style="font-family:Helvetica;font-weight:700;font-size:20px;margin-left:4px;">draw.io labs</span>
-    <button style="position:relative;margin-left:auto;margin-right:10px;padding:4px 6px;" title="Unescape" id="create"
-      onclick="replaceEscapes();return false;">
-      Unescape
-    </button>
-    <a class="adaptive-asset" href="https://github.com/jgraph/drawio-tools/discussions/3" title="Help" target="_blank">
-      <img src="help.svg" style="width:16px;" />
-    </a>
+  <div class="page">
+    <header class="header">
+      <div class="container">
+        <div class="header__inner">
+          <a href="../" class="header__brand">
+            <img src="../assets/logo.svg" alt="draw.io" class="header__logo">
+            <span class="header__title">draw.io Tools</span>
+          </a>
+          <nav class="header__nav">
+            <a href="../" class="header__link">All Tools</a>
+            <a href="https://github.com/jgraph/drawio-tools/discussions/3" class="header__link" target="_blank">Help</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="container tool-page">
+        <nav class="breadcrumb">
+          <a href="../" class="breadcrumb__link">Tools</a>
+          <span class="breadcrumb__separator">/</span>
+          <span class="breadcrumb__current">AI Generate</span>
+        </nav>
+
+        <div class="tool-header">
+          <h1 class="tool-header__title">
+            <svg class="tool-header__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+              <path d="M2 17l10 5 10-5"/>
+              <path d="M2 12l10 5 10-5"/>
+            </svg>
+            AI Generate
+          </h1>
+          <p class="tool-header__description">
+            Generate draw.io diagrams from natural language descriptions using AI.
+            Supports ChatGPT, Claude, Gemini, and Mermaid syntax.
+          </p>
+        </div>
+
+        <!-- Prompt Input -->
+        <div class="card mb-lg">
+          <div class="card__body">
+            <div class="textarea-container">
+              <label for="prompt">Diagram Description</label>
+              <textarea
+                id="prompt"
+                rows="4"
+                placeholder="Describe your diagram, e.g., 'five tier sequence diagram on how to order fast food online' or paste Mermaid syntax like 'graph TD; A-->B; A-->C;'"
+                spellcheck="false"
+                autocomplete="off"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Configuration -->
+        <div class="options-panel mb-lg">
+          <div class="options-panel__title">Configuration</div>
+          <div class="config-row">
+            <div class="config-field">
+              <label for="engine">Engine</label>
+              <select id="engine">
+                <option value="chatgpt">ChatGPT</option>
+                <option value="gemini">Gemini</option>
+                <option value="mermaidjs">Mermaid</option>
+                <option value="drawio">draw.io XML</option>
+              </select>
+            </div>
+
+            <div class="config-field" id="modelSection">
+              <label for="model">Model</label>
+              <select id="model">
+                <option value="gpt-4.5-preview">GPT-4.5 Preview</option>
+                <option value="gpt-4o" selected>GPT-4o</option>
+                <option value="gpt-4o-mini">GPT-4o mini</option>
+                <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                <option value="gpt-4">GPT-4</option>
+                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                <option value="gemini-2.5-pro-exp-03-25">Gemini 2.5 Pro</option>
+                <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash-Lite</option>
+                <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                <option value="claude-3-7-sonnet-latest">Claude 3.7 Sonnet</option>
+                <option value="claude-3-5-haiku-latest">Claude 3.5 Haiku</option>
+                <option value="claude-3-5-sonnet-latest">Claude 3.5 Sonnet v2</option>
+              </select>
+            </div>
+
+            <div class="config-field" id="keySection">
+              <label for="apikey">API Key</label>
+              <input type="password" id="apikey" placeholder="Enter your API key">
+            </div>
+
+            <div class="config-field" id="promptSection">
+              <label for="aiPromptSelect">Prompt Type</label>
+              <select id="aiPromptSelect">
+                <option id="mermaidOption"
+                  value='Write a MermaidJS declaration for "%prompt%" and return only the valid MermaidJS syntax without any other text do not return a gantt chart unless specifically requested'
+                  selected>Mermaid</option>
+                <option id="drawioOption"
+                  value='Write a draw.io file for "%prompt%" and return only the valid XML syntax without any other text'>
+                  draw.io XML</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Generate Button -->
+        <div class="btn-group mb-lg">
+          <button type="button" class="btn btn--primary btn--lg" id="generateBtn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            Generate Diagram
+          </button>
+          <button type="button" class="btn btn--secondary" id="unescapeBtn">Unescape Text</button>
+        </div>
+
+        <!-- Preview -->
+        <div class="card mb-lg">
+          <div class="card__header">
+            <h3 class="card__title">Preview</h3>
+          </div>
+          <div class="card__body">
+            <div class="preview-container" id="previewContainer">
+              <div class="preview-placeholder" id="placeholder">
+                Generated diagram will appear here
+              </div>
+              <iframe id="preview" allowtransparency="true" style="display: none;"></iframe>
+            </div>
+            <div class="engine-info" id="info"></div>
+          </div>
+          <div class="card__footer">
+            <div class="btn-group">
+              <button type="button" class="btn btn--primary" id="viewBtn" disabled>View Full Screen</button>
+              <button type="button" class="btn btn--secondary" id="editBtn" disabled>Edit in draw.io</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="alertContainer"></div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__inner">
+          <span>&copy; 2026 JGraph Ltd. Apache-2.0 License.</span>
+          <div class="footer__links">
+            <a href="https://www.drawio.com">draw.io</a>
+            <a href="https://github.com/jgraph/drawio-tools">GitHub</a>
+          </div>
+        </div>
+      </div>
+    </footer>
   </div>
-  <div style="display:block;align-items:center;padding:0 20px 20px 20px;">
-    <textarea id="prompt"
-      style="width:100%;height:60px;font-family:inherit;font-size:inherit;padding:10px;box-sizing:border-box;resize:vertical;"
-      placeholder="Diagram description, eg. five tier sequence diagram on how to order fast food online or graph TD; A-->B; A-->C; B-->D; C-->D;"
-      spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
-    <div
-      style="position:relative;display:flex;align-items:center;justify-items:stretch;padding-top:10px;white-space:nowrap;">
-      <div style="margin-left:auto;"></div>
-      <div style="opacity:0.5;" id="keySection">
-        Key: <input style="padding:2px;" title="API Key" id="apikey">
-      </div>
-      <div style="opacity:0.5;margin-left:10px;display:flex;align-items:center;flex-grow:1;" id="promptSection">
-        Prompt:&nbsp;
-        <select style="padding:2px;border-radius:4px;" title="Type" id="aiPromptSelect">
-          <option id="mermaidOption"
-            value="Write a MermaidJS declaration for &quot;%prompt%&quot; and return only the valid MermaidJS syntax without any other text do not return a gantt chart unless specifically requested"
-            selected>Mermaid</option>
-          <option id="drawioOption"
-            value="Write a draw.io file for &quot;%prompt%&quot; and return only the valid XML syntax without any other text">
-            draw.io</option>
-        </select>
-        <input style="padding:2px;flex-grow:1;" title="Prompt" id="aiPrompt">
-      </div>
-      <div style="opacity:0.5;margin-left:10px;display:none;" id="modelSection">
-        Model:
-        <select style="padding:2px;border-radius:4px;" title="Model" id="model">
-          <option value="gpt-4.5-preview">GPT-4.5 Preview</option>
-          <option value="gpt-4o" selected>GPT-4o</option>
-          <option value="gpt-4o-mini">GPT-4o mini</option>
-          <option value="gpt-4-turbo">GPT-4 Turbo</option>
-          <option value="gpt-4">GPT-4</option>
-          <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-          <option value="gemini-2.5-pro-exp-03-25">Gemini 2.5 Pro 03-25</option>
-          <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
-          <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash-Lite</option>
-          <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-          <option value="claude-3-7-sonnet-latest">Claude 3.7 Sonnet</option>
-          <option value="claude-3-5-haiku-latest">Claude 3.5 Haiku</option>
-          <option value="claude-3-5-sonnet-latest">Claude 3.5 Sonnet v2</option>
-          <option value="claude-3-5-sonnet-20240620">Claude 3.5 Sonnet</option>
-          <option value="claude-3-opus-20240229">Claude 3 Opus</option>
-          <option value="claude-3-sonnet-20240229">Claude 3 Sonnet</option>
-          <option value="claude-3-haiku-20240307">Claude 3 Haiku</option>
-        </select>
-      </div>
-      <div style="margin-left:10px;opacity:0.5;">
-        Engine:
-        <select style="padding:2px;border-radius:4px;" title="Engine" id="engine">
-          <option value="chatgpt">ChatGPT</option>
-          <option value="gemini">Gemini</option>
-          <option value="mermaidjs">Mermaid</option>
-          <option value="drawio">draw.io</option>
-        </select>
-      </div>
-      <button style="position:relative;margin-left:20px;" title="Generate Diagram" id="generate"
-        onclick="generate();return false;">
-        Generate
-      </button>
-    </div>
-  </div>
-  <div style="display:block;align-items:center;padding:0 20px 20px 20px;">
-    <div
-      style="position:relative;height:540px;border:1px solid rgb(133, 133, 133);resize:vertical;overflow:auto;box-sizing:border-box;background-repeat:no-repeat;background-position:center center;background-image:url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPCFET0NUWVBFIHN2ZyBQVUJMSUMgIi0vL1czQy8vRFREIFNWRyAxLjEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkIj4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHdpZHRoPSI2MHB4IiBoZWlnaHQ9IjMwcHgiIHZpZXdCb3g9Ii0wLjUgLTAuNSA2MCAzMCIgY2xhc3M9ImdlLWV4cG9ydC1zdmctZGFyayI+PGRlZnM+PHN0eWxlIHR5cGU9InRleHQvY3NzIj5zdmcuZ2UtZXhwb3J0LXN2Zy1kYXJrOm5vdChtangtY29udGFpbmVyICZndDsgc3ZnKSB7IGZpbHRlcjogaW52ZXJ0KDEwMCUpIGh1ZS1yb3RhdGUoMTgwZGVnKTsgfSYjeGE7c3ZnLmdlLWV4cG9ydC1zdmctZGFyayBmb3JlaWduT2JqZWN0IGltZywmI3hhO3N2Zy5nZS1leHBvcnQtc3ZnLWRhcmsgaW1hZ2U6bm90KHN2Zy5nZS1leHBvcnQtc3ZnLWRhcmsgc3dpdGNoIGltYWdlKSwmI3hhO3N2Zy5nZS1leHBvcnQtc3ZnLWRhcmsgc3ZnOm5vdChtangtY29udGFpbmVyICZndDsgc3ZnKSYjeGE7eyBmaWx0ZXI6IGludmVydCgxMDAlKSBodWUtcm90YXRlKDE4MGRlZykgfTwvc3R5bGU+PC9kZWZzPjxnPjxnIGRhdGEtY2VsbC1pZD0iMCI+PGcgZGF0YS1jZWxsLWlkPSIxIj48ZyBkYXRhLWNlbGwtaWQ9IkI0WHVrdVk0T2NSTERVNlBqQ0Y4LTEiPjxnPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSI2MCIgaGVpZ2h0PSIzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJub25lIiBwb2ludGVyLWV2ZW50cz0iYWxsIi8+PC9nPjxnPjxnIGZpbGw9InJnYigwLCAwLCAwKSIgZm9udC1mYW1pbHk9IiZxdW90O0hlbHZldGljYSZxdW90OyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNnB4IiBvcGFjaXR5PSIwLjUiPjx0ZXh0IHg9IjI5LjUiIHk9IjIxLjUiPlByZXZpZXc8L3RleHQ+PC9nPjwvZz48L2c+PC9nPjwvZz48L2c+PC9zdmc+);">
-      <iframe id="preview" allowtransparency="true"
-        style="border:5px solid transparent;box-sizing:border-box;position:absolute;width:100%;height:100%;"></iframe>
-    </div>
-    <div style="position:relative;display:flex;align-items:center;justify-items:stretch;padding-top:10px;">
-      <div id="info"
-        style="display:flex;align-items:center;justify-items:end;margin-left:auto;margin-right:20px;opacity:0.5;">
-      </div>
-      <button disabled="disabled" style="position:relative;" title="View Diagram" id="view">
-        View
-      </button>
-      <button disabled="disabled" style="position:relative;margin-left:10px;" title="Edit Diagram" id="edit">
-        Edit
-      </button>
-    </div>
-  </div>
-  <script type="text/javascript">
-    //<![CDATA[
-    var spin = 'url(data:image/svg+xml;base64,77u/PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyMDAgMjAwJz48Y2lyY2xlIGZpbGw9JyM4MDgwODAnIHN0cm9rZT0nIzgwODA4MCcgc3Ryb2tlLXdpZHRoPScxNScgcj0nMTUnIGN4PSczNScgY3k9JzEwMCcgZGF0YS1kYXJrcmVhZGVyLWlubGluZS1maWxsPScnIGRhdGEtZGFya3JlYWRlci1pbmxpbmUtc3Ryb2tlPScnIHN0eWxlPSctLWRhcmtyZWFkZXItaW5saW5lLWZpbGw6ICNmZjZkZmY7IC0tZGFya3JlYWRlci1pbmxpbmUtc3Ryb2tlOiAjZmY2ZGZmOyc+PGFuaW1hdGUgYXR0cmlidXRlTmFtZT0nY3gnIGNhbGNNb2RlPSdzcGxpbmUnIGR1cj0nNC4yJyB2YWx1ZXM9JzM1OzE2NTsxNjU7MzU7MzUnIGtleVNwbGluZXM9JzAgLjEgLjUgMTswIC4xIC41IDE7MCAuMSAuNSAxOzAgLjEgLjUgMScgcmVwZWF0Q291bnQ9J2luZGVmaW5pdGUnIGJlZ2luPScwJz48L2FuaW1hdGU+PC9jaXJjbGU+PGNpcmNsZSBmaWxsPScjODA4MDgwJyBzdHJva2U9JyM4MDgwODAnIHN0cm9rZS13aWR0aD0nMTUnIG9wYWNpdHk9Jy44JyByPScxNScgY3g9JzM1JyBjeT0nMTAwJyBkYXRhLWRhcmtyZWFkZXItaW5saW5lLWZpbGw9JycgZGF0YS1kYXJrcmVhZGVyLWlubGluZS1zdHJva2U9Jycgc3R5bGU9Jy0tZGFya3JlYWRlci1pbmxpbmUtZmlsbDogI2ZmNmRmZjsgLS1kYXJrcmVhZGVyLWlubGluZS1zdHJva2U6ICNmZjZkZmY7Jz48YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdjeCcgY2FsY01vZGU9J3NwbGluZScgZHVyPSc0LjInIHZhbHVlcz0nMzU7MTY1OzE2NTszNTszNScga2V5U3BsaW5lcz0nMCAuMSAuNSAxOzAgLjEgLjUgMTswIC4xIC41IDE7MCAuMSAuNSAxJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScgYmVnaW49JzAuMDUnPjwvYW5pbWF0ZT48L2NpcmNsZT48Y2lyY2xlIGZpbGw9JyM4MDgwODAnIHN0cm9rZT0nIzgwODA4MCcgc3Ryb2tlLXdpZHRoPScxNScgb3BhY2l0eT0nLjYnIHI9JzE1JyBjeD0nMzUnIGN5PScxMDAnIGRhdGEtZGFya3JlYWRlci1pbmxpbmUtZmlsbD0nJyBkYXRhLWRhcmtyZWFkZXItaW5saW5lLXN0cm9rZT0nJyBzdHlsZT0nLS1kYXJrcmVhZGVyLWlubGluZS1maWxsOiAjZmY2ZGZmOyAtLWRhcmtyZWFkZXItaW5saW5lLXN0cm9rZTogI2ZmNmRmZjsnPjxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J2N4JyBjYWxjTW9kZT0nc3BsaW5lJyBkdXI9JzQuMicgdmFsdWVzPSczNTsxNjU7MTY1OzM1OzM1JyBrZXlTcGxpbmVzPScwIC4xIC41IDE7MCAuMSAuNSAxOzAgLjEgLjUgMTswIC4xIC41IDEnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJyBiZWdpbj0nLjEnPjwvYW5pbWF0ZT48L2NpcmNsZT48Y2lyY2xlIGZpbGw9JyM4MDgwODAnIHN0cm9rZT0nIzgwODA4MCcgc3Ryb2tlLXdpZHRoPScxNScgb3BhY2l0eT0nLjQnIHI9JzE1JyBjeD0nMzUnIGN5PScxMDAnIGRhdGEtZGFya3JlYWRlci1pbmxpbmUtZmlsbD0nJyBkYXRhLWRhcmtyZWFkZXItaW5saW5lLXN0cm9rZT0nJyBzdHlsZT0nLS1kYXJrcmVhZGVyLWlubGluZS1maWxsOiAjZmY2ZGZmOyAtLWRhcmtyZWFkZXItaW5saW5lLXN0cm9rZTogI2ZmNmRmZjsnPjxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9J2N4JyBjYWxjTW9kZT0nc3BsaW5lJyBkdXI9JzQuMicgdmFsdWVzPSczNTsxNjU7MTY1OzM1OzM1JyBrZXlTcGxpbmVzPScwIC4xIC41IDE7MCAuMSAuNSAxOzAgLjEgLjUgMTswIC4xIC41IDEnIHJlcGVhdENvdW50PSdpbmRlZmluaXRlJyBiZWdpbj0nLjE1Jz48L2FuaW1hdGU+PC9jaXJjbGU+PGNpcmNsZSBmaWxsPScjODA4MDgwJyBzdHJva2U9JyM4MDgwODAnIHN0cm9rZS13aWR0aD0nMTUnIG9wYWNpdHk9Jy4yJyByPScxNScgY3g9JzM1JyBjeT0nMTAwJyBkYXRhLWRhcmtyZWFkZXItaW5saW5lLWZpbGw9JycgZGF0YS1kYXJrcmVhZGVyLWlubGluZS1zdHJva2U9Jycgc3R5bGU9Jy0tZGFya3JlYWRlci1pbmxpbmUtZmlsbDogI2ZmNmRmZjsgLS1kYXJrcmVhZGVyLWlubGluZS1zdHJva2U6ICNmZjZkZmY7Jz48YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSdjeCcgY2FsY01vZGU9J3NwbGluZScgZHVyPSc0LjInIHZhbHVlcz0nMzU7MTY1OzE2NTszNTszNScga2V5U3BsaW5lcz0nMCAuMSAuNSAxOzAgLjEgLjUgMTswIC4xIC41IDE7MCAuMSAuNSAxJyByZXBlYXRDb3VudD0naW5kZWZpbml0ZScgYmVnaW49Jy4yJz48L2FuaW1hdGU+PC9jaXJjbGU+PC9zdmc+)';
 
-    var urlParams = (function (url) {
-      var result = new Object();
-      var idx = url.lastIndexOf('#');
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+  <script src="../utils/drawio-tools.js"></script>
+  <script>
+    (function() {
+      var DT = window.DrawioTools;
 
-      if (idx > 0) {
-        var params = url.substring(idx + 1).split('&');
+      var promptEl = document.getElementById('prompt');
+      var engineEl = document.getElementById('engine');
+      var modelEl = document.getElementById('model');
+      var apikeyEl = document.getElementById('apikey');
+      var aiPromptSelectEl = document.getElementById('aiPromptSelect');
+      var generateBtn = document.getElementById('generateBtn');
+      var viewBtn = document.getElementById('viewBtn');
+      var editBtn = document.getElementById('editBtn');
+      var previewEl = document.getElementById('preview');
+      var placeholderEl = document.getElementById('placeholder');
+      var previewContainer = document.getElementById('previewContainer');
+      var infoEl = document.getElementById('info');
+      var alertContainer = document.getElementById('alertContainer');
 
-        for (var i = 0; i < params.length; i++) {
-          idx = params[i].indexOf('=');
+      var modelSection = document.getElementById('modelSection');
+      var keySection = document.getElementById('keySection');
+      var promptSection = document.getElementById('promptSection');
 
-          if (idx > 0) {
-            result[params[i].substring(0, idx)] = params[i].substring(idx + 1);
+      var urlParams = new URLSearchParams(window.location.hash.substring(1));
+
+      if (urlParams.get('key')) {
+        apikeyEl.value = urlParams.get('key');
+      }
+
+      function showAlert(message, type) {
+        type = type || 'info';
+        var alert = document.createElement('div');
+        alert.className = 'alert alert--' + type;
+        alert.textContent = message;
+        alertContainer.innerHTML = '';
+        alertContainer.appendChild(alert);
+        setTimeout(function() { alert.remove(); }, 5000);
+      }
+
+      function engineChanged() {
+        var engine = engineEl.value;
+        var prefix = engine === 'chatgpt' ? 'gpt' : engine;
+
+        var isAI = engine !== 'mermaidjs' && engine !== 'drawio';
+        modelSection.style.display = isAI ? '' : 'none';
+        keySection.style.display = isAI ? '' : 'none';
+        promptSection.style.display = isAI ? '' : 'none';
+
+        var options = modelEl.options;
+        for (var i = 0; i < options.length; i++) {
+          options[i].style.display = options[i].value.indexOf(prefix) === 0 ? '' : 'none';
+        }
+
+        if (engine === 'gemini') {
+          modelEl.value = 'gemini-2.0-flash';
+        } else if (engine === 'chatgpt') {
+          modelEl.value = 'gpt-4o-mini';
+        }
+      }
+
+      engineEl.addEventListener('change', engineChanged);
+      engineChanged();
+
+      document.getElementById('unescapeBtn').addEventListener('click', function() {
+        var input = promptEl.value;
+        input = input.replace(/\\u([0-9A-Fa-f]{4})/g, function(match, group) {
+          return String.fromCharCode(parseInt(group, 16));
+        });
+        promptEl.value = input.replace(/\\n/g, '\n');
+      });
+
+      function compressData(data) {
+        if (data && data.length > 0) {
+          var tmp = pako.deflateRaw(encodeURIComponent(data));
+          return btoa(String.fromCharCode.apply(null, new Uint8Array(tmp)));
+        }
+        return data;
+      }
+
+      function extractCode(input) {
+        var result = input;
+
+        if (result.indexOf('```mermaid') >= 0) {
+          result = result.substring(result.indexOf('```mermaid') + 11);
+        } else if (result.indexOf('```xml') >= 0) {
+          result = result.substring(result.indexOf('```xml') + 7);
+        } else {
+          var start = result.indexOf('```');
+          if (start === 0) {
+            result = result.substring(3);
+          } else if (start > 0) {
+            result = result.substring(0, start + 3);
           }
         }
+
+        result = result
+          .replace(/^```mermaid\n/, '')
+          .replace(/^```xml\n/, '')
+          .replace(/\n```\n$/, '')
+          .replace(/\n```$/, '')
+          .replace(/<\?xml[^>]+\?>\s*/, '');
+
+        return result;
       }
 
-      return result;
-    })(window.location.href);
+      function sendPostRequest(url, data, engine, model, apikey) {
+        var headers = { 'Content-Type': 'application/json' };
 
-    var keystore = (urlParams['keys'] != null) ?
-      JSON.parse(decodeURIComponent(urlParams['keys'])) : null;
-
-    if (urlParams['key'] != null) {
-      document.getElementById('apikey').value = urlParams['key'];
-    }
-
-    if (window.location.hostname == 'localhost') {
-      // Adds claude as an engine option for localhost
-      // where a proxy server must be running
-      var option = document.createElement('option');
-      option.value = 'claude';
-      option.text = 'Claude';
-      document.getElementById('engine').insertBefore(option,
-        document.getElementById('engine').options[0]);
-
-      // Adds automatic option for local testing
-      if (keystore != null &&
-        keystore['claude'] != null &&
-        keystore['chatgpt'] != null) {
-        var option = document.createElement('option');
-        option.value = 'auto';
-        option.text = 'Automatic';
-        document.getElementById('engine').insertBefore(option,
-          document.getElementById('engine').options[0]);
-      }
-    }
-
-    function replaceEscapes() {
-      var input = document.getElementById('prompt').value;
-      // Replace Unicode escape sequences
-      input = input.replace(/\\u([0-9A-Fa-f]{4})/g, (match, group) =>
-        String.fromCharCode(parseInt(group, 16))
-      );
-      // Replace newline escape sequences
-      document.getElementById('prompt').value = input.replace(/\\n/g, '\n');
-    };
-
-    async function sendPostRequest(url, data, engine, model, apikey, max_tokens) {
-      try {
-        var body = JSON.stringify(data);
-        document.getElementById('info').innerText = '';
-        document.getElementById('info').innerText = 'Engine: ' +
-          engine + ' Model: ' + model + ' Waiting...';
-        var t0 = Date.now();
-
-        var headers = {
-          'Content-Type': 'application/json'
-        };
-
-        if (engine == 'chatgpt') {
+        if (engine === 'chatgpt') {
           headers['Authorization'] = 'Bearer ' + apikey;
-        }
-        else if (engine == 'claude') {
+        } else if (engine === 'claude') {
           headers['x-api-key'] = apikey;
           headers['anthropic-version'] = '2023-06-01';
           headers['anthropic-dangerous-direct-browser-access'] = 'true';
         }
 
-        var controller = new AbortController();
-        var timeoutId = setTimeout(() => controller.abort(), 60000);
-        console.log('sendPostRequest.request', url.length, 'url bytes', body.length,
-          'body bytes', 'url', [url], 'headers', headers, 'data', [data]);
+        infoEl.textContent = 'Engine: ' + engine + ' | Model: ' + model + ' | Waiting...';
+        var t0 = Date.now();
 
-        var response = await fetch(url, {
+        var controller = new AbortController();
+        var timeoutId = setTimeout(function() { controller.abort(); }, 60000);
+
+        return fetch(url, {
           method: 'POST',
           headers: headers,
-          body: body,
+          body: JSON.stringify(data),
           signal: controller.signal
+        }).then(function(response) {
+          if (!response.ok) {
+            throw new Error('HTTP error! Status: ' + response.status);
+          }
+          return response.json();
+        }).then(function(jsonResponse) {
+          var dt = Date.now() - t0;
+          infoEl.textContent = 'Engine: ' + engine + ' | Model: ' + model + ' | Time: ' + dt + 'ms';
+          return jsonResponse;
+        }).finally(function() {
+          clearTimeout(timeoutId);
         });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const jsonResponse = await response.json();
-
-        var dt = Date.now() - t0;
-        console.log('sendPostRequest.response', dt, 'ms', 'jsonResponse', [jsonResponse]);
-        document.getElementById('info').innerText = 'Engine: ' +
-          engine + ' Model: ' + model + ' Time: ' + dt + 'ms';
-
-        return jsonResponse;
-      } catch (error) {
-        console.error('Error:', error);
-        throw error;
-      }
-      finally {
-        clearTimeout(timeoutId);
-      }
-    };
-
-    function doGenerate(engine, model, aiprompt, mediaType, base64Image) {
-      var apikey = (engine != null) ? keystore[engine] :
-        document.getElementById('apikey').value;
-      engine = (engine != null) ? engine :
-        document.getElementById('engine').value;
-      model = (model != null) ? model :
-        document.getElementById('model').value;
-      var prompt = document.getElementById('prompt').value;
-
-      if (prompt == '') {
-        prompt = 'a random diagram';
       }
 
-      if (aiprompt == null) {
-        aiprompt = document.getElementById('aiPrompt').value;
-        aiprompt = aiprompt.replace(/%prompt%/g, prompt);
-      }
+      function preview(value) {
+        var params = 'lightbox=1&dark=auto&border=10&edit=_blank';
+        var prefix = 'https://www.draw.io/?';
+        var data = compressData(value);
 
-      if (engine != 'mermaidjs' && engine != 'drawio' &&
-        engine != 'auto' && apikey == '') {
-        alert('API key is required for ' + engine);
-      }
-      else {
-        document.getElementById('edit').disabled = true;
-        document.getElementById('view').disabled = true;
-        document.getElementById('generate').disabled = true;
-        document.getElementById('preview').removeAttribute('src');
-        document.getElementById('preview').style.display = 'none';
-        document.getElementById('preview').parentNode.style.backgroundImage = spin;
-
-        console.log('doGenerate', prompt.length, 'bytes', 'engine', engine,
-          'model', model, 'prompt', [prompt], 'aiprompt', [aiprompt]);
-
-        function handleError(error) {
-          document.getElementById('generate').disabled = false;
-          document.getElementById('preview').parentNode.style.backgroundImage = 'none';
-          console.error('Error:', error);
-          alert('Error:' + error);
+        var createObj = {
+          type: value.indexOf('<') === 0 ? 'xml' : 'mermaid',
+          compressed: true,
+          data: data
         };
 
-        try {
-          if (engine == 'gemini') {
-            var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apikey;
-            sendPostRequest(url, {
-              contents:
-                [{
-                  parts:
-                    [{
-                      text: aiprompt
-                    }]
-                }]
-            }, engine, model, apikey).then(function (response) {
-              preview(extractCode(response.candidates[0].content.parts[0].text));
-            }).catch(function (error) {
-              console.log('doGenerate.failed', 'engine',
-                engine, 'model', model, 'error', error);
+        var create = '#create=' + encodeURIComponent(JSON.stringify(createObj));
+        var link = prefix + params + create;
 
-              if (keystore['chatgpt'] != null) {
-                doGenerate('chatgpt', 'gpt-4o-mini', aiprompt);
-              }
-              else {
-                handleError(error);
-              }
-            });
-          }
-          else if (engine == 'claude') {
-            var url = 'https://api.anthropic.com/v1/messages';
-            sendPostRequest(url, {
-              max_tokens: 1024,
-              model: model,
-              messages: [{
-                'role': 'user', 'content': (base64Image != null) ?
-                  [
-                    {
-                      type: 'image',
-                      source: {
-                        type: 'base64',
-                        media_type: mediaType,
-                        data: base64Image,
-                      },
-                    },
-                    {
-                      type: 'text',
-                      text: aiprompt,
-                    },
-                  ] : aiprompt
-              }]
-            }, engine, model, apikey, (base64Image != null) ? 10000 : 1024).then(function (response) {
-              preview(extractCode(response.content[0].text));
-            }).catch(function (error) {
-              console.log('doGenerate.failed', 'engine',
-                engine, 'model', model, 'error', error);
+        previewEl.src = link;
+        previewEl.style.display = 'block';
+        placeholderEl.style.display = 'none';
+        previewContainer.classList.remove('preview-loading');
 
-              if (keystore['chatgpt'] != null && base64Image == null) {
-                doGenerate('chatgpt', 'gpt-4o-mini', aiprompt);
-              }
-              else {
-                handleError(error);
-              }
-            });
-          }
-          else if (engine == 'chatgpt') {
-            var url = 'https://api.openai.com/v1/chat/completions';
-            sendPostRequest(url, {
-              model: model,
-              messages: [{
-                'role': 'user', 'content': aiprompt
-              }]
-            }, engine, model, apikey).then(function (response) {
-              preview(extractCode(response.choices[0].message.content));
-            }).catch(function (error) {
-              console.log('doGenerate.failed', 'engine',
-                engine, 'model', model, 'error', error);
-              if (model == 'gpt-4o-mini') {
-                handleError(error);
-              }
-              else {
-                doGenerate('chatgpt', 'gpt-4o-mini', aiprompt);
-              }
-            });
-          }
-          else if (engine == 'mermaidjs' || engine == 'drawio') {
-            preview(prompt);
-          }
-          else {
-            document.getElementById('generate').disabled = false;
-            document.getElementById('preview').parentNode.style.backgroundImage = 'none';
-            alert('Invalid engine');
-          }
-        }
-        catch (error) {
-          handleError(error);
-        }
+        viewBtn.disabled = false;
+        editBtn.disabled = false;
+        generateBtn.disabled = false;
+
+        viewBtn.onclick = function() { window.open(prefix + params + create); };
+        editBtn.onclick = function() { window.open(prefix + create); };
       }
-    };
 
-    function generate() {
-      var prompt = document.getElementById('prompt').value;
+      function generate() {
+        var engine = engineEl.value;
+        var model = modelEl.value;
+        var apikey = apikeyEl.value;
+        var prompt = promptEl.value || 'a random diagram';
 
-      if (document.getElementById('engine').value == 'auto') {
-        if (prompt.startsWith('data:image/')) {
-          var mediaType = prompt.substring(5, prompt.indexOf(';'));
-          doGenerate('claude', 'claude-3-7-sonnet-latest',
-            'Turn this into a draw.io diagram and return only ' +
-            'the XML with no additional text or explanation make sure ' +
-            'that the draw.io file is valid and does not contain any errors',
-            mediaType, prompt.substring(prompt.indexOf(',') + 1));
+        if (engine !== 'mermaidjs' && engine !== 'drawio' && !apikey) {
+          showAlert('API key is required for ' + engine, 'error');
+          return;
         }
-        else {
-          var typePrompt = '"' + prompt + '" classify this prompt for a diagram by returning ' +
-            '"xml" for floorplans, mockups and network diagrams, "mermaid-complex" for detailed ' +
-            'or complex diagram descriptions or mindmaps and "mermaid" for all other cases do ' +
-            'not return any other text or explanation just the string with no quotes';
 
-          var url = 'https://api.openai.com/v1/chat/completions';
-          sendPostRequest(url, {
-            model: 'gpt-4o-mini',
-            messages: [{
-              'role': 'user', 'content': typePrompt
-            }]
-          }, 'chatgpt', null, keystore['chatgpt']).then(function (response) {
-            var type = response.choices[0].message.content;
+        generateBtn.disabled = true;
+        viewBtn.disabled = true;
+        editBtn.disabled = true;
+        previewEl.style.display = 'none';
+        placeholderEl.style.display = 'none';
+        previewContainer.classList.add('preview-loading');
 
-            // Removes all leading and trailing quotes
-            console.log('generate', 'type', type);
-            type = type.replace(/^[\"\'\s]+/, '').replace(/[\"\'\s]+$/, '');
+        var aiprompt = aiPromptSelectEl.value.replace(/%prompt%/g, prompt);
 
-            if (type == 'xml') {
-              doGenerate('chatgpt', 'gpt-4.5-preview',
-                document.getElementById('drawioOption').value.replace(/%prompt%/g, prompt));
-            }
-            else if (type == 'mermaid-complex') {
-              doGenerate('claude', 'claude-3-7-sonnet-latest',
-                document.getElementById('mermaidOption').value.replace(/%prompt%/g, prompt));
-            }
-            else {
-              doGenerate('chatgpt', 'gpt-4o-mini');
-            }
-          }).catch(function (error) {
-            handleError(error);
+        if (engine === 'gemini') {
+          var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apikey;
+          sendPostRequest(
+            url,
+            { contents: [{ parts: [{ text: aiprompt }] }] },
+            engine,
+            model,
+            apikey
+          ).then(function(response) {
+            preview(extractCode(response.candidates[0].content.parts[0].text));
+          }).catch(function(error) {
+            console.error('Error:', error);
+            showAlert('Error: ' + error.message, 'error');
+            generateBtn.disabled = false;
+            previewContainer.classList.remove('preview-loading');
+            placeholderEl.style.display = 'flex';
           });
+        } else if (engine === 'chatgpt') {
+          var url = 'https://api.openai.com/v1/chat/completions';
+          sendPostRequest(
+            url,
+            { model: model, messages: [{ role: 'user', content: aiprompt }] },
+            engine,
+            model,
+            apikey
+          ).then(function(response) {
+            preview(extractCode(response.choices[0].message.content));
+          }).catch(function(error) {
+            console.error('Error:', error);
+            showAlert('Error: ' + error.message, 'error');
+            generateBtn.disabled = false;
+            previewContainer.classList.remove('preview-loading');
+            placeholderEl.style.display = 'flex';
+          });
+        } else if (engine === 'mermaidjs' || engine === 'drawio') {
+          preview(prompt);
+        } else {
+          showAlert('Invalid engine', 'error');
+          generateBtn.disabled = false;
+          previewContainer.classList.remove('preview-loading');
+          placeholderEl.style.display = 'flex';
         }
       }
-      else {
-        doGenerate();
-      }
-    };
 
-    function extractCode(input) {
-      result = input;
+      generateBtn.addEventListener('click', generate);
 
-      if (result.indexOf('```mermaid') >= 0) {
-        result = result.substring(result.indexOf('```mermaid') + 11);
-      }
-      else if (result.indexOf('```xml') >= 0) {
-        result = result.substring(result.indexOf('```xml') + 7);
-      }
-      else {
-        var start = result.indexOf('```');
-
-        if (start == 0)
-          result = result.substring(3);
-        else if (start > 0)
-          result = result.substring(0, start + 3);
-      }
-
-      result = result.replace(/^```mermaid\n/, '').replace(/^```xml\n/, '').
-        replace(/\n```\n$/, '').replace(/\n```$/, '').
-        replace(/<\?xml[^>]+\?>\s*/, '');
-
-      console.log('extractCode', input.length, 'bytes', result.length,
-        'bytes extracted', 'input', [input], 'result', [result]);
-
-      return result;
-    };
-
-    function preview(value) {
-      var params = 'lightbox=1&dark=auto&border=10&edit=_blank';
-      var prefix = (urlParams['dev'] == '1') ?
-        'https://test.draw.io/?dev=1&' :
-        'https://www.draw.io/?' + params;
-      var data = compressData(value);
-      var create = '';
-
-      var createObj = {
-        type: (value.startsWith('<')) ? 'xml' : 'mermaid',
-        compressed: true,
-        data: data
-      };
-
-      create = '#create=' + encodeURIComponent(
-        JSON.stringify(createObj));
-
-      var link = prefix + params + create;
-      console.log('preview', link.length, 'url bytes',
-        data.length, 'data bytes', value.length, 'value bytes',
-        'link', [link], 'value', [value], 'data', [data],
-        'createObj', [createObj]);
-
-      document.getElementById('preview').src = link;
-      document.getElementById('preview').style.display = 'block';
-      document.getElementById('preview').parentNode.style.backgroundImage = 'none';
-      prefix = (urlParams['dev'] == '1') ?
-        'https://test.draw.io/?dev=1&' :
-        'https://www.draw.io/?';
-      link = prefix + create;
-      document.getElementById('edit').disabled = false;
-      document.getElementById('view').disabled = false;
-      document.getElementById('generate').disabled = false;
-      document.getElementById('view').onclick = function () {
-        window.open(prefix + params + create);
-      };
-      document.getElementById('edit').onclick = function () {
-        window.open(link);
-      };
-    };
-
-    if (window.File != null && window.FileReader != null && window.FileList != null) {
-      function handleDrop(evt) {
-        evt.stopPropagation();
-        evt.preventDefault();
-
-        if (evt.dataTransfer.files.length > 0) {
-          var file = evt.dataTransfer.files[0];
-
-          var reader = new FileReader();
-          reader.onload = function (e) {
-            evt.target.value = e.target.result;
-          };
-
-          // Reads images as data URL
-          if (file.type.startsWith('image/')) {
-            reader.readAsDataURL(file);
-          }
-          else {
-            reader.readAsText(file);
-          }
-        }
-      };
-
-      function handleDragOver(evt) {
-        evt.stopPropagation();
-        evt.preventDefault();
-      };
-
-      // Setup the dnd listeners.
-      var textarea = document.getElementById('prompt');
-      textarea.addEventListener('dragover', handleDragOver, false);
-      textarea.addEventListener('drop', handleDrop, false);
-
-      // Invokes generate on enter key
-      document.getElementById('prompt').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-          generate();
+      promptEl.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault();
+          generate();
         }
       });
 
-      if (urlParams['engine'] != null) {
-        document.getElementById('engine').value = urlParams['engine'];
+      DT.setupDropZone(
+        promptEl,
+        function(content, file) {
+          if (file.type.indexOf('image/') === 0) {
+            DT.readFileAsDataURL(file).then(function(dataUrl) {
+              promptEl.value = dataUrl;
+            });
+          } else {
+            promptEl.value = content;
+          }
+        }
+      );
+
+      promptEl.focus();
+
+      if (urlParams.get('engine')) {
+        engineEl.value = urlParams.get('engine');
+        engineChanged();
       }
 
-      function engineChanged() {
-        document.getElementById('promptSection').style.display = 'flex';
-        document.getElementById('modelSection').style.display = '';
-        document.getElementById('keySection').style.display = '';
-
-        var engine = document.getElementById('engine').value;
-        var prefix = (engine == 'chatgpt') ? 'gpt' : engine;
-
-        // Hide all elements in the model dropdown that do not begin with gpt or gemini depening on the engine
-        var modelOptions = document.getElementById('model').options;
-
-        for (var i = 0; i < modelOptions.length; i++) {
-          var option = modelOptions[i];
-          option.style.display = (option.value.startsWith(prefix)) ? '' : 'none';
-        }
-
-        if (keystore != null && keystore[engine] != null) {
-          document.getElementById('apikey').value = keystore[engine];
-        }
-
-        if (engine == 'gemini') {
-          document.getElementById('model').value = 'gemini-2.0-flash';
-        }
-        else if (engine == 'chatgpt') {
-          document.getElementById('model').value = 'gpt-4o-mini';
-        }
-        else if (engine == 'claude') {
-          document.getElementById('model').value = 'claude-3-5-haiku-latest';
-        }
-        else {
-          document.getElementById('promptSection').style.display = 'none';
-          document.getElementById('modelSection').style.display = 'none';
-          document.getElementById('keySection').style.display = 'none';
-        }
-      };
-
-      function arrayBufferToString(buffer) {
-        var binary = '';
-        var bytes = new Uint8Array(buffer);
-        var len = bytes.byteLength;
-
-        for (var i = 0; i < len; i++) {
-          binary += String.fromCharCode(bytes[i]);
-        }
-
-        return binary;
-      };
-
-      function compressData(data) {
-        var result = data;
-
-        if (typeof (pako) !== 'undefined' &&
-          data != null && data.length > 0) {
-          var tmp = (false) ? pako.deflate(encodeURIComponent(data)) :
-            pako.deflateRaw(encodeURIComponent(data));
-          result = btoa(arrayBufferToString(new Uint8Array(tmp)));
-        }
-
-        console.log('compressData', data.length, 'bytes', result.length,
-          'bytes compressed', 'data', [data], 'result', [result]);
-
-        return result;
-      };
-
-      engineChanged();
-      document.getElementById('engine').addEventListener('change', engineChanged, false);
-
-      function promptChanged() {
-        document.getElementById('aiPrompt').value = document.getElementById('aiPromptSelect').value;
-      };
-
-      document.getElementById('aiPromptSelect').addEventListener('change', promptChanged, false);
-
-      if (urlParams['aiprompt'] != null) {
-        document.getElementById('aiPrompt').value = decodeURIComponent(urlParams['aiprompt']);
-      }
-      else {
-        promptChanged();
-      }
-
-      if (urlParams['prompt'] != null) {
-        document.getElementById('prompt').value = decodeURIComponent(urlParams['prompt']);
+      if (urlParams.get('prompt')) {
+        promptEl.value = decodeURIComponent(urlParams.get('prompt'));
         generate();
       }
-      else {
-        document.getElementById('prompt').focus();
-      }
-    }
-    //]]>
+    })();
   </script>
 </body>
-
 </html>

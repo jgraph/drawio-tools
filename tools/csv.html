@@ -1,90 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Online CSV Viewer</title>
-	<meta charset="utf-8" />
-	<link rel="stylesheet" type="text/css" href="style.css">
-	<script type="text/javascript" src="deflate/pako.min.js"></script>
-	<script type="text/javascript">
-		function bytesToString(arr) {
-			var str = '';
-
-			for (var i = 0; i < arr.length; i++) {
-				str += String.fromCharCode(arr[i]);
-			}
-
-			return str;
-		};
-
-		function encode(data) {
-			return btoa(bytesToString(pako.deflateRaw(encodeURIComponent(data))));
-		};
-
-		function getDesc() {
-			var data = document.getElementById('desc').value;
-			var lines = data.split('\n');
-			var result = [];
-
-			for (var i = 0; i < lines.length; i++) {
-				if (lines[i].charAt(0) != '#' && lines[i].length > 0) {
-					result.push('#' + lines[i]).replace;
-				}
-			}
-
-			return result.join('\n');
-		};
-
-		function create() {
-			var url = document.getElementById('url').value;
-			var area = document.getElementById('textarea');
-			var a = document.getElementById('result');
-			area.style.display = 'none';
-			area.innerHTML = '';
-			a.innerHTML = '';
-
-			var link = 'https://viewer.diagrams.net/';
-			var title = document.getElementById('title').value;
-			var params = [];
-
-			params.push('desc=' + encode(JSON.stringify({ url: url, format: 'csv', data: getDesc() })));
-
-			if (title.length > 0) {
-				params.push('title=' + encodeURIComponent(title));
-			}
-
-			link += '?' + params.join('&');
-			a.setAttribute('href', link);
-			a.appendChild(document.createTextNode(link));
-		}
-	</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Convert CSV data into draw.io diagrams with custom styling and connections">
+  <title>CSV Import - draw.io Tools</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../styles/main.css">
 </head>
-<body onload="document.getElementById('url').focus();">
-	<span style="position:relative;display:inline-block;left:50%;transform:translate(-50%,0);">
-		<div style="display:flex;align-items:center;opacity:0.7;">
-			<img src="logo.svg" style="width:28px;" />
-			<span style="font-family:Helvetica;font-weight:700;font-size:20px;margin-left:4px;">draw.io</span>
-			<h2 style="text-align:center;width:100%;margin:10px;">Online CSV Viewer</h2>
-		</div>
-		<hr>
-		<br>
-		View public CSV files:
-		<br><br>
-		1. Link to CSV file: <input type="text" id="url" size="80" value=""
-			placeholder="eg. https://jgraph.github.io/drawio-diagrams/diagrams/orgchart.csv"></input>
-		<br><small>Note: Public Google sheets can be used via
-			https://docs.google.com/spreadsheets/d/{fileId}/export?format=csv&usp=sharing where {fileId} is
-			the ID of the file.</small>
-		<br><br>
-		2. Enter Title: <input type="text" size="30" id="title" placeholder="eg. Title"></input> (Optional)
-		<br><br>
-		3. Enter Description:
-		<br>
-		<textarea rows="20" cols="100" id="desc" spellcheck="false" autocomplete="off" autocorrect="off"
-			autocapitalize="off">
-#
-# Example CSV import. Use # for comments and # for configuration. Paste CSV below.
-# The following names are reserved and should not be used (or ignored):
-# id, tooltip, placeholder(s), link and label (see below)
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="container">
+        <div class="header__inner">
+          <a href="../" class="header__brand">
+            <img src="../assets/logo.svg" alt="draw.io" class="header__logo">
+            <span class="header__title">draw.io Tools</span>
+          </a>
+          <nav class="header__nav">
+            <a href="../" class="header__link">All Tools</a>
+            <a href="https://github.com/jgraph/drawio-tools" class="header__link" target="_blank">GitHub</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="container tool-page">
+        <nav class="breadcrumb">
+          <a href="../" class="breadcrumb__link">Tools</a>
+          <span class="breadcrumb__separator">/</span>
+          <span class="breadcrumb__current">CSV Import</span>
+        </nav>
+
+        <div class="tool-header">
+          <h1 class="tool-header__title">
+            <svg class="tool-header__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <path d="M14 2v6h6"/>
+              <line x1="8" y1="13" x2="16" y2="13"/>
+              <line x1="8" y1="17" x2="16" y2="17"/>
+            </svg>
+            CSV Import
+          </h1>
+          <p class="tool-header__description">
+            Convert CSV data into draw.io diagrams. Define shapes, styles, labels, and connections
+            using a powerful configuration syntax.
+          </p>
+        </div>
+
+        <!-- URL Input -->
+        <div class="card mb-lg">
+          <div class="card__header">
+            <h3 class="card__title">Step 1: CSV Source</h3>
+          </div>
+          <div class="card__body">
+            <label for="url">Link to CSV File (Optional)</label>
+            <input
+              type="url"
+              id="url"
+              placeholder="https://jgraph.github.io/drawio-diagrams/diagrams/orgchart.csv"
+              autocomplete="off"
+            >
+            <p class="text-muted mt-sm" style="font-size: var(--font-size-xs);">
+              For Google Sheets:
+              <code>https://docs.google.com/spreadsheets/d/{fileId}/export?format=csv&usp=sharing</code>
+            </p>
+          </div>
+        </div>
+
+        <!-- Title -->
+        <div class="card mb-lg">
+          <div class="card__header">
+            <h3 class="card__title">Step 2: Diagram Title (Optional)</h3>
+          </div>
+          <div class="card__body">
+            <input type="text" id="title" placeholder="My Org Chart">
+          </div>
+        </div>
+
+        <!-- Configuration -->
+        <div class="card mb-lg">
+          <div class="card__header">
+            <h3 class="card__title">Step 3: Configuration</h3>
+          </div>
+          <div class="card__body">
+            <div class="textarea-container textarea-container--large">
+              <label for="desc">CSV Import Configuration</label>
+              <textarea id="desc" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">#
+# Example CSV import. Use # for comments. Paste CSV below.
+# Reserved names: id, tooltip, placeholder(s), link and label
 #
 
 # Node label with placeholders and HTML.
@@ -93,147 +98,228 @@
 label: %name%<br><i style="color:gray;">%position%</i><br><a href="mailto:%email%">Email</a>
 
 # Node style (placeholders are replaced once).
-# Default is the current style for nodes.
 
 style: label;image=%image%;whiteSpace=wrap;html=1;rounded=1;fillColor=%fill%;strokeColor=%stroke%;
 
-# Parent style for nodes with child nodes (placeholders are replaced once).
+# Parent style for nodes with child nodes.
 
 parentstyle: swimlane;whiteSpace=wrap;html=1;childLayout=stackLayout;horizontal=1;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;
 
-# Style to be used for objects not in the CSV. If this is - then such objects are ignored,
-# else they are created using this as their style, eg. whiteSpace=wrap;html=1;
+# Style for objects not in CSV. Use - to ignore them.
 
 unknownStyle: -
 
-# Optional column name that contains a reference to a named style in styles.
-# Default is the current style for nodes.
+# Optional column name that contains a reference to a named style.
 
 stylename: -
 
-# JSON for named styles of the form {"name": "style", "name": "style"} where style is a cell style with
-# placeholders that are replaced once.
+# JSON for named styles: {"name": "style", ...}
 
 styles: -
 
-# JSON for variables in styles of the form {"name": "value", "name": "value"} where name is a string
-# that will replace a placeholder in a style.
+# JSON for variables in styles: {"name": "value", ...}
 
 vars: -
 
-# Optional column name that contains a reference to a named label in labels.
-# Default is the current label.
+# Optional column name for named label reference.
 
 labelname: -
 
-# JSON for named labels of the form {"name": "label", "name": "label"} where label is a cell label with
-# placeholders.
+# JSON for named labels: {"name": "label", ...}
 
 labels: -
 
-# Uses the given column name as the identity for cells (updates existing cells).
-# Default is no identity (empty value or -).
+# Column name as identity for cells (updates existing cells).
 
 identity: -
 
-# Uses the given column name as the parent reference for cells. Default is no parent (empty or -).
-# The identity above is used for resolving the reference so it must be specified.
+# Column name as parent reference for cells.
 
 parent: -
 
-# Adds a prefix to the identity of cells to make sure they do not collide with existing cells (whose
-# IDs are numbers from 0..n, sometimes with a GUID prefix in the context of realtime collaboration).
-# Default is csvimport-.
+# Prefix added to cell identity to avoid collisions.
 
 namespace: csvimport-
 
-# Connections between rows ("from": source colum, "to": target column).
-# Label, style and invert are optional. Defaults are '', current style and false.
-# If placeholders are used in the style, they are replaced with data from the source.
-# An optional placeholders can be set to target to use data from the target instead.
-# In addition to label, an optional fromlabel and tolabel can be used to name the column
-# that contains the text for the label in the edges source or target (invert ignored).
-# In addition to those, an optional source and targetlabel can be used to specify a label
-# that contains placeholders referencing the respective columns in the source or target row.
-# The label is created in the form fromlabel + sourcelabel + label + tolabel + targetlabel.
-# Additional labels can be added by using an optional labels array with entries of the
-# form {"label": string, "x": number, "y": number, "dx": number, "dy": number} where
-# x is from -1 to 1 along the edge, y is orthogonal, and dx/dy are offsets in pixels.
-# An optional placeholders with the string value "source" or "target" can be specified
-# to replace placeholders in the additional label with data from the source or target.
-# An optional data object can be specified to define the metadata for the connector.
-# The target column may contain a comma-separated list of values.
-# Multiple connect entries are allowed.
+# Connections between rows.
+# "from": source column, "to": target column
+# Optional: label, style, invert, placeholders, data
 
 connect: {"from": "manager", "to": "name", "invert": true, "label": "manages", \
-		"style": "curved=1;endArrow=blockThin;endFill=1;fontSize=11;"}
+    "style": "curved=1;endArrow=blockThin;endFill=1;fontSize=11;"}
 connect: {"from": "refs", "to": "id", "style": "curved=1;fontSize=11;"}
 
-# Node x-coordinate. Possible value is a column name. Default is empty. Layouts will
-# override this value.
+# Node position columns
 
 left:
-
-# Node y-coordinate. Possible value is a column name. Default is empty. Layouts will
-# override this value.
-
 top:
 
-# Node width. Possible value is a number (in px), auto or an @ sign followed by a column
-# name that contains the value for the width. Default is auto.
+# Node dimensions (number, auto, or @columnName)
 
 width: auto
-
-# Node height. Possible value is a number (in px), auto, width or an @ sign followed by a column
-# name that contains the value for the height. Default is auto.
-
 height: auto
 
-# Collapsed state for vertices. Possible values are true or false. Default is false.
+# Collapsed state for vertices
 
 collapsed: false
 
-# Padding for autosize. Default is 0.
+# Padding for autosize
 
 padding: -12
 
-# Comma-separated list of ignored columns for metadata. (These can be
-# used for connections and styles but will not be added as metadata.)
+# Ignored columns for metadata (can be used for connections/styles)
 
 ignore: id,image,fill,stroke,refs,manager
 
-# Column to be renamed to link attribute (used as link).
+# Column to rename to link attribute
 
 link: url
 
-# Spacing between nodes. Default is 40.
+# Layout spacing
 
 nodespacing: 40
-
-# Spacing between levels of hierarchical layouts. Default is 100.
-
 levelspacing: 100
-
-# Spacing between parallel edges. Default is 40. Use 0 to disable.
-
 edgespacing: 40
 
-# Name or JSON of layout. Possible values are auto, none, verticaltree, horizontaltree,
-# verticalflow, horizontalflow, organic, circle, orgchart or a JSON string as used in
-# Layout, Apply. Default is auto.
+# Layout type: auto, none, verticaltree, horizontaltree,
+# verticalflow, horizontalflow, organic, circle, orgchart
 
 layout: auto
+</textarea>
+            </div>
+          </div>
+        </div>
 
-# If the CSV at the given URL has no column names in the first line, then please
-# add them here as a comma-separated list, eg. name,location,id
-		</textarea>
-		<br><br>
-		<button onclick="create();return false;" style="font-weight:bold;">4. Click Here!</button>
-		<br><br>
-		<a href="" target="_blank" id="result"></a>
-		<textarea style="display:none;" rows="20" cols="100" id="textarea" spellcheck="false" autocomplete="off"
-			autocorrect="off" autocapitalize="off"></textarea>
-	</span>
+        <!-- Generate Button -->
+        <div class="card mb-lg">
+          <div class="card__header">
+            <h3 class="card__title">Step 4: Generate</h3>
+          </div>
+          <div class="card__body">
+            <button type="button" class="btn btn--primary btn--lg" id="createBtn">
+              Generate Viewer Link
+            </button>
+          </div>
+        </div>
+
+        <!-- Result -->
+        <div class="card" id="resultCard" style="display: none;">
+          <div class="card__header">
+            <h3 class="card__title">Result</h3>
+          </div>
+          <div class="card__body">
+            <a href="" target="_blank" id="resultLink" style="word-break: break-all;"></a>
+          </div>
+          <div class="card__footer">
+            <div class="btn-group">
+              <button type="button" class="btn btn--primary" id="openBtn">Open in Viewer</button>
+              <button type="button" class="btn btn--secondary" id="copyBtn">Copy Link</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="alertContainer" class="mt-lg"></div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__inner">
+          <span>&copy; 2026 JGraph Ltd. Apache-2.0 License.</span>
+          <div class="footer__links">
+            <a href="https://www.drawio.com">draw.io</a>
+            <a href="https://github.com/jgraph/drawio-tools">GitHub</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+  <script src="../utils/drawio-tools.js"></script>
+  <script>
+    (function() {
+      var DT = window.DrawioTools;
+
+      var urlInput = document.getElementById('url');
+      var titleInput = document.getElementById('title');
+      var descInput = document.getElementById('desc');
+      var resultCard = document.getElementById('resultCard');
+      var resultLink = document.getElementById('resultLink');
+      var alertContainer = document.getElementById('alertContainer');
+
+      var generatedUrl = '';
+
+      function showAlert(message, type) {
+        type = type || 'info';
+        var alert = document.createElement('div');
+        alert.className = 'alert alert--' + type;
+        alert.textContent = message;
+        alertContainer.innerHTML = '';
+        alertContainer.appendChild(alert);
+        setTimeout(function() { alert.remove(); }, 3000);
+      }
+
+      function encode(data) {
+        var compressed = pako.deflateRaw(encodeURIComponent(data));
+        return btoa(String.fromCharCode.apply(null, new Uint8Array(compressed)));
+      }
+
+      function getDesc() {
+        var data = descInput.value;
+        var lines = data.split('\n');
+        var result = [];
+
+        for (var i = 0; i < lines.length; i++) {
+          if (lines[i].charAt(0) !== '#' && lines[i].length > 0) {
+            result.push('#' + lines[i]);
+          }
+        }
+
+        return result.join('\n');
+      }
+
+      document.getElementById('createBtn').addEventListener('click', function() {
+        var url = urlInput.value.trim();
+        var title = titleInput.value.trim();
+
+        var link = 'https://viewer.diagrams.net/';
+        var params = [];
+
+        params.push('desc=' + encode(JSON.stringify({
+          url: url,
+          format: 'csv',
+          data: getDesc()
+        })));
+
+        if (title.length > 0) {
+          params.push('title=' + encodeURIComponent(title));
+        }
+
+        link += '?' + params.join('&');
+
+        resultCard.style.display = '';
+        resultLink.href = link;
+        resultLink.textContent = link;
+        generatedUrl = link;
+
+        showAlert('Link generated', 'success');
+      });
+
+      document.getElementById('openBtn').addEventListener('click', function() {
+        if (generatedUrl) {
+          window.open(generatedUrl, '_blank');
+        }
+      });
+
+      document.getElementById('copyBtn').addEventListener('click', function() {
+        DT.copyToClipboard(generatedUrl).then(function(success) {
+          showAlert(success ? 'Copied to clipboard' : 'Failed to copy', success ? 'success' : 'error');
+        });
+      });
+
+      urlInput.focus();
+    })();
+  </script>
 </body>
-
 </html>

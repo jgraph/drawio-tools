@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A collection of web-based utility tools for working with draw.io diagrams">
+  <title>draw.io Tools</title>
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
+  <link rel="stylesheet" href="./styles/main.css">
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="container">
+        <div class="header__inner">
+          <a href="./" class="header__brand">
+            <img src="./assets/logo.svg" alt="draw.io" class="header__logo">
+            <span class="header__title">draw.io Tools</span>
+          </a>
+          <nav class="header__nav">
+            <a href="https://www.drawio.com" class="header__link" target="_blank">draw.io</a>
+            <a href="https://github.com/jgraph/drawio-tools" class="header__link" target="_blank">GitHub</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="container">
+        <section class="hero">
+          <img src="./assets/logo.svg" alt="draw.io" class="hero__logo">
+          <h1 class="hero__title">draw.io Tools</h1>
+          <p class="hero__subtitle">
+            A collection of web-based utilities for working with draw.io diagrams.
+            Encode, decode, validate, and generate diagrams with ease.
+          </p>
+        </section>
+
+        <section class="category">
+          <h2 class="category__title">Text & Encoding</h2>
+          <div class="tool-grid">
+            <a href="./tools/text-tools.html" class="tool-card">
+              <svg class="tool-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 7V4h16v3M9 20h6M12 4v16"/>
+              </svg>
+              <h3 class="tool-card__title">Text Tools</h3>
+              <p class="tool-card__description">
+                Compress, decompress, encode, and decode text. Supports URL encoding,
+                Base64, deflate compression, and more.
+              </p>
+              <span class="tool-card__arrow">Open tool →</span>
+            </a>
+
+            <a href="./tools/base64.html" class="tool-card">
+              <svg class="tool-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <path d="M21 15l-5-5L5 21"/>
+              </svg>
+              <h3 class="tool-card__title">Base64 Images</h3>
+              <p class="tool-card__description">
+                Convert images to Base64 data URLs for embedding directly in diagrams or web pages.
+              </p>
+              <span class="tool-card__arrow">Open tool →</span>
+            </a>
+          </div>
+        </section>
+
+        <section class="category">
+          <h2 class="category__title">Diagram Files</h2>
+          <div class="tool-grid">
+            <a href="./tools/mxfile-tools.html" class="tool-card">
+              <svg class="tool-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 12l2 2 4-4"/>
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <path d="M14 2v6h6"/>
+              </svg>
+              <h3 class="tool-card__title">MxFile Tools</h3>
+              <p class="tool-card__description">
+                Validate and repair draw.io diagram files. Check for encoding errors,
+                fix corrupted files, and inspect file structure.
+              </p>
+              <span class="tool-card__arrow">Open tool →</span>
+            </a>
+
+            <a href="./tools/viewer.html" class="tool-card">
+              <svg class="tool-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <h3 class="tool-card__title">Diagram Viewer</h3>
+              <p class="tool-card__description">
+                View draw.io diagrams from public URLs. Generate embeddable links
+                for sharing diagrams.
+              </p>
+              <span class="tool-card__arrow">Open tool →</span>
+            </a>
+
+            <a href="./tools/merge.html" class="tool-card">
+              <svg class="tool-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"/>
+                <rect x="14" y="3" width="7" height="7"/>
+                <rect x="3" y="14" width="7" height="7"/>
+                <rect x="14" y="14" width="7" height="7"/>
+              </svg>
+              <h3 class="tool-card__title">Image Merge</h3>
+              <p class="tool-card__description">
+                Stack multiple images vertically into a single image. Perfect for
+                creating image sequences.
+              </p>
+              <span class="tool-card__arrow">Open tool →</span>
+            </a>
+          </div>
+        </section>
+
+        <section class="category">
+          <h2 class="category__title">Generation & Import</h2>
+          <div class="tool-grid">
+            <a href="./tools/generate.html" class="tool-card">
+              <svg class="tool-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5"/>
+                <path d="M2 12l10 5 10-5"/>
+              </svg>
+              <h3 class="tool-card__title">AI Generate</h3>
+              <p class="tool-card__description">
+                Generate draw.io diagrams from natural language descriptions using
+                AI (ChatGPT, Claude, Gemini).
+              </p>
+              <span class="tool-card__arrow">Open tool →</span>
+            </a>
+
+            <a href="./tools/csv.html" class="tool-card">
+              <svg class="tool-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <path d="M14 2v6h6"/>
+                <line x1="8" y1="13" x2="16" y2="13"/>
+                <line x1="8" y1="17" x2="16" y2="17"/>
+              </svg>
+              <h3 class="tool-card__title">CSV Import</h3>
+              <p class="tool-card__description">
+                Convert CSV data into draw.io diagrams. Define shapes, styles,
+                and connections from tabular data.
+              </p>
+              <span class="tool-card__arrow">Open tool →</span>
+            </a>
+
+            <a href="./tools/link.html" class="tool-card">
+              <svg class="tool-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </svg>
+              <h3 class="tool-card__title">Custom Links</h3>
+              <p class="tool-card__description">
+                Create interactive diagram links with actions like toggle, show/hide,
+                animations, and navigation.
+              </p>
+              <span class="tool-card__arrow">Open tool →</span>
+            </a>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__inner">
+          <span>&copy; 2026 JGraph Ltd. Apache-2.0 License.</span>
+          <div class="footer__links">
+            <a href="https://www.drawio.com">draw.io</a>
+            <a href="https://github.com/jgraph/drawio-tools">GitHub</a>
+            <a href="https://github.com/jgraph/drawio-tools/issues">Report Issue</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

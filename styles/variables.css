@@ -1,0 +1,103 @@
+/* Draw.io Tools - CSS Custom Properties */
+
+:root {
+  /* Brand Colors */
+  --drawio-blue: #29b6f2;
+  --drawio-blue-dark: #003555;
+  --drawio-blue-hover: #1aa3e0;
+
+  /* Light Mode Colors */
+  --color-bg: #ffffff;
+  --color-bg-secondary: #f8f9fa;
+  --color-bg-tertiary: #e9ecef;
+  --color-text: #212529;
+  --color-text-secondary: #6c757d;
+  --color-border: #dee2e6;
+  --color-border-focus: var(--drawio-blue);
+
+  /* Component Colors */
+  --color-card-bg: #ffffff;
+  --color-card-border: #e9ecef;
+  --color-card-shadow: rgba(0, 0, 0, 0.08);
+
+  /* Button Colors */
+  --btn-primary-bg: var(--drawio-blue);
+  --btn-primary-text: #ffffff;
+  --btn-secondary-bg: #e9ecef;
+  --btn-secondary-text: #495057;
+
+  /* Status Colors */
+  --color-success: #198754;
+  --color-success-bg: #d1e7dd;
+  --color-warning: #ffc107;
+  --color-warning-bg: #fff3cd;
+  --color-error: #dc3545;
+  --color-error-bg: #f8d7da;
+  --color-info: #0dcaf0;
+  --color-info-bg: #cff4fc;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* Typography */
+  --font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    "Noto Sans", "Liberation Sans", Arial, sans-serif;
+  --font-family-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 32px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+
+  /* Layout */
+  --container-max-width: 1200px;
+  --header-height: 60px;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #1a1a1a;
+    --color-bg-secondary: #242424;
+    --color-bg-tertiary: #2d2d2d;
+    --color-text: #e9ecef;
+    --color-text-secondary: #adb5bd;
+    --color-border: #404040;
+
+    --color-card-bg: #242424;
+    --color-card-border: #404040;
+    --color-card-shadow: rgba(0, 0, 0, 0.3);
+
+    --btn-primary-bg: var(--drawio-blue-dark);
+    --btn-secondary-bg: #404040;
+    --btn-secondary-text: #e9ecef;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
+  }
+}

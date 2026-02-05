@@ -1,359 +1,475 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Create Custom Link</title>
-	<meta charset="utf-8" />
-	<link rel="stylesheet" type="text/css" href="style.css">
-	<script type="text/javascript">
-		function add(type) {
-			try {
-				var link = document.getElementById('link').value;
-				var obj = JSON.parse(link.substring(link.indexOf(',') + 1));
-
-				var title = document.getElementById('title').value;
-
-				if (title != '') {
-					obj.title = title;
-				}
-
-				if (obj.actions == null) {
-					obj.actions = [];
-				}
-
-				if (type == 'link') {
-					obj.actions.push({ open: document.getElementById('href').value });
-				}
-				else if (type == 'wait') {
-					var wait = document.getElementById('wait').value;
-					obj.actions.push({ wait: (wait != '') ? wait : 1000 });
-				}
-				else if (type == 'viewbox') {
-					var tokens = document.getElementById('viewbox').value.split(' ');
-
-					if (tokens.length > 3) {
-						var action = {};
-						action.viewbox = {
-							x: parseInt(tokens[0]), y: parseInt(tokens[1]),
-							width: parseInt(tokens[2]), height: parseInt(tokens[3])
-						};
-
-						if (tokens.length > 4) {
-							action.border = parseInt(tokens[4]);
-						}
-
-						obj.actions.push(action);
-					}
-					else {
-						showMessage('Missing arguments');
-					}
-				}
-				else if (type == 'tags') {
-					var toggle = document.getElementById('toggleTags').value.split(' ');
-					var hidden = document.getElementById('hiddenTags').value.split(' ');
-					var visible = document.getElementById('visibleTags').value.split(' ');
-
-					if (toggle.length > 0 || hidden.length > 0 || visible.length > 0) {
-						var action = {};
-						var add = false;
-
-						if (toggle.length > 0) {
-							if (toggle[0] == '*') {
-								action.toggle = [];
-								add = true;
-							}
-							else if (toggle[0] != '') {
-								action.toggle = toggle;
-								add = true;
-							}
-						}
-
-						if (hidden.length > 0) {
-							if (hidden[0] == '*') {
-								action.visible = [];
-								add = true;
-							}
-							else if (hidden[0] != '') {
-								action.hidden = hidden;
-								add = true;
-							}
-						}
-
-						if (visible.length > 0) {
-							if (visible[0] == '*') {
-								action.hidden = [];
-								add = true;
-							}
-							else if (visible[0] != '') {
-								action.visible = visible;
-								add = true;
-							}
-						}
-
-						if (add) {
-							obj.actions.push({ tags: action });
-						}
-						else {
-							showMessage('Missing arguments');
-						}
-					}
-				}
-				else {
-					var action = document.getElementById('parallel').checked && obj.actions.length > 0 ?
-						obj.actions[obj.actions.length - 1] : {};
-					var selector = {};
-					var cells = document.getElementById('cells').value;
-					var exclude = document.getElementById('exclude').value;
-					var name = document.getElementById('action').value;
-
-					if (cells.length > 0) {
-						selector['cells'] = cells.split(' ');
-					}
-
-					if (exclude.length > 0) {
-						selector['excludeCells'] = exclude.split(' ');
-					}
-
-					var tags = document.getElementById('tags').value;
-
-					if (tags == '*') {
-						selector['tags'] = [''];
-					}
-					else if (tags.length > 0) {
-						selector['tags'] = tags.split(' ');
-					}
-
-					if (name == 'style' || name == 'toggleStyle') {
-						var key = document.getElementById('key').value;
-						selector.key = (key != '') ? key : 'flowAnimation';
-					}
-
-					if (name == 'style' || name == 'opacity') {
-						var value = document.getElementById('value').value;
-						selector.value = (value != '') ? value : '1';
-					}
-
-					if (name == 'fadeIn' || name == 'fadeOut') {
-						selector.delay = 1000;
-					}
-
-					if (name == 'wipeIn' || name == 'wipeOut') {
-						action.delay = 30;
-						action.steps = 30;
-					}
-
-					action[name] = selector;
-
-					if (!document.getElementById('parallel').checked) {
-						obj.actions.push(action);
-					}
-				}
-
-				document.getElementById('link').value = 'data:action/json,' + JSON.stringify(obj, null, 2);
-
-				var href = getLink();
-				document.getElementById('anchor').href = href;
-				document.getElementById('anchor').innerHTML = href.replace(/&/g, "&amp;")
-					.replace(/</g, "&lt;")
-					.replace(/>/g, "&gt;")
-					.replace(/"/g, "&quot;")
-					.replace(/'/g, "&#39;");
-			}
-			catch (e) {
-				showMessage(e);
-			}
-		};
-
-		function clearInput() {
-			document.getElementById('action').value = 'toggle';
-			document.getElementById('key').value = '';
-			document.getElementById('value').value = '';
-			document.getElementById('cells').value = '';
-			document.getElementById('exclude').value = '';
-			document.getElementById('tags').value = '';
-			document.getElementById('href').value = '';
-			document.getElementById('wait').value = '';
-			document.getElementById('viewbox').value = '';
-			document.getElementById('parallel').checked = false;
-			actionChanged();
-		};
-
-		function resetLink() {
-			document.getElementById('link').value = 'data:action/json,' + JSON.stringify({}, null, 2);
-		};
-
-		function validateLink(quiet) {
-			try {
-				var href = document.getElementById('link').value;
-				var start = href.indexOf('data:action/json,');
-				var link = JSON.parse(href.substring(start + 17));
-
-				if (link.actions == null || link.actions.length == 0) {
-					throw 'No actions';
-				}
-				else if (!quiet) {
-					document.getElementById('link').value = 'data:action/json,' + JSON.stringify(link, null, 2);
-					showMessage('Link is valid');
-				}
-
-				return true;
-			}
-			catch (e) {
-				var index = (e.message != null) ? e.message.indexOf(' at position ') : 0;
-
-				if (index > 0) {
-					var pos = parseInt(e.message.substring(index + 13));
-					setCaretPosition('link', pos + 14);
-				}
-
-				showMessage('Error: ' + e);
-			}
-		};
-
-		function showMessage(message) {
-			var confirmation = document.getElementById('confirmation');
-			confirmation.style.display = '';
-			confirmation.innerHTML = message;
-
-			window.setTimeout(function () {
-				confirmation.style.display = 'none';
-			}, 3000);
-		};
-
-		function setCaretPosition(elemId, caretPos) {
-			var elem = document.getElementById(elemId);
-
-			if (elem != null) {
-				elem.focus();
-
-				if (elem.createTextRange) {
-					var range = elem.createTextRange();
-					range.move('character', caretPos);
-					range.select();
-				}
-				else if (elem.selectionStart) {
-					elem.setSelectionRange(caretPos, caretPos);
-				}
-			}
-		};
-
-		function getLink() {
-			return 'data:action/json,' + JSON.stringify(JSON.parse(link.value.substring(17)));
-		};
-
-		function copyLink() {
-			try {
-				if (validateLink(true)) {
-					var link = document.getElementById('link');
-					var prev = link.value;
-					link.value = getLink();
-					link.focus();
-					link.select();
-					document.execCommand('copy');
-					link.value = prev;
-					showMessage('Link Copied');
-				}
-			}
-			catch (e) {
-				showMessage('Error: ' + e);
-			}
-		};
-
-		function actionChanged() {
-			var action = document.getElementById('action').value;
-			document.getElementById('keyBox').style.display =
-				(action == 'style' || action == 'toggleStyle') ? '' : 'none';
-			document.getElementById('valueBox').style.display =
-				(action == 'style' || action == 'opacity') ? '' : 'none';
-		};
-	</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Create custom interactive links for draw.io diagrams with actions like toggle, show/hide, and animations">
+  <title>Custom Links - draw.io Tools</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../styles/main.css">
+  <style>
+    .action-section {
+      padding: var(--spacing-md);
+      background: var(--color-bg-secondary);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--spacing-md);
+    }
+    .action-section__title {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      margin-bottom: var(--spacing-sm);
+    }
+    .inline-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-sm);
+      align-items: center;
+    }
+    .inline-form input[type="text"] {
+      width: auto;
+      min-width: 150px;
+    }
+    .inline-form select {
+      width: auto;
+    }
+  </style>
 </head>
-<body onload="resetLink();actionChanged();document.getElementById('cells').focus();">
-	<span style="position:relative;display:inline-block;left:50%;transform:translate(-50%,0);">
-		<div style="display:flex;align-items:center;opacity:0.7;">
-			<img src="logo.svg" style="width:28px;" />
-			<span style="font-family:Helvetica;font-weight:700;font-size:20px;margin-left:4px;">draw.io</span>
-			<h2 style="text-align:center;width:100%;margin:10px;">Create Custom Link</h2>
-			<a style="position:absolute;right:0px;" class="adaptive-asset"
-				href="https://www.diagrams.net/doc/faq/custom-links" title="Help" target="_blank">
-				<img src="help.svg" style="width:16px;" />
-			</a>
-		</div>
-		<hr>
-		Title: <input type="text" size="16" id="title"></input>
-		<hr>
-		1. Action for Cell(s): <select id="action" onchange="actionChanged();">
-			<option value="toggle" selected>Toggle</option>
-			<option value="show">Show</option>
-			<option value="hide">Hide</option>
-			<option value="style">Set Style</option>
-			<option value="toggleStyle">Toggle Style</option>
-			<option disabled>-</option>
-			<option value="opacity">Opacity</option>
-			<option value="wipeIn">Wipe In</option>
-			<option value="wipeOut">Wipe Out</option>
-			<option value="fadeIn">Fade In</option>
-			<option value="fadeOut">Fade Out</option>
-			<option value="highlight">Highlight</option>
-			<option value="select">Select</option>
-			<option value="scroll">Scroll</option>
-		</select>
-		<span id="keyBox">Key: <input type="text" size="20" id="key" placeholder="flowAnimation"></input></span>
-		<span id="valueBox">Value: <input type="text" size="20" id="value" placeholder="1"></input></span>
-		<br><br>
-		2. Cells/Layers: <input type="text" size="60" id="cells" placeholder="1 2 3"></input> Space-separated list of
-		cell or layer IDs, * for all
-		<br><br>
-		3. Tags: <input type="text" size="60" id="tags" placeholder="water pipes"></input> Space-separated list of tags,
-		* for all
-		<br>
-		<small>This will find all cells with <i>all</i> given tags and change their visible state.<br>
-			Use <i>Add Tags</i> below to set the visible state of the tags instead.</small>
-		<br><br>
-		4. Exclude Cells/Layers: <input type="text" size="60" id="exclude" placeholder="1 2 3"></input> Space-separated
-		list of cell or layer IDs
-		<br><br>
-		5. <button onclick="add();return false;" style="font-weight:bold;">Add Action</button>
-		<input type="checkbox" id="parallel"> Run at the same time
-		<br>
-		<hr>
-		Or <button onclick="add('link');return false;" style="font-weight:bold;">Add Link:</button>
-		&nbsp;<input type="text" size="60" id="href"
-			placeholder="data:page/id,d77c2f53-a0fe-16b8-c644-547af6ee0c87"></input>
-		Custom link or hyperlink
-		<br>
-		<hr>
-		Or <button onclick="add('wait');return false;" style="font-weight:bold;">Add Wait:</button>
-		&nbsp;<input type="text" size="5" id="wait" placeholder="1000"></input>
-		milliseconds
-		<br>
-		<hr>
-		Or <button onclick="add('viewbox');return false;" style="font-weight:bold;">Add Viewbox:</button>
-		&nbsp;<input type="text" size="60" id="viewbox"></input>
-		x y width height border
-		<br>
-		<hr>
-		Or <button onclick="add('tags');return false;" style="font-weight:bold;">Add Tags:</button>
-		&nbsp;Toggle: <input type="text" size="16" id="toggleTags"></input>
-		&nbsp;Hidden: <input type="text" size="16" id="hiddenTags"></input>
-		&nbsp;Visible: <input type="text" size="16" id="visibleTags"></input> Space-separated list of tags, * for all
-		<br>
-		<small>This will set the visible state of the given tags in the current view.</small>
-		<hr>
-		<button onclick="clearInput();return false;">Clear Input</button>
-		<br>
-		<hr>
-		Custom Link:
-		<br>
-		<textarea rows="12" cols="100" id="link" spellcheck="false" autocomplete="off" autocorrect="off"
-			autocapitalize="off"></textarea>
-		<br>
-		<button onclick="validateLink();return false;">Validate</button>
-		<button onclick="resetLink();return false;">Reset Link</button>
-		<button onclick="copyLink();return false;"><b>Copy Link</b></button>
-		<span id="confirmation" style="display:none;font-size:10pt;padding:3px;font-weight:bold;"></span>
-		<br><br>
-		<a id="anchor" href="#" onclick="copyLink();return false;"></a>
-	</span>
-</body>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="container">
+        <div class="header__inner">
+          <a href="../" class="header__brand">
+            <img src="../assets/logo.svg" alt="draw.io" class="header__logo">
+            <span class="header__title">draw.io Tools</span>
+          </a>
+          <nav class="header__nav">
+            <a href="../" class="header__link">All Tools</a>
+            <a href="https://www.diagrams.net/doc/faq/custom-links" class="header__link" target="_blank">Help</a>
+          </nav>
+        </div>
+      </div>
+    </header>
 
+    <main class="main-content">
+      <div class="container tool-page">
+        <nav class="breadcrumb">
+          <a href="../" class="breadcrumb__link">Tools</a>
+          <span class="breadcrumb__separator">/</span>
+          <span class="breadcrumb__current">Custom Links</span>
+        </nav>
+
+        <div class="tool-header">
+          <h1 class="tool-header__title">
+            <svg class="tool-header__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
+            Custom Links
+          </h1>
+          <p class="tool-header__description">
+            Create interactive diagram links with actions like toggle visibility, show/hide cells,
+            animations, and navigation. Build complex interactions without coding.
+          </p>
+        </div>
+
+        <!-- Title -->
+        <div class="card mb-lg">
+          <div class="card__body">
+            <label for="title">Link Title (Optional)</label>
+            <input type="text" id="title" placeholder="Click to toggle...">
+          </div>
+        </div>
+
+        <!-- Cell Actions -->
+        <div class="card mb-lg">
+          <div class="card__header">
+            <h3 class="card__title">Cell Actions</h3>
+          </div>
+          <div class="card__body">
+            <div class="action-section">
+              <div class="inline-form mb-md">
+                <label for="action">Action:</label>
+                <select id="action">
+                  <option value="toggle" selected>Toggle</option>
+                  <option value="show">Show</option>
+                  <option value="hide">Hide</option>
+                  <option value="style">Set Style</option>
+                  <option value="toggleStyle">Toggle Style</option>
+                  <option disabled>───────────</option>
+                  <option value="opacity">Opacity</option>
+                  <option value="wipeIn">Wipe In</option>
+                  <option value="wipeOut">Wipe Out</option>
+                  <option value="fadeIn">Fade In</option>
+                  <option value="fadeOut">Fade Out</option>
+                  <option value="highlight">Highlight</option>
+                  <option value="select">Select</option>
+                  <option value="scroll">Scroll</option>
+                </select>
+
+                <span id="keyBox" style="display: none;">
+                  <label for="key">Key:</label>
+                  <input type="text" id="key" placeholder="flowAnimation" style="width: 120px;">
+                </span>
+
+                <span id="valueBox" style="display: none;">
+                  <label for="value">Value:</label>
+                  <input type="text" id="value" placeholder="1" style="width: 80px;">
+                </span>
+              </div>
+
+              <div class="inline-form mb-md">
+                <label for="cells">Cells/Layers:</label>
+                <input type="text" id="cells" placeholder="1 2 3" style="flex: 1;">
+                <span class="text-muted" style="font-size: var(--font-size-xs);">Space-separated IDs, * for all</span>
+              </div>
+
+              <div class="inline-form mb-md">
+                <label for="tags">Tags:</label>
+                <input type="text" id="tags" placeholder="water pipes" style="flex: 1;">
+                <span class="text-muted" style="font-size: var(--font-size-xs);">Space-separated tags, * for all</span>
+              </div>
+
+              <div class="inline-form mb-md">
+                <label for="exclude">Exclude:</label>
+                <input type="text" id="exclude" placeholder="4 5" style="flex: 1;">
+              </div>
+
+              <div class="inline-form">
+                <button type="button" class="btn btn--primary" id="addActionBtn">Add Action</button>
+                <label class="checkbox">
+                  <input type="checkbox" id="parallel">
+                  <span>Run in parallel with previous</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Actions -->
+        <div class="card mb-lg">
+          <div class="card__header">
+            <h3 class="card__title">Additional Actions</h3>
+          </div>
+          <div class="card__body">
+            <div class="action-section">
+              <div class="action-section__title">Add Link</div>
+              <div class="inline-form">
+                <input type="text" id="href" placeholder="data:page/id,..." style="flex: 1;">
+                <button type="button" class="btn btn--secondary" id="addLinkBtn">Add Link</button>
+              </div>
+            </div>
+
+            <div class="action-section">
+              <div class="action-section__title">Add Wait</div>
+              <div class="inline-form">
+                <input type="text" id="wait" placeholder="1000" style="width: 100px;">
+                <span class="text-muted">milliseconds</span>
+                <button type="button" class="btn btn--secondary" id="addWaitBtn">Add Wait</button>
+              </div>
+            </div>
+
+            <div class="action-section">
+              <div class="action-section__title">Add Viewbox</div>
+              <div class="inline-form">
+                <input type="text" id="viewbox" placeholder="x y width height border" style="flex: 1;">
+                <button type="button" class="btn btn--secondary" id="addViewboxBtn">Add Viewbox</button>
+              </div>
+            </div>
+
+            <div class="action-section">
+              <div class="action-section__title">Add Tags Visibility</div>
+              <div class="inline-form">
+                <label for="toggleTags">Toggle:</label>
+                <input type="text" id="toggleTags" placeholder="tag1 tag2" style="width: 120px;">
+                <label for="hiddenTags">Hidden:</label>
+                <input type="text" id="hiddenTags" placeholder="tag3" style="width: 120px;">
+                <label for="visibleTags">Visible:</label>
+                <input type="text" id="visibleTags" placeholder="tag4" style="width: 120px;">
+                <button type="button" class="btn btn--secondary" id="addTagsBtn">Add Tags</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Link Output -->
+        <div class="card mb-lg">
+          <div class="card__header">
+            <h3 class="card__title">Custom Link</h3>
+          </div>
+          <div class="card__body">
+            <div class="textarea-container">
+              <textarea id="link" rows="10" spellcheck="false"></textarea>
+            </div>
+          </div>
+          <div class="card__footer">
+            <div class="btn-group">
+              <button type="button" class="btn btn--primary" id="copyBtn">Copy Link</button>
+              <button type="button" class="btn btn--secondary" id="validateBtn">Validate</button>
+              <button type="button" class="btn btn--secondary" id="resetBtn">Reset</button>
+              <button type="button" class="btn btn--secondary" id="clearInputBtn">Clear Input</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview -->
+        <div class="card" id="previewCard" style="display: none;">
+          <div class="card__header">
+            <h3 class="card__title">Minified Link</h3>
+          </div>
+          <div class="card__body">
+            <a href="#" id="anchor" onclick="return false;" style="word-break: break-all;"></a>
+          </div>
+        </div>
+
+        <div id="alertContainer" class="mt-lg"></div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__inner">
+          <span>&copy; 2026 JGraph Ltd. Apache-2.0 License.</span>
+          <div class="footer__links">
+            <a href="https://www.drawio.com">draw.io</a>
+            <a href="https://github.com/jgraph/drawio-tools">GitHub</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="../utils/drawio-tools.js"></script>
+  <script>
+    (function() {
+      var DT = window.DrawioTools;
+
+      var linkEl = document.getElementById('link');
+      var actionEl = document.getElementById('action');
+      var keyBox = document.getElementById('keyBox');
+      var valueBox = document.getElementById('valueBox');
+      var alertContainer = document.getElementById('alertContainer');
+      var previewCard = document.getElementById('previewCard');
+      var anchor = document.getElementById('anchor');
+
+      function showAlert(message, type) {
+        type = type || 'info';
+        var alert = document.createElement('div');
+        alert.className = 'alert alert--' + type;
+        alert.textContent = message;
+        alertContainer.innerHTML = '';
+        alertContainer.appendChild(alert);
+        setTimeout(function() { alert.remove(); }, 3000);
+      }
+
+      function resetLink() {
+        linkEl.value = 'data:action/json,' + JSON.stringify({}, null, 2);
+        previewCard.style.display = 'none';
+      }
+
+      function updatePreview() {
+        try {
+          var href = linkEl.value;
+          var link = JSON.parse(href.substring(17));
+          var minified = 'data:action/json,' + JSON.stringify(link);
+          anchor.href = minified;
+          anchor.textContent = minified;
+          previewCard.style.display = '';
+        } catch (e) {
+          previewCard.style.display = 'none';
+        }
+      }
+
+      function actionChanged() {
+        var action = actionEl.value;
+        keyBox.style.display = (action === 'style' || action === 'toggleStyle') ? '' : 'none';
+        valueBox.style.display = (action === 'style' || action === 'opacity') ? '' : 'none';
+      }
+
+      actionEl.addEventListener('change', actionChanged);
+      actionChanged();
+      resetLink();
+
+      function addAction(type) {
+        try {
+          var href = linkEl.value;
+          var obj = JSON.parse(href.substring(17));
+          var title = document.getElementById('title').value;
+
+          if (title) {
+            obj.title = title;
+          }
+
+          if (!obj.actions) {
+            obj.actions = [];
+          }
+
+          if (type === 'link') {
+            obj.actions.push({ open: document.getElementById('href').value });
+          } else if (type === 'wait') {
+            var wait = document.getElementById('wait').value;
+            obj.actions.push({ wait: wait ? parseInt(wait) : 1000 });
+          } else if (type === 'viewbox') {
+            var tokens = document.getElementById('viewbox').value.split(' ');
+            if (tokens.length >= 4) {
+              var action = {
+                viewbox: {
+                  x: parseInt(tokens[0]),
+                  y: parseInt(tokens[1]),
+                  width: parseInt(tokens[2]),
+                  height: parseInt(tokens[3])
+                }
+              };
+              if (tokens.length > 4) {
+                action.border = parseInt(tokens[4]);
+              }
+              obj.actions.push(action);
+            } else {
+              showAlert('Missing viewbox arguments (x y width height)', 'warning');
+              return;
+            }
+          } else if (type === 'tags') {
+            var toggle = document.getElementById('toggleTags').value.split(' ').filter(function(t) { return t; });
+            var hidden = document.getElementById('hiddenTags').value.split(' ').filter(function(t) { return t; });
+            var visible = document.getElementById('visibleTags').value.split(' ').filter(function(t) { return t; });
+
+            var action = {};
+            var add = false;
+
+            if (toggle.length > 0) {
+              action.toggle = toggle[0] === '*' ? [] : toggle;
+              add = true;
+            }
+            if (hidden.length > 0) {
+              action.hidden = hidden[0] === '*' ? [] : hidden;
+              add = true;
+            }
+            if (visible.length > 0) {
+              action.visible = visible[0] === '*' ? [] : visible;
+              add = true;
+            }
+
+            if (add) {
+              obj.actions.push({ tags: action });
+            } else {
+              showAlert('Please specify at least one tag action', 'warning');
+              return;
+            }
+          } else {
+            var parallel = document.getElementById('parallel').checked;
+            var action = parallel && obj.actions.length > 0 ? obj.actions[obj.actions.length - 1] : {};
+
+            var selector = {};
+            var cells = document.getElementById('cells').value;
+            var exclude = document.getElementById('exclude').value;
+            var name = actionEl.value;
+
+            if (cells) {
+              selector.cells = cells.split(' ').filter(function(c) { return c; });
+            }
+
+            if (exclude) {
+              selector.excludeCells = exclude.split(' ').filter(function(c) { return c; });
+            }
+
+            var tags = document.getElementById('tags').value;
+            if (tags === '*') {
+              selector.tags = [''];
+            } else if (tags) {
+              selector.tags = tags.split(' ').filter(function(t) { return t; });
+            }
+
+            if (name === 'style' || name === 'toggleStyle') {
+              var key = document.getElementById('key').value;
+              selector.key = key || 'flowAnimation';
+            }
+
+            if (name === 'style' || name === 'opacity') {
+              var value = document.getElementById('value').value;
+              selector.value = value || '1';
+            }
+
+            if (name === 'fadeIn' || name === 'fadeOut') {
+              selector.delay = 1000;
+            }
+
+            if (name === 'wipeIn' || name === 'wipeOut') {
+              action.delay = 30;
+              action.steps = 30;
+            }
+
+            action[name] = selector;
+
+            if (!parallel) {
+              obj.actions.push(action);
+            }
+          }
+
+          linkEl.value = 'data:action/json,' + JSON.stringify(obj, null, 2);
+          updatePreview();
+          showAlert('Action added', 'success');
+        } catch (e) {
+          showAlert('Error: ' + e.message, 'error');
+        }
+      }
+
+      document.getElementById('addActionBtn').addEventListener('click', function() { addAction(); });
+      document.getElementById('addLinkBtn').addEventListener('click', function() { addAction('link'); });
+      document.getElementById('addWaitBtn').addEventListener('click', function() { addAction('wait'); });
+      document.getElementById('addViewboxBtn').addEventListener('click', function() { addAction('viewbox'); });
+      document.getElementById('addTagsBtn').addEventListener('click', function() { addAction('tags'); });
+
+      document.getElementById('validateBtn').addEventListener('click', function() {
+        try {
+          var href = linkEl.value;
+          var link = JSON.parse(href.substring(17));
+
+          if (!link.actions || link.actions.length === 0) {
+            throw new Error('No actions defined');
+          }
+
+          linkEl.value = 'data:action/json,' + JSON.stringify(link, null, 2);
+          updatePreview();
+          showAlert('Link is valid', 'success');
+        } catch (e) {
+          showAlert('Error: ' + e.message, 'error');
+        }
+      });
+
+      document.getElementById('resetBtn').addEventListener('click', resetLink);
+
+      document.getElementById('clearInputBtn').addEventListener('click', function() {
+        actionEl.value = 'toggle';
+        document.getElementById('key').value = '';
+        document.getElementById('value').value = '';
+        document.getElementById('cells').value = '';
+        document.getElementById('exclude').value = '';
+        document.getElementById('tags').value = '';
+        document.getElementById('href').value = '';
+        document.getElementById('wait').value = '';
+        document.getElementById('viewbox').value = '';
+        document.getElementById('toggleTags').value = '';
+        document.getElementById('hiddenTags').value = '';
+        document.getElementById('visibleTags').value = '';
+        document.getElementById('parallel').checked = false;
+        actionChanged();
+      });
+
+      document.getElementById('copyBtn').addEventListener('click', function() {
+        try {
+          var href = linkEl.value;
+          var link = JSON.parse(href.substring(17));
+          var minified = 'data:action/json,' + JSON.stringify(link);
+          DT.copyToClipboard(minified).then(function(success) {
+            showAlert(success ? 'Link copied to clipboard' : 'Failed to copy', success ? 'success' : 'error');
+          });
+        } catch (e) {
+          showAlert('Error: ' + e.message, 'error');
+        }
+      });
+
+      linkEl.addEventListener('input', updatePreview);
+    })();
+  </script>
+</body>
 </html>
