@@ -642,6 +642,63 @@
   }
 
   // ============================================
+  // UI UTILITIES
+  // ============================================
+
+  var toastContainer = null;
+
+  function getToastContainer() {
+    if (!toastContainer) {
+      toastContainer = document.createElement('div');
+      toastContainer.className = 'toast-container';
+      document.body.appendChild(toastContainer);
+    }
+    return toastContainer;
+  }
+
+  function showToast(message, type, duration) {
+    type = type || 'info';
+    duration = duration || 4000;
+
+    var container = getToastContainer();
+
+    var toast = document.createElement('div');
+    toast.className = 'toast toast--' + type;
+
+    var messageSpan = document.createElement('span');
+    messageSpan.className = 'toast__message';
+    messageSpan.textContent = message;
+
+    var closeBtn = document.createElement('button');
+    closeBtn.className = 'toast__close';
+    closeBtn.innerHTML = '&times;';
+    closeBtn.setAttribute('aria-label', 'Close');
+
+    toast.appendChild(messageSpan);
+    toast.appendChild(closeBtn);
+    container.appendChild(toast);
+
+    function removeToast() {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(-10px)';
+      toast.style.transition = 'all 0.2s ease-out';
+      setTimeout(function() {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      }, 200);
+    }
+
+    closeBtn.addEventListener('click', removeToast);
+
+    if (duration > 0) {
+      setTimeout(removeToast, duration);
+    }
+
+    return toast;
+  }
+
+  // ============================================
   // EXPORT
   // ============================================
 
@@ -681,7 +738,9 @@
     setupDropZone: setupDropZone,
     copyToClipboard: copyToClipboard,
     getFileExtension: getFileExtension,
-    isDrawioFile: isDrawioFile
+    isDrawioFile: isDrawioFile,
+    // UI
+    showToast: showToast
   };
 
 })(window);

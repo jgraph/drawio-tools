@@ -129,7 +129,6 @@
           </div>
         </div>
 
-        <div id="alertContainer" class="mt-md"></div>
       </div>
     </main>
 
@@ -154,7 +153,6 @@
 
       var textarea = document.getElementById('textarea');
       var charCount = document.getElementById('charCount');
-      var alertContainer = document.getElementById('alertContainer');
 
       var urlEncodeCheck = document.getElementById('urlEncodeCheck');
       var deflateCheck = document.getElementById('deflateCheck');
@@ -166,13 +164,7 @@
       textarea.addEventListener('input', updateCharCount);
 
       function showAlert(message, type) {
-        type = type || 'info';
-        var alert = document.createElement('div');
-        alert.className = 'alert alert--' + type;
-        alert.textContent = message;
-        alertContainer.innerHTML = '';
-        alertContainer.appendChild(alert);
-        setTimeout(function() { alert.remove(); }, 5000);
+        DT.showToast(message, type);
       }
 
       function handleResult(result, successMsg) {

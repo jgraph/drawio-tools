@@ -209,13 +209,7 @@ layout: auto
       var generatedUrl = '';
 
       function showAlert(message, type) {
-        type = type || 'info';
-        var alert = document.createElement('div');
-        alert.className = 'alert alert--' + type;
-        alert.textContent = message;
-        alertContainer.innerHTML = '';
-        alertContainer.appendChild(alert);
-        setTimeout(function() { alert.remove(); }, 3000);
+        DT.showToast(message, type);
       }
 
       function encode(data) {
