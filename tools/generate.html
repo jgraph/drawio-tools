@@ -113,6 +113,7 @@
           <div class="config-field">
             <label for="engine">Engine</label>
             <select id="engine">
+              <option value="claude">Claude</option>
               <option value="chatgpt">ChatGPT</option>
               <option value="gemini">Gemini</option>
               <option value="mermaidjs">Mermaid</option>
@@ -123,19 +124,12 @@
           <div class="config-field" id="modelSection">
             <label for="model">Model</label>
             <select id="model">
+              <option value="claude-opus-4-5" selected>Claude 4.5 Opus</option>
+              <option value="claude-haiku-4-5">Claude 4.5 Haiku</option>
+              <option value="gemini-3-pro-preview">Gemini 3 Pro Preview</option>
+              <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
               <option value="gpt-4.5-preview">GPT-4.5 Preview</option>
-              <option value="gpt-4o" selected>GPT-4o</option>
-              <option value="gpt-4o-mini">GPT-4o mini</option>
-              <option value="gpt-4-turbo">GPT-4 Turbo</option>
-              <option value="gpt-4">GPT-4</option>
-              <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-              <option value="gemini-2.5-pro-exp-03-25">Gemini 2.5 Pro</option>
-              <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
-              <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash-Lite</option>
-              <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-              <option value="claude-3-7-sonnet-latest">Claude 3.7 Sonnet</option>
-              <option value="claude-3-5-haiku-latest">Claude 3.5 Haiku</option>
-              <option value="claude-3-5-sonnet-latest">Claude 3.5 Sonnet v2</option>
+              <option value="gpt-4o">GPT-4o</option>
             </select>
           </div>
 
@@ -239,9 +233,11 @@
         }
 
         if (engine === 'gemini') {
-          modelEl.value = 'gemini-2.0-flash';
+          modelEl.value = 'gemini-2.5-pro';
         } else if (engine === 'chatgpt') {
-          modelEl.value = 'gpt-4o-mini';
+          modelEl.value = 'gpt-4.5-preview';
+        } else if (engine === 'claude') {
+          modelEl.value = 'claude-opus-4-5';
         }
       }
 
@@ -400,6 +396,23 @@
             apikey
           ).then(function(response) {
             preview(extractCode(response.choices[0].message.content));
+          }).catch(function(error) {
+            console.error('Error:', error);
+            showAlert('Error: ' + error.message, 'error');
+            generateBtn.disabled = false;
+            previewContainer.classList.remove('preview-loading');
+            placeholderEl.style.display = 'flex';
+          });
+        } else if (engine === 'claude') {
+          var url = 'https://api.anthropic.com/v1/messages';
+          sendPostRequest(
+            url,
+            { max_tokens: 1024, model: model, messages: [{ role: 'user', content: aiprompt }] },
+            engine,
+            model,
+            apikey
+          ).then(function(response) {
+            preview(extractCode(response.content[0].text));
           }).catch(function(error) {
             console.error('Error:', error);
             showAlert('Error: ' + error.message, 'error');
