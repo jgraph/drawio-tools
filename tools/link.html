@@ -9,28 +9,36 @@
   <link rel="stylesheet" href="../styles/main.css">
   <style>
     .action-section {
-      padding: var(--spacing-md);
+      padding: var(--spacing-sm);
       background: var(--color-bg-secondary);
-      border-radius: var(--radius-md);
-      margin-bottom: var(--spacing-md);
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--spacing-sm);
     }
     .action-section__title {
-      font-size: var(--font-size-sm);
+      font-size: var(--font-size-xs);
       font-weight: 600;
-      margin-bottom: var(--spacing-sm);
+      margin-bottom: var(--spacing-xs);
     }
     .inline-form {
       display: flex;
       flex-wrap: wrap;
-      gap: var(--spacing-sm);
+      gap: var(--spacing-xs);
       align-items: center;
+      font-size: var(--font-size-xs);
     }
     .inline-form input[type="text"] {
       width: auto;
-      min-width: 150px;
+      min-width: 100px;
+      padding: var(--spacing-xs) var(--spacing-sm);
+      font-size: var(--font-size-xs);
     }
     .inline-form select {
       width: auto;
+      padding: var(--spacing-xs) var(--spacing-sm);
+      font-size: var(--font-size-xs);
+    }
+    .inline-form label {
+      margin-bottom: 0;
     }
   </style>
 </head>
@@ -68,27 +76,18 @@
             Custom Links
           </h1>
           <p class="tool-header__description">
-            Create interactive diagram links with actions like toggle visibility, show/hide cells,
-            animations, and navigation. Build complex interactions without coding.
+            Build interactive custom links for draw.io diagrams with actions like toggle, show/hide, animations, and navigation.
           </p>
         </div>
 
-        <!-- Title -->
-        <div class="card mb-lg">
-          <div class="card__body">
-            <label for="title">Link Title (Optional)</label>
-            <input type="text" id="title" placeholder="Click to toggle...">
-          </div>
+        <div class="mb-sm">
+          <label for="title">Title (optional)</label>
+          <input type="text" id="title" placeholder="Click to toggle...">
         </div>
 
-        <!-- Cell Actions -->
-        <div class="card mb-lg">
-          <div class="card__header">
-            <h3 class="card__title">Cell Actions</h3>
-          </div>
-          <div class="card__body">
-            <div class="action-section">
-              <div class="inline-form mb-md">
+        <div class="action-section">
+          <div class="action-section__title">Cell Actions</div>
+          <div class="inline-form mb-sm">
                 <label for="action">Action:</label>
                 <select id="action">
                   <option value="toggle" selected>Toggle</option>
@@ -116,110 +115,65 @@
                   <label for="value">Value:</label>
                   <input type="text" id="value" placeholder="1" style="width: 80px;">
                 </span>
-              </div>
+          </div>
 
-              <div class="inline-form mb-md">
-                <label for="cells">Cells/Layers:</label>
-                <input type="text" id="cells" placeholder="1 2 3" style="flex: 1;">
-                <span class="text-muted" style="font-size: var(--font-size-xs);">Space-separated IDs, * for all</span>
-              </div>
+          <div class="inline-form mb-sm">
+            <label for="cells">Cells:</label>
+            <input type="text" id="cells" placeholder="1 2 3">
+            <label for="tags">Tags:</label>
+            <input type="text" id="tags" placeholder="water pipes">
+            <label for="exclude">Exclude:</label>
+            <input type="text" id="exclude" placeholder="4 5">
+          </div>
 
-              <div class="inline-form mb-md">
-                <label for="tags">Tags:</label>
-                <input type="text" id="tags" placeholder="water pipes" style="flex: 1;">
-                <span class="text-muted" style="font-size: var(--font-size-xs);">Space-separated tags, * for all</span>
-              </div>
-
-              <div class="inline-form mb-md">
-                <label for="exclude">Exclude:</label>
-                <input type="text" id="exclude" placeholder="4 5" style="flex: 1;">
-              </div>
-
-              <div class="inline-form">
-                <button type="button" class="btn btn--primary" id="addActionBtn">Add Action</button>
-                <label class="checkbox">
-                  <input type="checkbox" id="parallel">
-                  <span>Run in parallel with previous</span>
-                </label>
-              </div>
-            </div>
+          <div class="inline-form">
+            <button type="button" class="btn btn--primary btn--sm" id="addActionBtn">Add Action</button>
+            <label class="checkbox">
+              <input type="checkbox" id="parallel">
+              <span>Parallel</span>
+            </label>
           </div>
         </div>
 
-        <!-- Additional Actions -->
-        <div class="card mb-lg">
-          <div class="card__header">
-            <h3 class="card__title">Additional Actions</h3>
+        <div class="action-section">
+          <div class="action-section__title">Additional Actions</div>
+          <div class="inline-form mb-sm">
+            <label>Link:</label>
+            <input type="text" id="href" placeholder="data:page/id,...">
+            <button type="button" class="btn btn--secondary btn--sm" id="addLinkBtn">Add</button>
+            <label>Wait:</label>
+            <input type="text" id="wait" placeholder="1000" style="width: 60px;">
+            <button type="button" class="btn btn--secondary btn--sm" id="addWaitBtn">Add</button>
           </div>
-          <div class="card__body">
-            <div class="action-section">
-              <div class="action-section__title">Add Link</div>
-              <div class="inline-form">
-                <input type="text" id="href" placeholder="data:page/id,..." style="flex: 1;">
-                <button type="button" class="btn btn--secondary" id="addLinkBtn">Add Link</button>
-              </div>
-            </div>
-
-            <div class="action-section">
-              <div class="action-section__title">Add Wait</div>
-              <div class="inline-form">
-                <input type="text" id="wait" placeholder="1000" style="width: 100px;">
-                <span class="text-muted">milliseconds</span>
-                <button type="button" class="btn btn--secondary" id="addWaitBtn">Add Wait</button>
-              </div>
-            </div>
-
-            <div class="action-section">
-              <div class="action-section__title">Add Viewbox</div>
-              <div class="inline-form">
-                <input type="text" id="viewbox" placeholder="x y width height border" style="flex: 1;">
-                <button type="button" class="btn btn--secondary" id="addViewboxBtn">Add Viewbox</button>
-              </div>
-            </div>
-
-            <div class="action-section">
-              <div class="action-section__title">Add Tags Visibility</div>
-              <div class="inline-form">
-                <label for="toggleTags">Toggle:</label>
-                <input type="text" id="toggleTags" placeholder="tag1 tag2" style="width: 120px;">
-                <label for="hiddenTags">Hidden:</label>
-                <input type="text" id="hiddenTags" placeholder="tag3" style="width: 120px;">
-                <label for="visibleTags">Visible:</label>
-                <input type="text" id="visibleTags" placeholder="tag4" style="width: 120px;">
-                <button type="button" class="btn btn--secondary" id="addTagsBtn">Add Tags</button>
-              </div>
-            </div>
+          <div class="inline-form mb-sm">
+            <label>Viewbox:</label>
+            <input type="text" id="viewbox" placeholder="x y width height">
+            <button type="button" class="btn btn--secondary btn--sm" id="addViewboxBtn">Add</button>
+          </div>
+          <div class="inline-form">
+            <label>Tags:</label>
+            <input type="text" id="toggleTags" placeholder="toggle" style="width: 70px;">
+            <input type="text" id="hiddenTags" placeholder="hide" style="width: 70px;">
+            <input type="text" id="visibleTags" placeholder="show" style="width: 70px;">
+            <button type="button" class="btn btn--secondary btn--sm" id="addTagsBtn">Add</button>
           </div>
         </div>
 
-        <!-- Link Output -->
-        <div class="card mb-lg">
-          <div class="card__header">
-            <h3 class="card__title">Custom Link</h3>
-          </div>
-          <div class="card__body">
-            <div class="textarea-container">
-              <textarea id="link" rows="10" spellcheck="false"></textarea>
-            </div>
-          </div>
-          <div class="card__footer">
-            <div class="btn-group">
-              <button type="button" class="btn btn--primary" id="copyBtn">Copy Link</button>
-              <button type="button" class="btn btn--secondary" id="validateBtn">Validate</button>
-              <button type="button" class="btn btn--secondary" id="resetBtn">Reset</button>
-              <button type="button" class="btn btn--secondary" id="clearInputBtn">Clear Input</button>
-            </div>
-          </div>
+        <div class="textarea-container mb-sm">
+          <label for="link">Custom Link Output</label>
+          <textarea id="link" rows="8" spellcheck="false"></textarea>
         </div>
 
-        <!-- Preview -->
-        <div class="card" id="previewCard" style="display: none;">
-          <div class="card__header">
-            <h3 class="card__title">Minified Link</h3>
-          </div>
-          <div class="card__body">
-            <a href="#" id="anchor" onclick="return false;" style="word-break: break-all;"></a>
-          </div>
+        <div class="btn-row mb-sm">
+          <button type="button" class="btn btn--primary" id="copyBtn">Copy</button>
+          <button type="button" class="btn btn--secondary" id="validateBtn">Validate</button>
+          <button type="button" class="btn btn--secondary" id="resetBtn">Reset</button>
+          <button type="button" class="btn btn--secondary" id="clearInputBtn">Clear</button>
+        </div>
+
+        <div id="previewCard" style="display: none;">
+          <div class="text-muted" style="font-size: var(--font-size-xs);">Minified:</div>
+          <a href="#" id="anchor" onclick="return false;" style="word-break: break-all; font-size: var(--font-size-xs);"></a>
         </div>
 
         <div id="alertContainer" class="mt-lg"></div>

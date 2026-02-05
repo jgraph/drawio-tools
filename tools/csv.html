@@ -44,50 +44,28 @@
             CSV Import
           </h1>
           <p class="tool-header__description">
-            Convert CSV data into draw.io diagrams. Define shapes, styles, labels, and connections
-            using a powerful configuration syntax.
+            Convert CSV data into draw.io diagrams with custom styling, connections, and automatic layout options.
           </p>
         </div>
 
-        <!-- URL Input -->
-        <div class="card mb-lg">
-          <div class="card__header">
-            <h3 class="card__title">Step 1: CSV Source</h3>
-          </div>
-          <div class="card__body">
-            <label for="url">Link to CSV File (Optional)</label>
-            <input
-              type="url"
-              id="url"
-              placeholder="https://jgraph.github.io/drawio-diagrams/diagrams/orgchart.csv"
-              autocomplete="off"
-            >
-            <p class="text-muted mt-sm" style="font-size: var(--font-size-xs);">
-              For Google Sheets:
-              <code>https://docs.google.com/spreadsheets/d/{fileId}/export?format=csv&usp=sharing</code>
-            </p>
-          </div>
+        <div class="mb-sm">
+          <label for="url">CSV URL (optional)</label>
+          <input
+            type="url"
+            id="url"
+            placeholder="https://jgraph.github.io/drawio-diagrams/diagrams/orgchart.csv"
+            autocomplete="off"
+          >
         </div>
 
-        <!-- Title -->
-        <div class="card mb-lg">
-          <div class="card__header">
-            <h3 class="card__title">Step 2: Diagram Title (Optional)</h3>
-          </div>
-          <div class="card__body">
-            <input type="text" id="title" placeholder="My Org Chart">
-          </div>
+        <div class="mb-sm">
+          <label for="title">Diagram Title (optional)</label>
+          <input type="text" id="title" placeholder="My Org Chart">
         </div>
 
-        <!-- Configuration -->
-        <div class="card mb-lg">
-          <div class="card__header">
-            <h3 class="card__title">Step 3: Configuration</h3>
-          </div>
-          <div class="card__body">
-            <div class="textarea-container textarea-container--large">
-              <label for="desc">CSV Import Configuration</label>
-              <textarea id="desc" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">#
+        <div class="textarea-container mb-sm">
+          <label for="desc">Configuration</label>
+          <textarea id="desc" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" rows="20">#
 # Example CSV import. Use # for comments. Paste CSV below.
 # Reserved names: id, tooltip, placeholder(s), link and label
 #
@@ -186,36 +164,16 @@ edgespacing: 40
 
 layout: auto
 </textarea>
-            </div>
-          </div>
         </div>
 
-        <!-- Generate Button -->
-        <div class="card mb-lg">
-          <div class="card__header">
-            <h3 class="card__title">Step 4: Generate</h3>
-          </div>
-          <div class="card__body">
-            <button type="button" class="btn btn--primary btn--lg" id="createBtn">
-              Generate Viewer Link
-            </button>
-          </div>
+        <div class="btn-row mb-sm">
+          <button type="button" class="btn btn--primary" id="createBtn">Generate Link</button>
+          <button type="button" class="btn btn--primary" id="openBtn" style="display: none;">Open</button>
+          <button type="button" class="btn btn--secondary" id="copyBtn" style="display: none;">Copy</button>
         </div>
 
-        <!-- Result -->
-        <div class="card" id="resultCard" style="display: none;">
-          <div class="card__header">
-            <h3 class="card__title">Result</h3>
-          </div>
-          <div class="card__body">
-            <a href="" target="_blank" id="resultLink" style="word-break: break-all;"></a>
-          </div>
-          <div class="card__footer">
-            <div class="btn-group">
-              <button type="button" class="btn btn--primary" id="openBtn">Open in Viewer</button>
-              <button type="button" class="btn btn--secondary" id="copyBtn">Copy Link</button>
-            </div>
-          </div>
+        <div id="resultCard" style="display: none;">
+          <a href="" target="_blank" id="resultLink" style="word-break: break-all; font-size: var(--font-size-xs);"></a>
         </div>
 
         <div id="alertContainer" class="mt-lg"></div>
@@ -302,6 +260,8 @@ layout: auto
         resultLink.href = link;
         resultLink.textContent = link;
         generatedUrl = link;
+        document.getElementById('openBtn').style.display = '';
+        document.getElementById('copyBtn').style.display = '';
 
         showAlert('Link generated', 'success');
       });

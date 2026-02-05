@@ -10,9 +10,9 @@
   <style>
     .preview-container {
       position: relative;
-      height: 500px;
+      height: 350px;
       border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-sm);
       overflow: hidden;
       background: var(--color-bg-secondary);
     }
@@ -28,6 +28,7 @@
       align-items: center;
       justify-content: center;
       color: var(--color-text-secondary);
+      font-size: var(--font-size-xs);
     }
     .preview-loading {
       background: var(--color-bg-secondary) url('data:image/svg+xml;base64,77u/PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyMDAgMjAwJz48Y2lyY2xlIGZpbGw9JyM4MDgwODAnIHN0cm9rZT0nIzgwODA4MCcgc3Ryb2tlLXdpZHRoPScxNScgcj0nMTUnIGN4PSczNScgY3k9JzEwMCc+PGFuaW1hdGUgYXR0cmlidXRlTmFtZT0nY3gnIGNhbGNNb2RlPSdzcGxpbmUnIGR1cj0nNC4yJyB2YWx1ZXM9JzM1OzE2NTsxNjU7MzU7MzUnIGtleVNwbGluZXM9JzAgLjEgLjUgMTswIC4xIC41IDE7MCAuMSAuNSAxOzAgLjEgLjUgMScgcmVwZWF0Q291bnQ9J2luZGVmaW5pdGUnIGJlZ2luPScwJz48L2FuaW1hdGU+PC9jaXJjbGU+PC9zdmc+') no-repeat center center;
@@ -35,18 +36,18 @@
     .engine-info {
       font-size: var(--font-size-xs);
       color: var(--color-text-secondary);
-      margin-top: var(--spacing-sm);
+      margin-top: var(--spacing-xs);
     }
     .config-row {
       display: flex;
       flex-wrap: wrap;
-      gap: var(--spacing-md);
+      gap: var(--spacing-sm);
       align-items: flex-end;
     }
     .config-field {
       display: flex;
       flex-direction: column;
-      gap: var(--spacing-xs);
+      gap: 2px;
     }
     .config-field label {
       font-size: var(--font-size-xs);
@@ -55,7 +56,7 @@
     .config-field select,
     .config-field input {
       padding: var(--spacing-xs) var(--spacing-sm);
-      font-size: var(--font-size-sm);
+      font-size: var(--font-size-xs);
     }
   </style>
 </head>
@@ -94,110 +95,82 @@
             AI Generate
           </h1>
           <p class="tool-header__description">
-            Generate draw.io diagrams from natural language descriptions using AI.
-            Supports ChatGPT, Claude, Gemini, and Mermaid syntax.
+            Generate draw.io diagrams from natural language descriptions using AI (ChatGPT, Gemini) or paste Mermaid syntax directly.
           </p>
         </div>
 
-        <!-- Prompt Input -->
-        <div class="card mb-lg">
-          <div class="card__body">
-            <div class="textarea-container">
-              <label for="prompt">Diagram Description</label>
-              <textarea
-                id="prompt"
-                rows="4"
-                placeholder="Describe your diagram, e.g., 'five tier sequence diagram on how to order fast food online' or paste Mermaid syntax like 'graph TD; A-->B; A-->C;'"
-                spellcheck="false"
-                autocomplete="off"
-              ></textarea>
-            </div>
-          </div>
+        <div class="textarea-container mb-sm">
+          <textarea
+            id="prompt"
+            rows="3"
+            placeholder="Describe your diagram or paste Mermaid syntax..."
+            spellcheck="false"
+            autocomplete="off"
+          ></textarea>
         </div>
 
-        <!-- Configuration -->
-        <div class="options-panel mb-lg">
-          <div class="options-panel__title">Configuration</div>
-          <div class="config-row">
-            <div class="config-field">
-              <label for="engine">Engine</label>
-              <select id="engine">
-                <option value="chatgpt">ChatGPT</option>
-                <option value="gemini">Gemini</option>
-                <option value="mermaidjs">Mermaid</option>
-                <option value="drawio">draw.io XML</option>
-              </select>
-            </div>
-
-            <div class="config-field" id="modelSection">
-              <label for="model">Model</label>
-              <select id="model">
-                <option value="gpt-4.5-preview">GPT-4.5 Preview</option>
-                <option value="gpt-4o" selected>GPT-4o</option>
-                <option value="gpt-4o-mini">GPT-4o mini</option>
-                <option value="gpt-4-turbo">GPT-4 Turbo</option>
-                <option value="gpt-4">GPT-4</option>
-                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                <option value="gemini-2.5-pro-exp-03-25">Gemini 2.5 Pro</option>
-                <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
-                <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash-Lite</option>
-                <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-                <option value="claude-3-7-sonnet-latest">Claude 3.7 Sonnet</option>
-                <option value="claude-3-5-haiku-latest">Claude 3.5 Haiku</option>
-                <option value="claude-3-5-sonnet-latest">Claude 3.5 Sonnet v2</option>
-              </select>
-            </div>
-
-            <div class="config-field" id="keySection">
-              <label for="apikey">API Key</label>
-              <input type="password" id="apikey" placeholder="Enter your API key">
-            </div>
-
-            <div class="config-field" id="promptSection">
-              <label for="aiPromptSelect">Prompt Type</label>
-              <select id="aiPromptSelect">
-                <option id="mermaidOption"
-                  value='Write a MermaidJS declaration for "%prompt%" and return only the valid MermaidJS syntax without any other text do not return a gantt chart unless specifically requested'
-                  selected>Mermaid</option>
-                <option id="drawioOption"
-                  value='Write a draw.io file for "%prompt%" and return only the valid XML syntax without any other text'>
-                  draw.io XML</option>
-              </select>
-            </div>
+        <div class="config-row mb-sm">
+          <div class="config-field">
+            <label for="engine">Engine</label>
+            <select id="engine">
+              <option value="chatgpt">ChatGPT</option>
+              <option value="gemini">Gemini</option>
+              <option value="mermaidjs">Mermaid</option>
+              <option value="drawio">draw.io XML</option>
+            </select>
           </div>
+
+          <div class="config-field" id="modelSection">
+            <label for="model">Model</label>
+            <select id="model">
+              <option value="gpt-4.5-preview">GPT-4.5 Preview</option>
+              <option value="gpt-4o" selected>GPT-4o</option>
+              <option value="gpt-4o-mini">GPT-4o mini</option>
+              <option value="gpt-4-turbo">GPT-4 Turbo</option>
+              <option value="gpt-4">GPT-4</option>
+              <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+              <option value="gemini-2.5-pro-exp-03-25">Gemini 2.5 Pro</option>
+              <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+              <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash-Lite</option>
+              <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+              <option value="claude-3-7-sonnet-latest">Claude 3.7 Sonnet</option>
+              <option value="claude-3-5-haiku-latest">Claude 3.5 Haiku</option>
+              <option value="claude-3-5-sonnet-latest">Claude 3.5 Sonnet v2</option>
+            </select>
+          </div>
+
+          <div class="config-field" id="keySection">
+            <label for="apikey">API Key</label>
+            <input type="password" id="apikey" placeholder="API key">
+          </div>
+
+          <div class="config-field" id="promptSection">
+            <label for="aiPromptSelect">Output</label>
+            <select id="aiPromptSelect">
+              <option id="mermaidOption"
+                value='Write a MermaidJS declaration for "%prompt%" and return only the valid MermaidJS syntax without any other text do not return a gantt chart unless specifically requested'
+                selected>Mermaid</option>
+              <option id="drawioOption"
+                value='Write a draw.io file for "%prompt%" and return only the valid XML syntax without any other text'>
+                draw.io XML</option>
+            </select>
+          </div>
+
+          <button type="button" class="btn btn--primary" id="generateBtn">Generate</button>
+          <button type="button" class="btn btn--secondary" id="unescapeBtn">Unescape</button>
         </div>
 
-        <!-- Generate Button -->
-        <div class="btn-group mb-lg">
-          <button type="button" class="btn btn--primary btn--lg" id="generateBtn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="5 3 19 12 5 21 5 3"/>
-            </svg>
-            Generate Diagram
-          </button>
-          <button type="button" class="btn btn--secondary" id="unescapeBtn">Unescape Text</button>
+        <div class="preview-container mb-sm" id="previewContainer">
+          <div class="preview-placeholder" id="placeholder">
+            Generated diagram will appear here
+          </div>
+          <iframe id="preview" allowtransparency="true" style="display: none;"></iframe>
         </div>
+        <div class="engine-info" id="info"></div>
 
-        <!-- Preview -->
-        <div class="card mb-lg">
-          <div class="card__header">
-            <h3 class="card__title">Preview</h3>
-          </div>
-          <div class="card__body">
-            <div class="preview-container" id="previewContainer">
-              <div class="preview-placeholder" id="placeholder">
-                Generated diagram will appear here
-              </div>
-              <iframe id="preview" allowtransparency="true" style="display: none;"></iframe>
-            </div>
-            <div class="engine-info" id="info"></div>
-          </div>
-          <div class="card__footer">
-            <div class="btn-group">
-              <button type="button" class="btn btn--primary" id="viewBtn" disabled>View Full Screen</button>
-              <button type="button" class="btn btn--secondary" id="editBtn" disabled>Edit in draw.io</button>
-            </div>
-          </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn--primary" id="viewBtn" disabled>View Full Screen</button>
+          <button type="button" class="btn btn--secondary" id="editBtn" disabled>Edit in draw.io</button>
         </div>
 
         <div id="alertContainer"></div>

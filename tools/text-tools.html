@@ -41,15 +41,13 @@
             Text Tools
           </h1>
           <p class="tool-header__description">
-            Compress, decompress, encode, and decode text. Supports the full draw.io encoding pipeline:
-            URL encoding → Deflate compression → Base64 encoding.
+            Encode, decode, compress, and transform text using the draw.io encoding pipeline.
           </p>
         </div>
 
-        <div class="card mb-lg">
+        <div class="card mb-md">
           <div class="card__body">
             <div class="textarea-container textarea-container--large">
-              <label for="textarea">Input / Output</label>
               <textarea
                 id="textarea"
                 placeholder="Drop a file here or paste text to encode/decode..."
@@ -66,32 +64,28 @@
           </div>
         </div>
 
-        <div class="options-panel mb-lg">
-          <div class="options-panel__title">Encoding Options</div>
-          <div class="options-panel__row">
-            <label class="checkbox">
-              <input type="checkbox" id="urlEncodeCheck" checked>
-              <span>URL Encode</span>
-            </label>
-            <label class="checkbox">
-              <input type="checkbox" id="deflateCheck" checked>
-              <span>Deflate</span>
-            </label>
-            <label class="checkbox">
-              <input type="checkbox" id="base64Check" checked>
-              <span>Base64</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="card mb-lg">
+        <div class="card mb-md">
           <div class="card__header">
-            <h3 class="card__title">Full Pipeline</h3>
+            <h3 class="card__title">Full Encoding Pipeline</h3>
           </div>
           <div class="card__body">
-            <p class="text-muted mb-md">
-              Apply the complete draw.io encoding/decoding pipeline based on selected options.
+            <p class="text-muted mb-md" style="font-size: var(--font-size-sm);">
+              Apply the complete draw.io encoding/decoding pipeline: URL encode → Deflate → Base64
             </p>
+            <div class="options-panel__row mb-md">
+              <label class="checkbox">
+                <input type="checkbox" id="urlEncodeCheck" checked>
+                <span>URL Encode</span>
+              </label>
+              <label class="checkbox">
+                <input type="checkbox" id="deflateCheck" checked>
+                <span>Deflate</span>
+              </label>
+              <label class="checkbox">
+                <input type="checkbox" id="base64Check" checked>
+                <span>Base64</span>
+              </label>
+            </div>
             <div class="btn-group">
               <button type="button" class="btn btn--primary" id="encodeBtn">Encode</button>
               <button type="button" class="btn btn--primary" id="decodeBtn">Decode</button>
@@ -99,79 +93,33 @@
           </div>
         </div>
 
-        <div class="card mb-lg">
+        <div class="card mb-md">
           <div class="card__header">
             <h3 class="card__title">Individual Operations</h3>
           </div>
           <div class="card__body">
-            <p class="text-muted mb-md">
-              Apply individual transformations to the text.
-            </p>
-
-            <div class="mb-md">
-              <h4 class="text-muted" style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-sm);">URL Encoding</h4>
-              <div class="btn-group">
-                <button type="button" class="btn btn--secondary" id="urlEncodeOnlyBtn">URL Encode</button>
-                <button type="button" class="btn btn--secondary" id="urlDecodeOnlyBtn">URL Decode</button>
-              </div>
+            <div class="btn-group mb-md">
+              <button type="button" class="btn btn--secondary" id="urlEncodeOnlyBtn">URL Encode</button>
+              <button type="button" class="btn btn--secondary" id="urlDecodeOnlyBtn">URL Decode</button>
+              <button type="button" class="btn btn--secondary" id="btoaBtn">btoa</button>
+              <button type="button" class="btn btn--secondary" id="atobBtn">atob</button>
+              <button type="button" class="btn btn--secondary" id="escapeBtn">Escape</button>
+              <button type="button" class="btn btn--secondary" id="unescapeBtn">Unescape</button>
             </div>
-
-            <div class="mb-md">
-              <h4 class="text-muted" style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-sm);">Base64</h4>
-              <div class="btn-group">
-                <button type="button" class="btn btn--secondary" id="btoaBtn">btoa (Encode)</button>
-                <button type="button" class="btn btn--secondary" id="atobBtn">atob (Decode)</button>
-              </div>
-            </div>
-
-            <div class="mb-md">
-              <h4 class="text-muted" style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-sm);">Escape Sequences</h4>
-              <div class="btn-group">
-                <button type="button" class="btn btn--secondary" id="escapeBtn">Escape</button>
-                <button type="button" class="btn btn--secondary" id="unescapeBtn">Unescape</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card mb-lg">
-          <div class="card__header">
-            <h3 class="card__title">Text Transformations</h3>
-          </div>
-          <div class="card__body">
             <div class="btn-group">
               <button type="button" class="btn btn--secondary" id="removeLinebreaksBtn">Remove Linebreaks</button>
               <button type="button" class="btn btn--secondary" id="jsVarBtn">JS Variable</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card mb-lg">
-          <div class="card__header">
-            <h3 class="card__title">Format & Normalize</h3>
-          </div>
-          <div class="card__body">
-            <div class="mb-md">
-              <h4 class="text-muted" style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-sm);">XML</h4>
-              <div class="btn-group">
-                <button type="button" class="btn btn--secondary" id="formatXmlBtn">Format XML</button>
-                <button type="button" class="btn btn--secondary" id="normalizeXmlBtn">Normalize XML</button>
-              </div>
-            </div>
-
-            <div>
-              <h4 class="text-muted" style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-sm);">JSON</h4>
-              <div class="btn-group">
-                <button type="button" class="btn btn--secondary" id="formatJsonBtn">Format JSON</button>
-                <button type="button" class="btn btn--secondary" id="normalizeJsonBtn">Normalize JSON</button>
-              </div>
+              <button type="button" class="btn btn--secondary" id="formatXmlBtn">Format XML</button>
+              <button type="button" class="btn btn--secondary" id="normalizeXmlBtn">Normalize XML</button>
+              <button type="button" class="btn btn--secondary" id="formatJsonBtn">Format JSON</button>
+              <button type="button" class="btn btn--secondary" id="normalizeJsonBtn">Normalize JSON</button>
             </div>
           </div>
         </div>
 
         <div class="card">
           <div class="card__header">
-            <h3 class="card__title">Download</h3>
+            <h3 class="card__title">Export</h3>
           </div>
           <div class="card__body">
             <div class="btn-group">
@@ -181,7 +129,7 @@
           </div>
         </div>
 
-        <div id="alertContainer" class="mt-lg"></div>
+        <div id="alertContainer" class="mt-md"></div>
       </div>
     </main>
 

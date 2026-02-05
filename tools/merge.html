@@ -10,15 +10,14 @@
   <style>
     .image-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: var(--spacing-md);
-      margin-bottom: var(--spacing-lg);
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: var(--spacing-sm);
     }
     .image-list__item {
       position: relative;
       background: var(--color-bg-secondary);
       border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-sm);
       overflow: hidden;
       aspect-ratio: 1;
       display: flex;
@@ -33,15 +32,15 @@
     .image-list__item--empty {
       border-style: dashed;
       color: var(--color-text-secondary);
-      font-size: var(--font-size-sm);
+      font-size: var(--font-size-xs);
     }
     .result-container {
       max-width: 100%;
       overflow: auto;
       background: var(--color-bg-secondary);
       border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      padding: var(--spacing-md);
+      border-radius: var(--radius-sm);
+      padding: var(--spacing-sm);
       text-align: center;
     }
     .result-container canvas {
@@ -86,64 +85,34 @@
             Image Merge
           </h1>
           <p class="tool-header__description">
-            Stack multiple images vertically into a single image. Perfect for creating
-            image sequences or combining diagram exports.
+            Stack multiple images vertically into a single combined image. Useful for creating long-form documentation or scrollable diagrams.
           </p>
         </div>
 
-        <!-- Drop Zone -->
-        <div class="card mb-lg">
-          <div class="card__body">
-            <div class="drop-zone" id="dropZone">
-              <svg class="drop-zone__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="7" height="7"/>
-                <rect x="14" y="3" width="7" height="7"/>
-                <rect x="3" y="14" width="7" height="7"/>
-                <rect x="14" y="14" width="7" height="7"/>
-              </svg>
-              <p class="drop-zone__text">Drop images here or click to browse</p>
-              <p class="drop-zone__hint">You can drop multiple images at once</p>
-              <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
-            </div>
-          </div>
+        <div class="drop-zone mb-md" id="dropZone">
+          <svg class="drop-zone__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/>
+            <rect x="14" y="3" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/>
+          </svg>
+          <p class="drop-zone__text">Drop images here (<span id="imageCount">0</span> loaded)</p>
+          <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
         </div>
 
-        <!-- Image List -->
-        <div class="card mb-lg">
-          <div class="card__header">
-            <h3 class="card__title">Images (<span id="imageCount">0</span>)</h3>
-          </div>
-          <div class="card__body">
-            <div class="image-list" id="imageList">
-              <div class="image-list__item image-list__item--empty">
-                No images yet
-              </div>
-            </div>
-            <div class="btn-group">
-              <button type="button" class="btn btn--primary" id="createBtn" disabled>
-                Create Vertical Stack
-              </button>
-              <button type="button" class="btn btn--secondary" id="resetBtn">
-                Reset
-              </button>
-            </div>
-          </div>
+        <div class="image-list mb-sm" id="imageList">
+          <div class="image-list__item image-list__item--empty">No images</div>
         </div>
 
-        <!-- Result -->
-        <div class="card" id="resultCard" style="display: none;">
-          <div class="card__header">
-            <h3 class="card__title">Result</h3>
-          </div>
-          <div class="card__body">
-            <div class="result-container" id="resultContainer"></div>
-            <div class="mt-md text-muted text-center" id="resultInfo"></div>
-          </div>
-          <div class="card__footer">
-            <div class="btn-group">
-              <button type="button" class="btn btn--primary" id="downloadBtn">Download Image</button>
-            </div>
-          </div>
+        <div class="btn-row mb-md">
+          <button type="button" class="btn btn--primary" id="createBtn" disabled>Stack</button>
+          <button type="button" class="btn btn--secondary" id="resetBtn">Reset</button>
+          <button type="button" class="btn btn--primary" id="downloadBtn" style="display: none;">Download</button>
+        </div>
+
+        <div id="resultCard" style="display: none;">
+          <div class="result-container" id="resultContainer"></div>
+          <div class="text-muted text-center" style="font-size: var(--font-size-xs); margin-top: var(--spacing-xs);" id="resultInfo"></div>
         </div>
 
         <div id="alertContainer" class="mt-lg"></div>
@@ -196,7 +165,7 @@
         createBtn.disabled = images.length === 0;
 
         if (images.length === 0) {
-          imageList.innerHTML = '<div class="image-list__item image-list__item--empty">No images yet</div>';
+          imageList.innerHTML = '<div class="image-list__item image-list__item--empty">No images</div>';
         } else {
           var html = '';
           for (var i = 0; i < images.length; i++) {
@@ -291,6 +260,7 @@
 
           resultInfo.textContent = width + '×' + height + ' pixels';
           resultCard.style.display = '';
+          document.getElementById('downloadBtn').style.display = '';
 
           showAlert('Stack created', 'success');
         } catch (error) {
@@ -302,6 +272,7 @@
         images = [];
         updateImageList();
         resultCard.style.display = 'none';
+        document.getElementById('downloadBtn').style.display = 'none';
         resultCanvas = null;
       });
 

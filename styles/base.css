@@ -80,7 +80,7 @@ a:hover {
 .header {
   background: var(--color-bg-secondary);
   border-bottom: 1px solid var(--color-border);
-  padding: var(--spacing-md) 0;
+  padding: var(--spacing-sm) 0;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -102,13 +102,13 @@ a:hover {
 }
 
 .header__logo {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
 }
 
 .header__title {
   font-weight: 700;
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-lg);
   margin: 0;
 }
 
@@ -181,7 +181,7 @@ select:focus {
 textarea {
   font-family: var(--font-family-mono);
   resize: vertical;
-  min-height: 200px;
+  min-height: 180px;
 }
 
 label {
@@ -275,23 +275,31 @@ label {
   gap: var(--spacing-sm);
 }
 
+/* Button Row - compact inline buttons */
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
 /* Cards */
 .card {
   background: var(--color-card-bg);
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
 
 .card__header {
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-lg);
   border-bottom: 1px solid var(--color-border);
   background: var(--color-bg-secondary);
 }
 
 .card__title {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-base);
   font-weight: 600;
   margin: 0;
 }
@@ -301,15 +309,15 @@ label {
 }
 
 .card__footer {
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-lg);
   border-top: 1px solid var(--color-border);
   background: var(--color-bg-secondary);
 }
 
 /* Alerts */
 .alert {
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
   margin-bottom: var(--spacing-md);
   font-size: var(--font-size-sm);
 }

@@ -36,19 +36,19 @@
   --color-info: #0dcaf0;
   --color-info-bg: #cff4fc;
 
-  /* Spacing */
+  /* Spacing - Balanced */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  --spacing-2xl: 48px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
 
   /* Border Radius */
   --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
 
   /* Typography */
   --font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
@@ -61,8 +61,8 @@
   --font-size-base: 14px;
   --font-size-lg: 16px;
   --font-size-xl: 18px;
-  --font-size-2xl: 24px;
-  --font-size-3xl: 32px;
+  --font-size-2xl: 22px;
+  --font-size-3xl: 28px;
 
   /* Shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -74,8 +74,8 @@
   --transition-base: 250ms ease;
 
   /* Layout */
-  --container-max-width: 1200px;
-  --header-height: 60px;
+  --container-max-width: 960px;
+  --header-height: 50px;
 }
 
 /* Dark Mode */
