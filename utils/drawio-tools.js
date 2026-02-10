@@ -324,8 +324,24 @@
     }
   }
 
+  function isDiagramUncompressed(diagram) {
+    var children = diagram.childNodes;
+    for (var i = 0; i < children.length; i++) {
+      if (children[i].nodeType === 1) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   function validateDiagramPage(diagram, pageNumber) {
     var errors = [];
+
+    // Uncompressed diagrams contain XML child elements directly
+    if (isDiagramUncompressed(diagram)) {
+      return errors;
+    }
+
     var data = getTextContent(diagram);
 
     if (!data || data.trim().length === 0) {
@@ -394,7 +410,13 @@
         continue;
       }
 
-      var data = tokens[i].substring(start, end);
+      var data = tokens[i].substring(start, end).trim();
+
+      // Skip base64 validation for uncompressed diagrams (XML content)
+      if (data.charAt(0) === '<') {
+        pos += tokens[i].length + 9;
+        continue;
+      }
 
       while (data.charAt(data.length - 1) === '=') {
         data = data.substring(0, data.length - 1);
