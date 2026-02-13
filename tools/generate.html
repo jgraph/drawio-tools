@@ -187,10 +187,11 @@
       </div>
     </footer>
   </div>
-  
+
   <script src="../utils/drawio-tools.js"></script>
   <script>
-    (function() {
+    (function()
+    {
       var DT = window.DrawioTools;
 
       var promptEl = document.getElementById('prompt');
@@ -214,15 +215,18 @@
       var urlParams = new URLSearchParams(window.location.hash.substring(1));
       var keys = null;
 
-      if (urlParams.get('keys')) {
+      if (urlParams.get('keys'))
+      {
         keys = JSON.parse(urlParams.get('keys'));
       }
 
-      function showAlert(message, type) {
+      function showAlert(message, type)
+      {
         DT.showToast(message, type);
       }
 
-      function engineChanged() {
+      function engineChanged()
+      {
         var engine = engineEl.value;
         var prefix = engine === 'chatgpt' ? 'gpt' : engine;
 
@@ -232,19 +236,26 @@
         promptSection.style.display = isAI ? '' : 'none';
 
         var options = modelEl.options;
-        for (var i = 0; i < options.length; i++) {
+        for (var i = 0; i < options.length; i++)
+        {
           options[i].style.display = options[i].value.indexOf(prefix) === 0 ? '' : 'none';
         }
 
-        if (engine === 'gemini') {
+        if (engine === 'gemini')
+        {
           modelEl.value = 'gemini-2.5-pro';
-        } else if (engine === 'chatgpt') {
+        }
+        else if (engine === 'chatgpt')
+        {
           modelEl.value = 'gpt-4.5-preview';
-        } else if (engine === 'claude') {
+        }
+        else if (engine === 'claude')
+        {
           modelEl.value = 'claude-opus-4-6';
         }
 
-        if (keys && keys[engine]) {
+        if (keys && keys[engine])
+        {
           apikeyEl.value = keys[engine];
         }
       }
@@ -252,26 +263,34 @@
       engineEl.addEventListener('change', engineChanged);
       engineChanged();
 
-      document.getElementById('unescapeBtn').addEventListener('click', function() {
+      document.getElementById('unescapeBtn').addEventListener('click', function()
+      {
         var input = promptEl.value;
-        input = input.replace(/\\u([0-9A-Fa-f]{4})/g, function(match, group) {
-          return String.fromCharCode(parseInt(group, 16));
-        });
+        input = input.replace(/\\u([0-9A-Fa-f]{4})/g, function(match, group) { return String.fromCharCode(parseInt(group, 16)); });
         promptEl.value = input.replace(/\\n/g, '\n');
       });
 
-      function extractCode(input) {
+      function extractCode(input)
+      {
         var result = input;
 
-        if (result.indexOf('```mermaid') >= 0) {
+        if (result.indexOf('```mermaid') >= 0)
+        {
           result = result.substring(result.indexOf('```mermaid') + 11);
-        } else if (result.indexOf('```xml') >= 0) {
+        }
+        else if (result.indexOf('```xml') >= 0)
+        {
           result = result.substring(result.indexOf('```xml') + 7);
-        } else {
+        }
+        else
+        {
           var start = result.indexOf('```');
-          if (start === 0) {
+          if (start === 0)
+          {
             result = result.substring(3);
-          } else if (start > 0) {
+          }
+          else if (start > 0)
+          {
             result = result.substring(0, start + 3);
           }
         }
@@ -286,12 +305,16 @@
         return result;
       }
 
-      function sendPostRequest(url, data, engine, model, apikey) {
+      function sendPostRequest(url, data, engine, model, apikey)
+      {
         var headers = { 'Content-Type': 'application/json' };
 
-        if (engine === 'chatgpt') {
+        if (engine === 'chatgpt')
+        {
           headers['Authorization'] = 'Bearer ' + apikey;
-        } else if (engine === 'claude') {
+        }
+        else if (engine === 'claude')
+        {
           headers['x-api-key'] = apikey;
           headers['anthropic-version'] = '2023-06-01';
           headers['anthropic-dangerous-direct-browser-access'] = 'true';
@@ -303,31 +326,38 @@
         var controller = new AbortController();
         var timeoutId = setTimeout(function() { controller.abort(); }, 60000);
 
-        return fetch(url, {
+        return fetch(url,
+        {
           method: 'POST',
           headers: headers,
           body: JSON.stringify(data),
           signal: controller.signal
-        }).then(function(response) {
-          if (!response.ok) {
+        }).then(function(response)
+        {
+          if (!response.ok)
+          {
             throw new Error('HTTP error! Status: ' + response.status);
           }
           return response.json();
-        }).then(function(jsonResponse) {
+        }).then(function(jsonResponse)
+        {
           var dt = Date.now() - t0;
           infoEl.textContent = 'Engine: ' + engine + ' | Model: ' + model + ' | Time: ' + dt + 'ms';
           return jsonResponse;
-        }).finally(function() {
+        }).finally(function()
+        {
           clearTimeout(timeoutId);
         });
       }
 
-      function preview(value) {
+      function preview(value)
+      {
         var params = 'lightbox=1&dark=auto&border=10&edit=_blank';
         var prefix = 'https://test.draw.io/?dev=1&test=1&'; //'https://www.draw.io/?';
         var data = value;
 
-        var createObj = {
+        var createObj =
+        {
           type: value.indexOf('<') === 0 ? 'xml' : 'mermaid',
           data: data
         };
@@ -335,9 +365,14 @@
         var create = '#create=' + encodeURIComponent(JSON.stringify({type: 'message'}));
         var link = prefix + params + create;
 
-        // Waits for ready message event and sends create message to ifsrame
-        window.addEventListener('message', function(event) {
-          if (JSON.parse(event.data).event === 'ready') {
+        link = 'https://test.draw.io/?dev=1&test=1#create=%7B%22type%22%3A%22message%22%7D';
+        link = 'https://test.draw.io/?dev=1&test=1&lightbox=1&dark=auto&border=10&edit=_blank#create=%7B%22type%22%3A%22message%22%7D';
+
+        // Waits for ready message event and sends create message to iframe
+        window.addEventListener('message', function(event)
+        {
+          if (JSON.parse(event.data).event === 'ready')
+          {
             event.source.postMessage({action: 'create', data: createObj}, '*');
           }
         });
@@ -355,13 +390,15 @@
         editBtn.onclick = function() { window.open(prefix + create); };
       }
 
-      function generate() {
+      function generate()
+      {
         var engine = engineEl.value;
         var model = modelEl.value;
         var apikey = apikeyEl.value;
         var prompt = promptEl.value || 'a random diagram';
 
-        if (engine !== 'mermaidjs' && engine !== 'drawio' && !apikey) {
+        if (engine !== 'mermaidjs' && engine !== 'drawio' && !apikey)
+        {
           showAlert('API key is required for ' + engine, 'error');
           return;
         }
@@ -375,7 +412,8 @@
 
         var aiprompt = aiPromptSelectEl.value.replace(/%prompt%/g, prompt);
 
-        if (engine === 'gemini') {
+        if (engine === 'gemini')
+        {
           var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apikey;
           sendPostRequest(
             url,
@@ -383,16 +421,20 @@
             engine,
             model,
             apikey
-          ).then(function(response) {
+          ).then(function(response)
+          {
             preview(extractCode(response.candidates[0].content.parts[0].text));
-          }).catch(function(error) {
+          }).catch(function(error)
+          {
             console.error('Error:', error);
             showAlert('Error: ' + error.message, 'error');
             generateBtn.disabled = false;
             previewContainer.classList.remove('preview-loading');
             placeholderEl.style.display = 'flex';
           });
-        } else if (engine === 'chatgpt') {
+        }
+        else if (engine === 'chatgpt')
+        {
           var url = 'https://api.openai.com/v1/chat/completions';
           sendPostRequest(
             url,
@@ -400,16 +442,20 @@
             engine,
             model,
             apikey
-          ).then(function(response) {
+          ).then(function(response)
+          {
             preview(extractCode(response.choices[0].message.content));
-          }).catch(function(error) {
+          }).catch(function(error)
+          {
             console.error('Error:', error);
             showAlert('Error: ' + error.message, 'error');
             generateBtn.disabled = false;
             previewContainer.classList.remove('preview-loading');
             placeholderEl.style.display = 'flex';
           });
-        } else if (engine === 'claude') {
+        }
+        else if (engine === 'claude')
+        {
           var url = 'https://api.anthropic.com/v1/messages';
           sendPostRequest(
             url,
@@ -417,18 +463,24 @@
             engine,
             model,
             apikey
-          ).then(function(response) {
+          ).then(function(response)
+          {
             preview(extractCode(response.content[0].text));
-          }).catch(function(error) {
+          }).catch(function(error)
+          {
             console.error('Error:', error);
             showAlert('Error: ' + error.message, 'error');
             generateBtn.disabled = false;
             previewContainer.classList.remove('preview-loading');
             placeholderEl.style.display = 'flex';
           });
-        } else if (engine === 'mermaidjs' || engine === 'drawio') {
+        }
+        else if (engine === 'mermaidjs' || engine === 'drawio')
+        {
           preview(prompt);
-        } else {
+        }
+        else
+        {
           showAlert('Invalid engine', 'error');
           generateBtn.disabled = false;
           previewContainer.classList.remove('preview-loading');
@@ -438,8 +490,10 @@
 
       generateBtn.addEventListener('click', generate);
 
-      promptEl.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
+      promptEl.addEventListener('keypress', function(e)
+      {
+        if (e.key === 'Enter' && !e.shiftKey)
+        {
           e.preventDefault();
           generate();
         }
@@ -447,12 +501,17 @@
 
       DT.setupDropZone(
         promptEl,
-        function(content, file) {
-          if (file.type.indexOf('image/') === 0) {
-            DT.readFileAsDataURL(file).then(function(dataUrl) {
+        function(content, file)
+        {
+          if (file.type.indexOf('image/') === 0)
+          {
+            DT.readFileAsDataURL(file).then(function(dataUrl)
+            {
               promptEl.value = dataUrl;
             });
-          } else {
+          }
+          else
+          {
             promptEl.value = content;
           }
         }
@@ -460,12 +519,14 @@
 
       promptEl.focus();
 
-      if (urlParams.get('engine')) {
+      if (urlParams.get('engine'))
+      {
         engineEl.value = urlParams.get('engine');
         engineChanged();
       }
 
-      if (urlParams.get('prompt')) {
+      if (urlParams.get('prompt'))
+      {
         promptEl.value = decodeURIComponent(urlParams.get('prompt'));
         generate();
       }

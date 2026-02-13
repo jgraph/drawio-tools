@@ -71,6 +71,20 @@ No installation or build step required. Simply:
 
 ### Code Style
 
+- Use **Allman brace style**: opening braces go on their own line, aligned with the control statement
+  ```javascript
+  function example()
+  {
+    if (condition)
+    {
+      // ...
+    }
+    else
+    {
+      // ...
+    }
+  }
+  ```
 - Use 2-space indentation
 - Use single quotes for JavaScript strings (except in HTML attributes)
 - Use `var` for compatibility (no `const`/`let`)

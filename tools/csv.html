@@ -196,7 +196,8 @@ layout: auto
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
   <script src="../utils/drawio-tools.js"></script>
   <script>
-    (function() {
+    (function()
+    {
       var DT = window.DrawioTools;
 
       var urlInput = document.getElementById('url');
@@ -208,22 +209,27 @@ layout: auto
 
       var generatedUrl = '';
 
-      function showAlert(message, type) {
+      function showAlert(message, type)
+      {
         DT.showToast(message, type);
       }
 
-      function encode(data) {
+      function encode(data)
+      {
         var compressed = pako.deflateRaw(encodeURIComponent(data));
         return btoa(String.fromCharCode.apply(null, new Uint8Array(compressed)));
       }
 
-      function getDesc() {
+      function getDesc()
+      {
         var data = descInput.value;
         var lines = data.split('\n');
         var result = [];
 
-        for (var i = 0; i < lines.length; i++) {
-          if (lines[i].charAt(0) !== '#' && lines[i].length > 0) {
+        for (var i = 0; i < lines.length; i++)
+        {
+          if (lines[i].charAt(0) !== '#' && lines[i].length > 0)
+          {
             result.push('#' + lines[i]);
           }
         }
@@ -231,7 +237,8 @@ layout: auto
         return result.join('\n');
       }
 
-      document.getElementById('createBtn').addEventListener('click', function() {
+      document.getElementById('createBtn').addEventListener('click', function()
+      {
         var url = urlInput.value.trim();
         var title = titleInput.value.trim();
 
@@ -244,7 +251,8 @@ layout: auto
           data: getDesc()
         })));
 
-        if (title.length > 0) {
+        if (title.length > 0)
+        {
           params.push('title=' + encodeURIComponent(title));
         }
 
@@ -260,14 +268,18 @@ layout: auto
         showAlert('Link generated', 'success');
       });
 
-      document.getElementById('openBtn').addEventListener('click', function() {
-        if (generatedUrl) {
+      document.getElementById('openBtn').addEventListener('click', function()
+      {
+        if (generatedUrl)
+        {
           window.open(generatedUrl, '_blank');
         }
       });
 
-      document.getElementById('copyBtn').addEventListener('click', function() {
-        DT.copyToClipboard(generatedUrl).then(function(success) {
+      document.getElementById('copyBtn').addEventListener('click', function()
+      {
+        DT.copyToClipboard(generatedUrl).then(function(success)
+        {
           showAlert(success ? 'Copied to clipboard' : 'Failed to copy', success ? 'success' : 'error');
         });
       });

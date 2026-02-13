@@ -107,7 +107,8 @@
 
   <script src="../utils/drawio-tools.js"></script>
   <script>
-    (function() {
+    (function()
+    {
       var DT = window.DrawioTools;
 
       var dropZone = document.getElementById('dropZone');
@@ -120,25 +121,31 @@
       var charCount = document.getElementById('charCount');
       var alertContainer = document.getElementById('alertContainer');
 
-      function showAlert(message, type) {
+      function showAlert(message, type)
+      {
         DT.showToast(message, type);
       }
 
-      function formatBytes(bytes) {
+      function formatBytes(bytes)
+      {
         if (bytes < 1024) return bytes + ' B';
         if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
         return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
       }
 
-      function processFile(file) {
-        if (!file.type.startsWith('image/')) {
+      function processFile(file)
+      {
+        if (!file.type.startsWith('image/'))
+        {
           showAlert('Please select an image file', 'error');
           return;
         }
 
-        DT.readFileAsDataURL(file).then(function(dataUrl) {
+        DT.readFileAsDataURL(file).then(function(dataUrl)
+        {
           imagePreview.src = dataUrl;
-          imagePreview.onload = function() {
+          imagePreview.onload = function()
+          {
             imageInfo.textContent = file.name + ' • ' + imagePreview.naturalWidth + '×' + imagePreview.naturalHeight + ' • ' + formatBytes(file.size);
           };
           previewCard.style.display = '';
@@ -148,43 +155,53 @@
           resultCard.style.display = '';
 
           showAlert('Image encoded successfully', 'success');
-        }).catch(function(error) {
+        }).catch(function(error)
+        {
           showAlert('Failed to encode image: ' + error.message, 'error');
         });
       }
 
       dropZone.addEventListener('click', function() { fileInput.click(); });
 
-      dropZone.addEventListener('dragover', function(e) {
+      dropZone.addEventListener('dragover', function(e)
+      {
         e.preventDefault();
         dropZone.classList.add('drop-zone--active');
       });
 
-      dropZone.addEventListener('dragleave', function() {
+      dropZone.addEventListener('dragleave', function()
+      {
         dropZone.classList.remove('drop-zone--active');
       });
 
-      dropZone.addEventListener('drop', function(e) {
+      dropZone.addEventListener('drop', function(e)
+      {
         e.preventDefault();
         dropZone.classList.remove('drop-zone--active');
-        if (e.dataTransfer.files.length > 0) {
+        if (e.dataTransfer.files.length > 0)
+        {
           processFile(e.dataTransfer.files[0]);
         }
       });
 
-      fileInput.addEventListener('change', function(e) {
-        if (e.target.files.length > 0) {
+      fileInput.addEventListener('change', function(e)
+      {
+        if (e.target.files.length > 0)
+        {
           processFile(e.target.files[0]);
         }
       });
 
-      document.getElementById('copyBtn').addEventListener('click', function() {
-        DT.copyToClipboard(result.value).then(function(success) {
+      document.getElementById('copyBtn').addEventListener('click', function()
+      {
+        DT.copyToClipboard(result.value).then(function(success)
+        {
           showAlert(success ? 'Copied to clipboard' : 'Failed to copy', success ? 'success' : 'error');
         });
       });
 
-      document.getElementById('clearBtn').addEventListener('click', function() {
+      document.getElementById('clearBtn').addEventListener('click', function()
+      {
         result.value = '';
         charCount.textContent = '0';
         previewCard.style.display = 'none';

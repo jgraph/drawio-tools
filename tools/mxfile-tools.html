@@ -206,7 +206,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
   <script src="../utils/drawio-tools.js"></script>
   <script>
-    (function() {
+    (function()
+    {
       var DT = window.DrawioTools;
 
       var dropZone = document.getElementById('dropZone');
@@ -222,47 +223,56 @@
       var pageListCard = document.getElementById('pageListCard');
       var pageList = document.getElementById('pageList');
 
-      function updateCharCount() {
+      function updateCharCount()
+      {
         charCount.textContent = textarea.value.length.toLocaleString();
       }
 
-      textarea.addEventListener('input', function() {
+      textarea.addEventListener('input', function()
+      {
         updateCharCount();
         analyzeContent();
       });
 
-      function showAlert(message, type) {
+      function showAlert(message, type)
+      {
         DT.showToast(message, type);
       }
 
-      function loadContent(content, filename) {
+      function loadContent(content, filename)
+      {
         textarea.value = content;
         updateCharCount();
         contentSection.style.display = 'block';
         analyzeContent();
 
-        if (filename) {
+        if (filename)
+        {
           showAlert('Loaded: ' + filename, 'success');
         }
       }
 
-      function escapeHtml(text) {
+      function escapeHtml(text)
+      {
         var div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
       }
 
-      function analyzeContent() {
+      function analyzeContent()
+      {
         var content = textarea.value.trim();
 
-        if (!content) {
+        if (!content)
+        {
           fileInfoSection.style.display = 'none';
           pageListCard.style.display = 'none';
           validationResults.style.display = 'none';
           return;
         }
 
-        if (!DT.isMxFile(content)) {
+        if (!DT.isMxFile(content))
+        {
           fileInfoSection.style.display = 'none';
           pageListCard.style.display = 'none';
           return;
@@ -271,17 +281,20 @@
         var info = DT.getMxFileInfo(content);
         var names = DT.getDiagramNames(content);
 
-        if (info) {
+        if (info)
+        {
           fileInfoSection.style.display = 'block';
           document.getElementById('pageCount').textContent = info.pages;
           document.getElementById('fileHost').textContent = info.host || '-';
           document.getElementById('fileVersion').textContent = info.version || '-';
           document.getElementById('fileStatus').textContent = 'Loaded';
 
-          if (names.length > 0) {
+          if (names.length > 0)
+          {
             pageListCard.style.display = 'block';
             var html = '';
-            for (var i = 0; i < names.length; i++) {
+            for (var i = 0; i < names.length; i++)
+            {
               html += '<li class="page-list__item"><span>Page ' + (i + 1) + ': ' + escapeHtml(names[i]) + '</span></li>';
             }
             pageList.innerHTML = html;
@@ -289,17 +302,21 @@
         }
       }
 
-      function displayValidationResults(result) {
+      function displayValidationResults(result)
+      {
         validationResults.style.display = 'block';
 
-        if (result.valid) {
+        if (result.valid)
+        {
           validationSummary.innerHTML = '<div class="validation-summary__item">' +
             '<svg class="validation-summary__icon validation-summary__icon--success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
             '<path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>' +
             '<span><strong>Valid</strong> - No errors found</span></div>';
           document.getElementById('fileStatus').textContent = 'Valid';
           document.getElementById('fileStatus').style.color = 'var(--color-success)';
-        } else {
+        }
+        else
+        {
           validationSummary.innerHTML = '<div class="validation-summary__item">' +
             '<svg class="validation-summary__icon validation-summary__icon--error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
             '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>' +
@@ -308,9 +325,11 @@
           document.getElementById('fileStatus').style.color = 'var(--color-error)';
         }
 
-        if (result.errors.length > 0) {
+        if (result.errors.length > 0)
+        {
           var html = '';
-          for (var i = 0; i < result.errors.length; i++) {
+          for (var i = 0; i < result.errors.length; i++)
+          {
             var error = result.errors[i];
             var details = '';
             if (error.page) details += 'Page ' + error.page;
@@ -323,7 +342,9 @@
               (details ? '<div class="error-detail">' + details + '</div>' : '') + '</div></li>';
           }
           resultsList.innerHTML = html;
-        } else {
+        }
+        else
+        {
           resultsList.innerHTML = '<li class="validation-results__item validation-results__item--success">' +
             '<svg class="validation-results__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
             '<path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>' +
@@ -331,15 +352,18 @@
         }
       }
 
-      document.getElementById('validateBtn').addEventListener('click', function() {
+      document.getElementById('validateBtn').addEventListener('click', function()
+      {
         var content = textarea.value.trim();
 
-        if (!content) {
+        if (!content)
+        {
           showAlert('Please provide file content to validate', 'warning');
           return;
         }
 
-        if (!DT.isMxFile(content)) {
+        if (!DT.isMxFile(content))
+        {
           showAlert('Content does not appear to be a valid mxfile', 'error');
           return;
         }
@@ -348,17 +372,20 @@
         displayValidationResults(result);
       });
 
-      document.getElementById('correctBtn').addEventListener('click', function() {
+      document.getElementById('correctBtn').addEventListener('click', function()
+      {
         var content = textarea.value.trim();
 
-        if (!content) {
+        if (!content)
+        {
           showAlert('Please provide file content to fix', 'warning');
           return;
         }
 
         var result = DT.correctMxFile(content);
 
-        if (result.success) {
+        if (result.success)
+        {
           textarea.value = result.data;
           updateCharCount();
           analyzeContent();
@@ -366,23 +393,29 @@
 
           var validation = DT.validateMxFile(result.data);
           displayValidationResults(validation);
-        } else {
+        }
+        else
+        {
           showAlert(result.message, 'error');
         }
       });
 
-      document.getElementById('downloadBtn').addEventListener('click', function() {
+      document.getElementById('downloadBtn').addEventListener('click', function()
+      {
         DT.downloadFile(textarea.value, 'fixed.drawio');
         showAlert('File downloaded', 'success');
       });
 
-      document.getElementById('copyBtn').addEventListener('click', function() {
-        DT.copyToClipboard(textarea.value).then(function(success) {
+      document.getElementById('copyBtn').addEventListener('click', function()
+      {
+        DT.copyToClipboard(textarea.value).then(function(success)
+        {
           showAlert(success ? 'Copied to clipboard' : 'Failed to copy', success ? 'success' : 'error');
         });
       });
 
-      document.getElementById('clearBtn').addEventListener('click', function() {
+      document.getElementById('clearBtn').addEventListener('click', function()
+      {
         textarea.value = '';
         updateCharCount();
         fileInfoSection.style.display = 'none';
@@ -392,12 +425,16 @@
 
       dropZone.addEventListener('click', function() { fileInput.click(); });
 
-      fileInput.addEventListener('change', function(e) {
-        if (e.target.files.length > 0) {
+      fileInput.addEventListener('change', function(e)
+      {
+        if (e.target.files.length > 0)
+        {
           var file = e.target.files[0];
-          DT.readFileAsText(file).then(function(content) {
+          DT.readFileAsText(file).then(function(content)
+          {
             loadContent(content, file.name);
-          }).catch(function() {
+          }).catch(function()
+          {
             showAlert('Failed to read file', 'error');
           });
         }
@@ -421,8 +458,10 @@
         }
       );
 
-      textarea.addEventListener('paste', function() {
-        setTimeout(function() {
+      textarea.addEventListener('paste', function()
+      {
+        setTimeout(function()
+        {
           contentSection.style.display = 'block';
           analyzeContent();
         }, 0);

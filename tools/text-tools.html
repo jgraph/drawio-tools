@@ -148,7 +148,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
   <script src="../utils/drawio-tools.js"></script>
   <script>
-    (function() {
+    (function()
+    {
       var DT = window.DrawioTools;
 
       var textarea = document.getElementById('textarea');
@@ -158,26 +159,33 @@
       var deflateCheck = document.getElementById('deflateCheck');
       var base64Check = document.getElementById('base64Check');
 
-      function updateCharCount() {
+      function updateCharCount()
+      {
         charCount.textContent = textarea.value.length.toLocaleString();
       }
       textarea.addEventListener('input', updateCharCount);
 
-      function showAlert(message, type) {
+      function showAlert(message, type)
+      {
         DT.showToast(message, type);
       }
 
-      function handleResult(result, successMsg) {
-        if (result.success) {
+      function handleResult(result, successMsg)
+      {
+        if (result.success)
+        {
           textarea.value = result.data;
           updateCharCount();
           if (successMsg) showAlert(successMsg, 'success');
-        } else {
+        }
+        else
+        {
           showAlert('Error: ' + result.error, 'error');
         }
       }
 
-      document.getElementById('encodeBtn').addEventListener('click', function() {
+      document.getElementById('encodeBtn').addEventListener('click', function()
+      {
         var options = {
           urlEncode: urlEncodeCheck.checked,
           deflate: deflateCheck.checked,
@@ -186,7 +194,8 @@
         handleResult(DT.encode(textarea.value, options), 'Encoded successfully');
       });
 
-      document.getElementById('decodeBtn').addEventListener('click', function() {
+      document.getElementById('decodeBtn').addEventListener('click', function()
+      {
         var options = {
           urlDecode: urlEncodeCheck.checked,
           inflate: deflateCheck.checked,
@@ -195,81 +204,98 @@
         handleResult(DT.decode(textarea.value, options), 'Decoded successfully');
       });
 
-      document.getElementById('urlEncodeOnlyBtn').addEventListener('click', function() {
+      document.getElementById('urlEncodeOnlyBtn').addEventListener('click', function()
+      {
         handleResult(DT.urlEncode(textarea.value));
       });
 
-      document.getElementById('urlDecodeOnlyBtn').addEventListener('click', function() {
+      document.getElementById('urlDecodeOnlyBtn').addEventListener('click', function()
+      {
         handleResult(DT.urlDecode(textarea.value));
       });
 
-      document.getElementById('btoaBtn').addEventListener('click', function() {
+      document.getElementById('btoaBtn').addEventListener('click', function()
+      {
         handleResult(DT.base64Encode(textarea.value));
       });
 
-      document.getElementById('atobBtn').addEventListener('click', function() {
+      document.getElementById('atobBtn').addEventListener('click', function()
+      {
         handleResult(DT.base64Decode(textarea.value));
       });
 
-      document.getElementById('escapeBtn').addEventListener('click', function() {
+      document.getElementById('escapeBtn').addEventListener('click', function()
+      {
         textarea.value = DT.escapeString(textarea.value);
         updateCharCount();
       });
 
-      document.getElementById('unescapeBtn').addEventListener('click', function() {
+      document.getElementById('unescapeBtn').addEventListener('click', function()
+      {
         textarea.value = DT.unescapeString(textarea.value);
         updateCharCount();
       });
 
-      document.getElementById('removeLinebreaksBtn').addEventListener('click', function() {
+      document.getElementById('removeLinebreaksBtn').addEventListener('click', function()
+      {
         textarea.value = DT.removeLinebreaks(textarea.value);
         updateCharCount();
         showAlert('Linebreaks removed', 'success');
       });
 
-      document.getElementById('jsVarBtn').addEventListener('click', function() {
+      document.getElementById('jsVarBtn').addEventListener('click', function()
+      {
         textarea.value = DT.toJsVariable(textarea.value);
         updateCharCount();
         showAlert('Converted to JS variable', 'success');
       });
 
-      document.getElementById('formatXmlBtn').addEventListener('click', function() {
+      document.getElementById('formatXmlBtn').addEventListener('click', function()
+      {
         handleResult(DT.formatXml(textarea.value), 'XML formatted');
       });
 
-      document.getElementById('normalizeXmlBtn').addEventListener('click', function() {
+      document.getElementById('normalizeXmlBtn').addEventListener('click', function()
+      {
         textarea.value = DT.normalizeXml(textarea.value);
         updateCharCount();
         showAlert('XML normalized', 'success');
       });
 
-      document.getElementById('formatJsonBtn').addEventListener('click', function() {
+      document.getElementById('formatJsonBtn').addEventListener('click', function()
+      {
         handleResult(DT.formatJson(textarea.value, 2), 'JSON formatted');
       });
 
-      document.getElementById('normalizeJsonBtn').addEventListener('click', function() {
+      document.getElementById('normalizeJsonBtn').addEventListener('click', function()
+      {
         handleResult(DT.normalizeJson(textarea.value), 'JSON normalized');
       });
 
-      document.getElementById('downloadBtn').addEventListener('click', function() {
+      document.getElementById('downloadBtn').addEventListener('click', function()
+      {
         DT.downloadFile(textarea.value, 'download.drawio');
         showAlert('File downloaded', 'success');
       });
 
-      document.getElementById('copyBtn').addEventListener('click', function() {
-        DT.copyToClipboard(textarea.value).then(function(success) {
+      document.getElementById('copyBtn').addEventListener('click', function()
+      {
+        DT.copyToClipboard(textarea.value).then(function(success)
+        {
           showAlert(success ? 'Copied to clipboard' : 'Failed to copy', success ? 'success' : 'error');
         });
       });
 
-      document.getElementById('clearBtn').addEventListener('click', function() {
+      document.getElementById('clearBtn').addEventListener('click', function()
+      {
         textarea.value = '';
         updateCharCount();
       });
 
       DT.setupDropZone(
         textarea,
-        function(content) {
+        function(content)
+        {
           textarea.value = content;
           updateCharCount();
           showAlert('File loaded', 'success');

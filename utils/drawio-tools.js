@@ -4,160 +4,211 @@
  * Uses pako from CDN (window.pako must be loaded first)
  */
 
-(function(global) {
+(function(global)
+{
   'use strict';
 
   // ============================================
   // ENCODING UTILITIES
   // ============================================
 
-  function encode(data, options) {
+  function encode(data, options)
+  {
     options = options || {};
     var urlEncode = options.urlEncode !== false;
     var deflate = options.deflate !== false;
     var base64 = options.base64 !== false;
 
-    try {
+    try
+    {
       var result = data;
 
-      if (urlEncode) {
+      if (urlEncode)
+      {
         result = encodeURIComponent(result);
       }
 
-      if (deflate && result.length > 0) {
+      if (deflate && result.length > 0)
+      {
         var compressed = pako.deflateRaw(result);
         result = String.fromCharCode.apply(null, new Uint8Array(compressed));
       }
 
-      if (base64) {
+      if (base64)
+      {
         result = btoa(result);
       }
 
       return { success: true, data: result };
-    } catch (e) {
+    }
+    catch (e)
+    {
       return { success: false, error: e.message };
     }
   }
 
-  function decode(data, options) {
+  function decode(data, options)
+  {
     options = options || {};
     var urlDecode = options.urlDecode !== false;
     var inflate = options.inflate !== false;
     var base64 = options.base64 !== false;
 
-    try {
+    try
+    {
       var result = data;
 
       var extracted = extractDiagramContent(result);
-      if (extracted) {
+      if (extracted)
+      {
         result = extracted;
       }
 
-      if (base64) {
+      if (base64)
+      {
         result = atob(result);
       }
 
-      if (inflate && result.length > 0) {
+      if (inflate && result.length > 0)
+      {
         var bytes = Uint8Array.from(result, function(c) { return c.charCodeAt(0); });
         result = pako.inflateRaw(bytes, { to: 'string' });
       }
 
-      if (urlDecode) {
+      if (urlDecode)
+      {
         result = decodeURIComponent(result);
       }
 
       return { success: true, data: result };
-    } catch (e) {
+    }
+    catch (e)
+    {
       return { success: false, error: e.message };
     }
   }
 
-  function extractDiagramContent(xml) {
-    try {
+  function extractDiagramContent(xml)
+  {
+    try
+    {
       var parser = new DOMParser();
       var doc = parser.parseFromString(xml, 'text/xml');
       var root = doc.documentElement;
 
-      if (root && root.nodeName === 'mxfile') {
+      if (root && root.nodeName === 'mxfile')
+      {
         var diagrams = root.getElementsByTagName('diagram');
-        if (diagrams.length > 0) {
+        if (diagrams.length > 0)
+        {
           return diagrams[0].textContent || '';
         }
       }
-    } catch (e) {}
+    }
+    catch (e) {}
     return null;
   }
 
-  function urlEncode(data) {
-    try {
+  function urlEncode(data)
+  {
+    try
+    {
       return { success: true, data: encodeURIComponent(data) };
-    } catch (e) {
+    }
+    catch (e)
+    {
       return { success: false, error: e.message };
     }
   }
 
-  function urlDecode(data) {
-    try {
+  function urlDecode(data)
+  {
+    try
+    {
       return { success: true, data: decodeURIComponent(data) };
-    } catch (e) {
+    }
+    catch (e)
+    {
       return { success: false, error: e.message };
     }
   }
 
-  function base64Encode(data) {
-    try {
+  function base64Encode(data)
+  {
+    try
+    {
       return { success: true, data: btoa(data) };
-    } catch (e) {
+    }
+    catch (e)
+    {
       return { success: false, error: e.message };
     }
   }
 
-  function base64Decode(data) {
-    try {
+  function base64Decode(data)
+  {
+    try
+    {
       return { success: true, data: atob(data) };
-    } catch (e) {
+    }
+    catch (e)
+    {
       return { success: false, error: e.message };
     }
   }
 
-  function deflate(data) {
-    try {
+  function deflate(data)
+  {
+    try
+    {
       var compressed = pako.deflateRaw(data);
       var result = String.fromCharCode.apply(null, new Uint8Array(compressed));
       return { success: true, data: result };
-    } catch (e) {
+    }
+    catch (e)
+    {
       return { success: false, error: e.message };
     }
   }
 
-  function inflate(data) {
-    try {
+  function inflate(data)
+  {
+    try
+    {
       var bytes = Uint8Array.from(data, function(c) { return c.charCodeAt(0); });
       var result = pako.inflateRaw(bytes, { to: 'string' });
       return { success: true, data: result };
-    } catch (e) {
+    }
+    catch (e)
+    {
       return { success: false, error: e.message };
     }
   }
 
-  function removeLinebreaks(data) {
+  function removeLinebreaks(data)
+  {
     return data.replace(/(\r\n|\n|\r)/gm, '');
   }
 
-  function escapeString(data) {
+  function escapeString(data)
+  {
     return escape(data);
   }
 
-  function unescapeString(data) {
+  function unescapeString(data)
+  {
     return unescape(data);
   }
 
-  function toJsVariable(data) {
+  function toJsVariable(data)
+  {
     var lines = data.split('\n');
     var result = [];
 
-    for (var i = 0; i < lines.length; i++) {
-      if (i < lines.length - 1 || lines[i].length > 0) {
+    for (var i = 0; i < lines.length; i++)
+    {
+      if (i < lines.length - 1 || lines[i].length > 0)
+      {
         result.push("'" + lines[i].replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "\\n'");
       }
     }
@@ -169,36 +220,45 @@
   // XML UTILITIES
   // ============================================
 
-  function parseXml(xml) {
-    try {
+  function parseXml(xml)
+  {
+    try
+    {
       var parser = new DOMParser();
       var doc = parser.parseFromString(xml, 'text/xml');
 
       var errors = doc.getElementsByTagName('parsererror');
-      if (errors && errors.length > 0) {
+      if (errors && errors.length > 0)
+      {
         return { success: false, error: errors[0].textContent };
       }
 
       return { success: true, doc: doc };
-    } catch (e) {
+    }
+    catch (e)
+    {
       return { success: false, error: e.message };
     }
   }
 
-  function normalizeXml(xml) {
+  function normalizeXml(xml)
+  {
     var result = xml;
     result = result.replace(/>\s*/g, '>');
     result = result.replace(/\s*</g, '<');
     return result;
   }
 
-  function formatXml(xml) {
-    try {
+  function formatXml(xml)
+  {
+    try
+    {
       var parser = new DOMParser();
       var xmlDoc = parser.parseFromString(xml, 'application/xml');
 
       var errors = xmlDoc.getElementsByTagName('parsererror');
-      if (errors && errors.length > 0) {
+      if (errors && errors.length > 0)
+      {
         return { success: false, error: 'Invalid XML: ' + errors[0].textContent };
       }
 
@@ -222,31 +282,42 @@
       var resultXml = new XMLSerializer().serializeToString(resultDoc);
 
       return { success: true, data: resultXml };
-    } catch (e) {
+    }
+    catch (e)
+    {
       return { success: false, error: e.message };
     }
   }
 
-  function formatJson(json, indent) {
+  function formatJson(json, indent)
+  {
     indent = indent || 2;
-    try {
+    try
+    {
       var parsed = JSON.parse(json);
       return { success: true, data: JSON.stringify(parsed, null, indent) };
-    } catch (e) {
+    }
+    catch (e)
+    {
       return { success: false, error: e.message };
     }
   }
 
-  function normalizeJson(json) {
-    try {
+  function normalizeJson(json)
+  {
+    try
+    {
       var parsed = JSON.parse(json);
       return { success: true, data: JSON.stringify(parsed) };
-    } catch (e) {
+    }
+    catch (e)
+    {
       return { success: false, error: e.message };
     }
   }
 
-  function getTextContent(node) {
+  function getTextContent(node)
+  {
     if (!node) return '';
     return node.textContent !== undefined ? node.textContent : node.text || '';
   }
@@ -262,13 +333,16 @@
     XML: 'xml'
   };
 
-  function validateMxFile(content) {
+  function validateMxFile(content)
+  {
     var errors = [];
 
-    try {
+    try
+    {
       var parseResult = parseXml(content);
 
-      if (!parseResult.success) {
+      if (!parseResult.success)
+      {
         errors.push({
           type: ErrorType.XML,
           message: 'XML parsing error: ' + parseResult.error
@@ -279,7 +353,8 @@
       var doc = parseResult.doc;
       var root = doc.documentElement;
 
-      if (root.nodeName !== 'mxfile') {
+      if (root.nodeName !== 'mxfile')
+      {
         errors.push({
           type: ErrorType.XML,
           message: "Invalid root element: expected 'mxfile', got '" + root.nodeName + "'"
@@ -288,8 +363,10 @@
       }
 
       var parserErrors = doc.getElementsByTagName('parsererror');
-      if (parserErrors && parserErrors.length > 0) {
-        for (var i = 0; i < parserErrors.length; i++) {
+      if (parserErrors && parserErrors.length > 0)
+      {
+        for (var i = 0; i < parserErrors.length; i++)
+        {
           errors.push({
             type: ErrorType.XML,
             message: 'Invalid XML content: ' + parserErrors[i].textContent
@@ -299,14 +376,16 @@
 
       var diagrams = doc.getElementsByTagName('diagram');
 
-      if (diagrams.length === 0) {
+      if (diagrams.length === 0)
+      {
         errors.push({
           type: ErrorType.XML,
           message: 'No diagram elements found in mxfile'
         });
       }
 
-      for (var i = 0; i < diagrams.length; i++) {
+      for (var i = 0; i < diagrams.length; i++)
+      {
         var pageErrors = validateDiagramPage(diagrams[i], i + 1);
         errors = errors.concat(pageErrors);
       }
@@ -315,7 +394,9 @@
       errors = errors.concat(textErrors);
 
       return { valid: errors.length === 0, errors: errors };
-    } catch (e) {
+    }
+    catch (e)
+    {
       errors.push({
         type: ErrorType.XML,
         message: 'Unexpected error: ' + e.message
@@ -324,40 +405,51 @@
     }
   }
 
-  function isDiagramUncompressed(diagram) {
+  function isDiagramUncompressed(diagram)
+  {
     var children = diagram.childNodes;
-    for (var i = 0; i < children.length; i++) {
-      if (children[i].nodeType === 1) {
+    for (var i = 0; i < children.length; i++)
+    {
+      if (children[i].nodeType === 1)
+      {
         return true;
       }
     }
     return false;
   }
 
-  function validateDiagramPage(diagram, pageNumber) {
+  function validateDiagramPage(diagram, pageNumber)
+  {
     var errors = [];
 
     // Uncompressed diagrams contain XML child elements directly
-    if (isDiagramUncompressed(diagram)) {
+    if (isDiagramUncompressed(diagram))
+    {
       return errors;
     }
 
     var data = getTextContent(diagram);
 
-    if (!data || data.trim().length === 0) {
+    if (!data || data.trim().length === 0)
+    {
       return errors;
     }
 
-    try {
+    try
+    {
       var base64Decoded = atob(data);
 
-      try {
+      try
+      {
         var bytes = Uint8Array.from(base64Decoded, function(c) { return c.charCodeAt(0); });
         var inflated = pako.inflateRaw(bytes, { to: 'string' });
 
-        try {
+        try
+        {
           decodeURIComponent(inflated);
-        } catch (e) {
+        }
+        catch (e)
+        {
           errors.push({
             type: ErrorType.URL_ENCODE,
             message: 'URL decode error: ' + e.message,
@@ -365,7 +457,8 @@
           });
 
           var uriErrors = checkUriComponents(inflated);
-          for (var i = 0; i < uriErrors.length; i++) {
+          for (var i = 0; i < uriErrors.length; i++)
+          {
             errors.push({
               type: ErrorType.URL_ENCODE,
               message: uriErrors[i],
@@ -373,14 +466,18 @@
             });
           }
         }
-      } catch (e) {
+      }
+      catch (e)
+      {
         errors.push({
           type: ErrorType.DEFLATE,
           message: 'Inflate error: ' + e.message,
           page: pageNumber
         });
       }
-    } catch (e) {
+    }
+    catch (e)
+    {
       errors.push({
         type: ErrorType.BASE64,
         message: 'Base64 decode error: ' + e.message,
@@ -391,16 +488,19 @@
     return errors;
   }
 
-  function validateMxFileText(content) {
+  function validateMxFileText(content)
+  {
     var errors = [];
     var tokens = content.split('<diagram ');
     var pos = tokens[0].length + 10;
 
-    for (var i = 1; i < tokens.length; i++) {
+    for (var i = 1; i < tokens.length; i++)
+    {
       var start = tokens[i].indexOf('>') + 1;
       var end = tokens[i].lastIndexOf('</diagram>');
 
-      if (end === -1) {
+      if (end === -1)
+      {
         errors.push({
           type: ErrorType.XML,
           message: 'Missing closing </diagram> tag',
@@ -413,16 +513,19 @@
       var data = tokens[i].substring(start, end).trim();
 
       // Skip base64 validation for uncompressed diagrams (XML content)
-      if (data.charAt(0) === '<') {
+      if (data.charAt(0) === '<')
+      {
         pos += tokens[i].length + 9;
         continue;
       }
 
-      while (data.charAt(data.length - 1) === '=') {
+      while (data.charAt(data.length - 1) === '=')
+      {
         data = data.substring(0, data.length - 1);
       }
 
-      for (var j = 0; j < data.length; j++) {
+      for (var j = 0; j < data.length; j++)
+      {
         var code = data.charCodeAt(j);
         var isValid =
           (code > 47 && code < 58) ||
@@ -431,7 +534,8 @@
           code === 43 ||
           code === 47;
 
-        if (!isValid) {
+        if (!isValid)
+        {
           errors.push({
             type: ErrorType.BASE64,
             message: "Invalid Base64 character '" + data.charAt(j) + "' (code: " + code + ")",
@@ -447,23 +551,30 @@
     return errors;
   }
 
-  function checkUriComponents(data) {
+  function checkUriComponents(data)
+  {
     var errors = [];
     var tokens = data.split('%');
     var pos = 0;
     var temp = [];
 
-    for (var j = 0; j < tokens.length; j++) {
-      if (tokens[j].length > 0) {
+    for (var j = 0; j < tokens.length; j++)
+    {
+      if (tokens[j].length > 0)
+      {
         temp.push(tokens[j]);
         pos += 1;
 
-        if (tokens[j].length > 2 || j === tokens.length - 1) {
+        if (tokens[j].length > 2 || j === tokens.length - 1)
+        {
           var value = '%' + temp.join('%');
 
-          try {
+          try
+          {
             decodeURIComponent(value);
-          } catch (ex) {
+          }
+          catch (ex)
+          {
             var displayValue = value.length < 32 ? value : value.substring(0, 32) + '...';
             errors.push('Invalid URI component at position ' + pos + ': ' + displayValue);
           }
@@ -478,10 +589,12 @@
     return errors;
   }
 
-  function correctMxFile(content) {
+  function correctMxFile(content)
+  {
     var trimmed = content.trim();
 
-    if (trimmed.endsWith('</mxfile>')) {
+    if (trimmed.endsWith('</mxfile>'))
+    {
       return {
         success: true,
         data: trimmed,
@@ -491,7 +604,8 @@
 
     var index = trimmed.lastIndexOf('</diagram>');
 
-    if (index > 0) {
+    if (index > 0)
+    {
       var corrected = trimmed.substring(0, index + 10) + '</mxfile>';
       return {
         success: true,
@@ -506,7 +620,8 @@
     };
   }
 
-  function isMxFile(content) {
+  function isMxFile(content)
+  {
     var trimmed = content.trim();
     return (
       trimmed.indexOf('<mxfile') === 0 ||
@@ -514,7 +629,8 @@
     );
   }
 
-  function getMxFileInfo(content) {
+  function getMxFileInfo(content)
+  {
     var parseResult = parseXml(content);
     if (!parseResult.success) return null;
 
@@ -531,14 +647,16 @@
     };
   }
 
-  function getDiagramNames(content) {
+  function getDiagramNames(content)
+  {
     var parseResult = parseXml(content);
     if (!parseResult.success) return [];
 
     var diagrams = parseResult.doc.getElementsByTagName('diagram');
     var names = [];
 
-    for (var i = 0; i < diagrams.length; i++) {
+    for (var i = 0; i < diagrams.length; i++)
+    {
       names.push(diagrams[i].getAttribute('name') || 'Page ' + (i + 1));
     }
 
@@ -549,8 +667,10 @@
   // FILE UTILITIES
   // ============================================
 
-  function readFileAsText(file) {
-    return new Promise(function(resolve, reject) {
+  function readFileAsText(file)
+  {
+    return new Promise(function(resolve, reject)
+    {
       var reader = new FileReader();
       reader.onload = function(e) { resolve(e.target.result); };
       reader.onerror = function() { reject(new Error('Failed to read file')); };
@@ -558,8 +678,10 @@
     });
   }
 
-  function readFileAsDataURL(file) {
-    return new Promise(function(resolve, reject) {
+  function readFileAsDataURL(file)
+  {
+    return new Promise(function(resolve, reject)
+    {
       var reader = new FileReader();
       reader.onload = function(e) { resolve(e.target.result); };
       reader.onerror = function() { reject(new Error('Failed to read file')); };
@@ -567,7 +689,8 @@
     });
   }
 
-  function downloadFile(content, filename, mimeType) {
+  function downloadFile(content, filename, mimeType)
+  {
     filename = filename || 'download.drawio';
     mimeType = mimeType || 'text/plain';
     var blob = new Blob([content], { type: mimeType });
@@ -581,39 +704,47 @@
     URL.revokeObjectURL(url);
   }
 
-  function setupDropZone(element, onDrop, options) {
+  function setupDropZone(element, onDrop, options)
+  {
     options = options || {};
     var onDragEnter = options.onDragEnter;
     var onDragLeave = options.onDragLeave;
 
-    function handleDragOver(e) {
+    function handleDragOver(e)
+    {
       e.stopPropagation();
       e.preventDefault();
       e.dataTransfer.dropEffect = 'copy';
     }
 
-    function handleDragEnter(e) {
+    function handleDragEnter(e)
+    {
       e.stopPropagation();
       e.preventDefault();
       if (onDragEnter) onDragEnter(e);
     }
 
-    function handleDragLeave(e) {
+    function handleDragLeave(e)
+    {
       e.stopPropagation();
       e.preventDefault();
       if (onDragLeave) onDragLeave(e);
     }
 
-    function handleDrop(e) {
+    function handleDrop(e)
+    {
       e.stopPropagation();
       e.preventDefault();
       if (onDragLeave) onDragLeave(e);
 
-      if (e.dataTransfer.files.length > 0) {
+      if (e.dataTransfer.files.length > 0)
+      {
         var file = e.dataTransfer.files[0];
-        readFileAsText(file).then(function(content) {
+        readFileAsText(file).then(function(content)
+        {
           onDrop(content, file);
-        }).catch(function(error) {
+        }).catch(function(error)
+        {
           console.error('Failed to read dropped file:', error);
         });
       }
@@ -624,7 +755,8 @@
     element.addEventListener('dragleave', handleDragLeave);
     element.addEventListener('drop', handleDrop);
 
-    return function() {
+    return function()
+    {
       element.removeEventListener('dragover', handleDragOver);
       element.removeEventListener('dragenter', handleDragEnter);
       element.removeEventListener('dragleave', handleDragLeave);
@@ -632,33 +764,41 @@
     };
   }
 
-  function copyToClipboard(text) {
-    return navigator.clipboard.writeText(text).then(function() {
+  function copyToClipboard(text)
+  {
+    return navigator.clipboard.writeText(text).then(function()
+    {
       return true;
-    }).catch(function() {
+    }).catch(function()
+    {
       var textarea = document.createElement('textarea');
       textarea.value = text;
       textarea.style.position = 'fixed';
       textarea.style.left = '-9999px';
       document.body.appendChild(textarea);
       textarea.select();
-      try {
+      try
+      {
         document.execCommand('copy');
         document.body.removeChild(textarea);
         return true;
-      } catch (e) {
+      }
+      catch (e)
+      {
         document.body.removeChild(textarea);
         return false;
       }
     });
   }
 
-  function getFileExtension(filename) {
+  function getFileExtension(filename)
+  {
     var parts = filename.split('.');
     return parts.length > 1 ? parts.pop().toLowerCase() : '';
   }
 
-  function isDrawioFile(filename) {
+  function isDrawioFile(filename)
+  {
     var ext = getFileExtension(filename);
     return ['drawio', 'xml', 'svg'].indexOf(ext) > -1;
   }
@@ -669,8 +809,10 @@
 
   var toastContainer = null;
 
-  function getToastContainer() {
-    if (!toastContainer) {
+  function getToastContainer()
+  {
+    if (!toastContainer)
+    {
       toastContainer = document.createElement('div');
       toastContainer.className = 'toast-container';
       document.body.appendChild(toastContainer);
@@ -678,7 +820,8 @@
     return toastContainer;
   }
 
-  function showToast(message, type, duration) {
+  function showToast(message, type, duration)
+  {
     type = type || 'info';
     duration = duration || 4000;
 
@@ -700,12 +843,15 @@
     toast.appendChild(closeBtn);
     container.appendChild(toast);
 
-    function removeToast() {
+    function removeToast()
+    {
       toast.style.opacity = '0';
       toast.style.transform = 'translateY(-10px)';
       toast.style.transition = 'all 0.2s ease-out';
-      setTimeout(function() {
-        if (toast.parentNode) {
+      setTimeout(function()
+      {
+        if (toast.parentNode)
+        {
           toast.parentNode.removeChild(toast);
         }
       }, 200);
@@ -713,7 +859,8 @@
 
     closeBtn.addEventListener('click', removeToast);
 
-    if (duration > 0) {
+    if (duration > 0)
+    {
       setTimeout(removeToast, duration);
     }
 

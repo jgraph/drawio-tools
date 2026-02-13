@@ -107,7 +107,8 @@
 
   <script src="../utils/drawio-tools.js"></script>
   <script>
-    (function() {
+    (function()
+    {
       var DT = window.DrawioTools;
 
       var urlInput = document.getElementById('url');
@@ -125,33 +126,40 @@
 
       var generatedUrl = '';
 
-      function showAlert(message, type) {
+      function showAlert(message, type)
+      {
         DT.showToast(message, type);
       }
 
-      [lightboxRadio, editorRadio, iframeRadio].forEach(function(radio) {
-        radio.addEventListener('change', function() {
+      [lightboxRadio, editorRadio, iframeRadio].forEach(function(radio)
+      {
+        radio.addEventListener('change', function()
+        {
           iframeOptions.style.display = iframeRadio.checked ? '' : 'none';
         });
       });
 
-      document.getElementById('createBtn').addEventListener('click', function() {
+      document.getElementById('createBtn').addEventListener('click', function()
+      {
         var url = urlInput.value.trim();
 
-        if (!url || !url.startsWith('http')) {
+        if (!url || !url.startsWith('http'))
+        {
           showAlert('Please enter a valid URL starting with http:// or https://', 'error');
           urlInput.focus();
           return;
         }
 
-        if (url.startsWith('https://drive.google.com/file/d/')) {
+        if (url.startsWith('https://drive.google.com/file/d/'))
+        {
           var id = url.substring(32, url.lastIndexOf('/'));
           url = 'https://drive.google.com/uc?id=' + id + '&export=download';
         }
 
         resultCard.style.display = '';
 
-        if (iframeRadio.checked) {
+        if (iframeRadio.checked)
+        {
           var height = heightInput.value || '400px';
           var viewerUrl = 'https://viewer.diagrams.net/?#U' + encodeURIComponent(url);
           var code = '<iframe frameborder="0" style="width:100%;height:' + height + ';" src="' + viewerUrl + '"></iframe>';
@@ -162,10 +170,13 @@
           generatedUrl = code;
 
           showAlert('Embed code generated', 'success');
-        } else {
+        }
+        else
+        {
           var link = 'https://app.diagrams.net';
 
-          if (lightboxRadio.checked) {
+          if (lightboxRadio.checked)
+          {
             link += '?lightbox=1&edit=_blank';
           }
 
@@ -181,19 +192,26 @@
         }
       });
 
-      document.getElementById('openBtn').addEventListener('click', function() {
-        if (iframeRadio.checked) {
+      document.getElementById('openBtn').addEventListener('click', function()
+      {
+        if (iframeRadio.checked)
+        {
           var match = generatedUrl.match(/src="([^"]+)"/);
-          if (match) {
+          if (match)
+          {
             window.open(match[1], '_blank');
           }
-        } else if (generatedUrl) {
+        }
+        else if (generatedUrl)
+        {
           window.open(generatedUrl, '_blank');
         }
       });
 
-      document.getElementById('copyBtn').addEventListener('click', function() {
-        DT.copyToClipboard(generatedUrl).then(function(success) {
+      document.getElementById('copyBtn').addEventListener('click', function()
+      {
+        DT.copyToClipboard(generatedUrl).then(function(success)
+        {
           showAlert(success ? 'Copied to clipboard' : 'Failed to copy', success ? 'success' : 'error');
         });
       });

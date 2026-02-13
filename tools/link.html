@@ -195,7 +195,8 @@
 
   <script src="../utils/drawio-tools.js"></script>
   <script>
-    (function() {
+    (function()
+    {
       var DT = window.DrawioTools;
 
       var linkEl = document.getElementById('link');
@@ -206,29 +207,36 @@
       var previewCard = document.getElementById('previewCard');
       var anchor = document.getElementById('anchor');
 
-      function showAlert(message, type) {
+      function showAlert(message, type)
+      {
         DT.showToast(message, type);
       }
 
-      function resetLink() {
+      function resetLink()
+      {
         linkEl.value = 'data:action/json,' + JSON.stringify({}, null, 2);
         previewCard.style.display = 'none';
       }
 
-      function updatePreview() {
-        try {
+      function updatePreview()
+      {
+        try
+        {
           var href = linkEl.value;
           var link = JSON.parse(href.substring(17));
           var minified = 'data:action/json,' + JSON.stringify(link);
           anchor.href = minified;
           anchor.textContent = minified;
           previewCard.style.display = '';
-        } catch (e) {
+        }
+        catch (e)
+        {
           previewCard.style.display = 'none';
         }
       }
 
-      function actionChanged() {
+      function actionChanged()
+      {
         var action = actionEl.value;
         keyBox.style.display = (action === 'style' || action === 'toggleStyle') ? '' : 'none';
         valueBox.style.display = (action === 'style' || action === 'opacity') ? '' : 'none';
@@ -238,28 +246,38 @@
       actionChanged();
       resetLink();
 
-      function addAction(type) {
-        try {
+      function addAction(type)
+      {
+        try
+        {
           var href = linkEl.value;
           var obj = JSON.parse(href.substring(17));
           var title = document.getElementById('title').value;
 
-          if (title) {
+          if (title)
+          {
             obj.title = title;
           }
 
-          if (!obj.actions) {
+          if (!obj.actions)
+          {
             obj.actions = [];
           }
 
-          if (type === 'link') {
+          if (type === 'link')
+          {
             obj.actions.push({ open: document.getElementById('href').value });
-          } else if (type === 'wait') {
+          }
+          else if (type === 'wait')
+          {
             var wait = document.getElementById('wait').value;
             obj.actions.push({ wait: wait ? parseInt(wait) : 1000 });
-          } else if (type === 'viewbox') {
+          }
+          else if (type === 'viewbox')
+          {
             var tokens = document.getElementById('viewbox').value.split(' ');
-            if (tokens.length >= 4) {
+            if (tokens.length >= 4)
+            {
               var action = {
                 viewbox: {
                   x: parseInt(tokens[0]),
@@ -268,15 +286,20 @@
                   height: parseInt(tokens[3])
                 }
               };
-              if (tokens.length > 4) {
+              if (tokens.length > 4)
+              {
                 action.border = parseInt(tokens[4]);
               }
               obj.actions.push(action);
-            } else {
+            }
+            else
+            {
               showAlert('Missing viewbox arguments (x y width height)', 'warning');
               return;
             }
-          } else if (type === 'tags') {
+          }
+          else if (type === 'tags')
+          {
             var toggle = document.getElementById('toggleTags').value.split(' ').filter(function(t) { return t; });
             var hidden = document.getElementById('hiddenTags').value.split(' ').filter(function(t) { return t; });
             var visible = document.getElementById('visibleTags').value.split(' ').filter(function(t) { return t; });
@@ -284,26 +307,34 @@
             var action = {};
             var add = false;
 
-            if (toggle.length > 0) {
+            if (toggle.length > 0)
+            {
               action.toggle = toggle[0] === '*' ? [] : toggle;
               add = true;
             }
-            if (hidden.length > 0) {
+            if (hidden.length > 0)
+            {
               action.hidden = hidden[0] === '*' ? [] : hidden;
               add = true;
             }
-            if (visible.length > 0) {
+            if (visible.length > 0)
+            {
               action.visible = visible[0] === '*' ? [] : visible;
               add = true;
             }
 
-            if (add) {
+            if (add)
+            {
               obj.actions.push({ tags: action });
-            } else {
+            }
+            else
+            {
               showAlert('Please specify at least one tag action', 'warning');
               return;
             }
-          } else {
+          }
+          else
+          {
             var parallel = document.getElementById('parallel').checked;
             var action = parallel && obj.actions.length > 0 ? obj.actions[obj.actions.length - 1] : {};
 
@@ -312,43 +343,53 @@
             var exclude = document.getElementById('exclude').value;
             var name = actionEl.value;
 
-            if (cells) {
+            if (cells)
+            {
               selector.cells = cells.split(' ').filter(function(c) { return c; });
             }
 
-            if (exclude) {
+            if (exclude)
+            {
               selector.excludeCells = exclude.split(' ').filter(function(c) { return c; });
             }
 
             var tags = document.getElementById('tags').value;
-            if (tags === '*') {
+            if (tags === '*')
+            {
               selector.tags = [''];
-            } else if (tags) {
+            }
+            else if (tags)
+            {
               selector.tags = tags.split(' ').filter(function(t) { return t; });
             }
 
-            if (name === 'style' || name === 'toggleStyle') {
+            if (name === 'style' || name === 'toggleStyle')
+            {
               var key = document.getElementById('key').value;
               selector.key = key || 'flowAnimation';
             }
 
-            if (name === 'style' || name === 'opacity') {
+            if (name === 'style' || name === 'opacity')
+            {
               var value = document.getElementById('value').value;
               selector.value = value || '1';
             }
 
-            if (name === 'fadeIn' || name === 'fadeOut') {
+            if (name === 'fadeIn' || name === 'fadeOut')
+            {
               selector.delay = 1000;
             }
 
-            if (name === 'wipeIn' || name === 'wipeOut') {
+            if (name === 'wipeIn' || name === 'wipeOut')
+            {
               action.delay = 30;
               action.steps = 30;
             }
 
             action[name] = selector;
 
-            if (!parallel) {
+            if (!parallel)
+            {
               obj.actions.push(action);
             }
           }
@@ -356,37 +397,60 @@
           linkEl.value = 'data:action/json,' + JSON.stringify(obj, null, 2);
           updatePreview();
           showAlert('Action added', 'success');
-        } catch (e) {
+        }
+        catch (e)
+        {
           showAlert('Error: ' + e.message, 'error');
         }
       }
 
-      document.getElementById('addActionBtn').addEventListener('click', function() { addAction(); });
-      document.getElementById('addLinkBtn').addEventListener('click', function() { addAction('link'); });
-      document.getElementById('addWaitBtn').addEventListener('click', function() { addAction('wait'); });
-      document.getElementById('addViewboxBtn').addEventListener('click', function() { addAction('viewbox'); });
-      document.getElementById('addTagsBtn').addEventListener('click', function() { addAction('tags'); });
+      document.getElementById('addActionBtn').addEventListener('click', function()
+      {
+        addAction();
+      });
+      document.getElementById('addLinkBtn').addEventListener('click', function()
+      {
+        addAction('link');
+      });
+      document.getElementById('addWaitBtn').addEventListener('click', function()
+      {
+        addAction('wait');
+      });
+      document.getElementById('addViewboxBtn').addEventListener('click', function()
+      {
+        addAction('viewbox');
+      });
+      document.getElementById('addTagsBtn').addEventListener('click', function()
+      {
+        addAction('tags');
+      });
 
-      document.getElementById('validateBtn').addEventListener('click', function() {
-        try {
+      document.getElementById('validateBtn').addEventListener('click', function()
+      {
+        try
+        {
           var href = linkEl.value;
           var link = JSON.parse(href.substring(17));
 
-          if (!link.actions || link.actions.length === 0) {
+          if (!link.actions || link.actions.length === 0)
+          {
             throw new Error('No actions defined');
           }
 
           linkEl.value = 'data:action/json,' + JSON.stringify(link, null, 2);
           updatePreview();
           showAlert('Link is valid', 'success');
-        } catch (e) {
+        }
+        catch (e)
+        {
           showAlert('Error: ' + e.message, 'error');
         }
       });
 
       document.getElementById('resetBtn').addEventListener('click', resetLink);
 
-      document.getElementById('clearInputBtn').addEventListener('click', function() {
+      document.getElementById('clearInputBtn').addEventListener('click', function()
+      {
         actionEl.value = 'toggle';
         document.getElementById('key').value = '';
         document.getElementById('value').value = '';
@@ -403,15 +467,20 @@
         actionChanged();
       });
 
-      document.getElementById('copyBtn').addEventListener('click', function() {
-        try {
+      document.getElementById('copyBtn').addEventListener('click', function()
+      {
+        try
+        {
           var href = linkEl.value;
           var link = JSON.parse(href.substring(17));
           var minified = 'data:action/json,' + JSON.stringify(link);
-          DT.copyToClipboard(minified).then(function(success) {
+          DT.copyToClipboard(minified).then(function(success)
+          {
             showAlert(success ? 'Link copied to clipboard' : 'Failed to copy', success ? 'success' : 'error');
           });
-        } catch (e) {
+        }
+        catch (e)
+        {
           showAlert('Error: ' + e.message, 'error');
         }
       });

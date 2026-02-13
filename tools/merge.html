@@ -134,7 +134,8 @@
 
   <script src="../utils/drawio-tools.js"></script>
   <script>
-    (function() {
+    (function()
+    {
       var DT = window.DrawioTools;
 
       var dropZone = document.getElementById('dropZone');
@@ -150,42 +151,55 @@
       var images = [];
       var resultCanvas = null;
 
-      function showAlert(message, type) {
+      function showAlert(message, type)
+      {
         DT.showToast(message, type);
       }
 
-      function updateImageList() {
+      function updateImageList()
+      {
         imageCount.textContent = images.length;
         createBtn.disabled = images.length === 0;
 
-        if (images.length === 0) {
+        if (images.length === 0)
+        {
           imageList.innerHTML = '<div class="image-list__item image-list__item--empty">No images</div>';
-        } else {
+        }
+        else
+        {
           var html = '';
-          for (var i = 0; i < images.length; i++) {
+          for (var i = 0; i < images.length; i++)
+          {
             html += '<div class="image-list__item" title="' + images[i].width + '×' + images[i].height + '"><img src="' + images[i].src + '" alt="Image ' + (i + 1) + '"></div>';
           }
           imageList.innerHTML = html;
         }
       }
 
-      function addFiles(files) {
+      function addFiles(files)
+      {
         var promises = [];
 
-        for (var i = 0; i < files.length; i++) {
-          (function(file) {
+        for (var i = 0; i < files.length; i++)
+        {
+          (function(file)
+          {
             if (!file.type.startsWith('image/')) return;
 
-            var promise = DT.readFileAsDataURL(file).then(function(dataUrl) {
-              return new Promise(function(resolve, reject) {
+            var promise = DT.readFileAsDataURL(file).then(function(dataUrl)
+            {
+              return new Promise(function(resolve, reject)
+              {
                 var img = new Image();
                 img.onload = function() { resolve(img); };
                 img.onerror = reject;
                 img.src = dataUrl;
               });
-            }).then(function(img) {
+            }).then(function(img)
+            {
               images.push(img);
-            }).catch(function(error) {
+            }).catch(function(error)
+            {
               console.error('Failed to load image:', error);
             });
 
@@ -193,7 +207,8 @@
           })(files[i]);
         }
 
-        Promise.all(promises).then(function() {
+        Promise.all(promises).then(function()
+        {
           updateImageList();
           showAlert(images.length + ' image(s) loaded', 'success');
         });
@@ -201,37 +216,46 @@
 
       dropZone.addEventListener('click', function() { fileInput.click(); });
 
-      dropZone.addEventListener('dragover', function(e) {
+      dropZone.addEventListener('dragover', function(e)
+      {
         e.preventDefault();
         dropZone.classList.add('drop-zone--active');
       });
 
-      dropZone.addEventListener('dragleave', function() {
+      dropZone.addEventListener('dragleave', function()
+      {
         dropZone.classList.remove('drop-zone--active');
       });
 
-      dropZone.addEventListener('drop', function(e) {
+      dropZone.addEventListener('drop', function(e)
+      {
         e.preventDefault();
         dropZone.classList.remove('drop-zone--active');
-        if (e.dataTransfer.files.length > 0) {
+        if (e.dataTransfer.files.length > 0)
+        {
           addFiles(Array.prototype.slice.call(e.dataTransfer.files));
         }
       });
 
-      fileInput.addEventListener('change', function(e) {
-        if (e.target.files.length > 0) {
+      fileInput.addEventListener('change', function(e)
+      {
+        if (e.target.files.length > 0)
+        {
           addFiles(Array.prototype.slice.call(e.target.files));
         }
       });
 
-      createBtn.addEventListener('click', function() {
+      createBtn.addEventListener('click', function()
+      {
         if (images.length === 0) return;
 
-        try {
+        try
+        {
           var width = 0;
           var height = 0;
 
-          for (var i = 0; i < images.length; i++) {
+          for (var i = 0; i < images.length; i++)
+          {
             width = Math.max(width, images[i].width);
             height += images[i].height;
           }
@@ -243,7 +267,8 @@
           var ctx = canvas.getContext('2d');
           var top = 0;
 
-          for (var j = 0; j < images.length; j++) {
+          for (var j = 0; j < images.length; j++)
+          {
             ctx.drawImage(images[j], 0, top);
             top += images[j].height;
           }
@@ -257,12 +282,15 @@
           document.getElementById('downloadBtn').style.display = '';
 
           showAlert('Stack created', 'success');
-        } catch (error) {
+        }
+        catch (error)
+        {
           showAlert('Error creating stack: ' + error.message, 'error');
         }
       });
 
-      document.getElementById('resetBtn').addEventListener('click', function() {
+      document.getElementById('resetBtn').addEventListener('click', function()
+      {
         images = [];
         updateImageList();
         resultCard.style.display = 'none';
@@ -270,7 +298,8 @@
         resultCanvas = null;
       });
 
-      document.getElementById('downloadBtn').addEventListener('click', function() {
+      document.getElementById('downloadBtn').addEventListener('click', function()
+      {
         if (!resultCanvas) return;
 
         var link = document.createElement('a');
