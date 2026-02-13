@@ -353,7 +353,7 @@
       function preview(value)
       {
         var params = 'lightbox=1&dark=auto&border=10&edit=_blank';
-        var prefix = 'https://test.draw.io/?dev=1&test=1&'; //'https://www.draw.io/?';
+        var prefix = 'https://www.draw.io/?';
         var data = value;
 
         var createObj =
@@ -364,9 +364,6 @@
 
         var create = '#create=' + encodeURIComponent(JSON.stringify({type: 'message'}));
         var link = prefix + params + create;
-
-        link = 'https://test.draw.io/?dev=1&test=1#create=%7B%22type%22%3A%22message%22%7D';
-        link = 'https://test.draw.io/?dev=1&test=1&lightbox=1&dark=auto&border=10&edit=_blank#create=%7B%22type%22%3A%22message%22%7D';
 
         // Waits for ready message event and sends create message to iframe
         window.addEventListener('message', function(event)
