@@ -38,7 +38,7 @@
 }
 
 .textarea-container textarea {
-  min-height: 220px;
+  min-height: 100px;
   font-size: var(--font-size-sm);
 }
 

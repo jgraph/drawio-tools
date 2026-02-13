@@ -106,6 +106,7 @@
             placeholder="Describe your diagram or paste Mermaid syntax..."
             spellcheck="false"
             autocomplete="off"
+            data-1p-ignore
           ></textarea>
         </div>
 
@@ -124,8 +125,8 @@
           <div class="config-field" id="modelSection">
             <label for="model">Model</label>
             <select id="model">
+              <option value="claude-opus-4-6" selected>Claude 4.6 Opus</option>
               <option value="claude-opus-4-5" selected>Claude 4.5 Opus</option>
-              <option value="claude-haiku-4-5">Claude 4.5 Haiku</option>
               <option value="gemini-3-pro-preview">Gemini 3 Pro Preview</option>
               <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
               <option value="gpt-4.5-preview">GPT-4.5 Preview</option>
@@ -141,9 +142,12 @@
           <div class="config-field" id="promptSection">
             <label for="aiPromptSelect">Output</label>
             <select id="aiPromptSelect">
+              <option id="autoOption"
+                value='Generate a diagram for "%prompt%" in either MermaidJS or draw.io XML format. Choose MermaidJS unless the diagram cannot be represented in it, then use draw.io XML without indentation or newlines. Return only the valid diagram code without any other text, checklists, instructions or explanations.'
+                selected>Auto</option>
               <option id="mermaidOption"
                 value='Write a MermaidJS declaration for "%prompt%" and return only the valid MermaidJS syntax without any other text do not return a gantt chart unless specifically requested'
-                selected>Mermaid</option>
+                >Mermaid</option>
               <option id="drawioOption"
                 value='Write a draw.io file for "%prompt%" and return only the valid XML syntax without any other text'>
                 draw.io XML</option>
@@ -183,8 +187,7 @@
       </div>
     </footer>
   </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+  
   <script src="../utils/drawio-tools.js"></script>
   <script>
     (function() {
@@ -209,9 +212,10 @@
       var promptSection = document.getElementById('promptSection');
 
       var urlParams = new URLSearchParams(window.location.hash.substring(1));
+      var keys = null;
 
-      if (urlParams.get('key')) {
-        apikeyEl.value = urlParams.get('key');
+      if (urlParams.get('keys')) {
+        keys = JSON.parse(urlParams.get('keys'));
       }
 
       function showAlert(message, type) {
@@ -237,7 +241,11 @@
         } else if (engine === 'chatgpt') {
           modelEl.value = 'gpt-4.5-preview';
         } else if (engine === 'claude') {
-          modelEl.value = 'claude-opus-4-5';
+          modelEl.value = 'claude-opus-4-6';
+        }
+
+        if (keys && keys[engine]) {
+          apikeyEl.value = keys[engine];
         }
       }
 
@@ -251,14 +259,6 @@
         });
         promptEl.value = input.replace(/\\n/g, '\n');
       });
-
-      function compressData(data) {
-        if (data && data.length > 0) {
-          var tmp = pako.deflateRaw(encodeURIComponent(data));
-          return btoa(String.fromCharCode.apply(null, new Uint8Array(tmp)));
-        }
-        return data;
-      }
 
       function extractCode(input) {
         var result = input;
@@ -324,17 +324,23 @@
 
       function preview(value) {
         var params = 'lightbox=1&dark=auto&border=10&edit=_blank';
-        var prefix = 'https://www.draw.io/?';
-        var data = compressData(value);
+        var prefix = 'https://test.draw.io/?dev=1&test=1&'; //'https://www.draw.io/?';
+        var data = value;
 
         var createObj = {
           type: value.indexOf('<') === 0 ? 'xml' : 'mermaid',
-          compressed: true,
           data: data
         };
 
-        var create = '#create=' + encodeURIComponent(JSON.stringify(createObj));
+        var create = '#create=' + encodeURIComponent(JSON.stringify({type: 'message'}));
         var link = prefix + params + create;
+
+        // Waits for ready message event and sends create message to ifsrame
+        window.addEventListener('message', function(event) {
+          if (JSON.parse(event.data).event === 'ready') {
+            event.source.postMessage({action: 'create', data: createObj}, '*');
+          }
+        });
 
         previewEl.src = link;
         previewEl.style.display = 'block';
