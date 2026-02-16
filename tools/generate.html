@@ -124,14 +124,7 @@
 
           <div class="config-field" id="modelSection">
             <label for="model">Model</label>
-            <select id="model">
-              <option value="claude-opus-4-6" selected>Claude 4.6 Opus</option>
-              <option value="claude-opus-4-5" selected>Claude 4.5 Opus</option>
-              <option value="gemini-3-pro-preview">Gemini 3 Pro Preview</option>
-              <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
-              <option value="gpt-4.5-preview">GPT-4.5 Preview</option>
-              <option value="gpt-4o">GPT-4o</option>
-            </select>
+            <select id="model"></select>
           </div>
 
           <div class="config-field" id="keySection">
@@ -206,7 +199,6 @@
       var placeholderEl = document.getElementById('placeholder');
       var previewContainer = document.getElementById('previewContainer');
       var infoEl = document.getElementById('info');
-      var alertContainer = document.getElementById('alertContainer');
 
       var modelSection = document.getElementById('modelSection');
       var keySection = document.getElementById('keySection');
@@ -220,6 +212,216 @@
         keys = JSON.parse(urlParams.get('keys'));
       }
 
+      // ---- AI config system ported from ChatWindow (drawio-dev Dialogs.js / Editor.js) ----
+
+      // Ported from Editor.replacePlaceholders - resolves {name} placeholders in strings
+      function replacePlaceholders(str, resolver)
+      {
+        var result = [];
+
+        if (str != null && resolver != null)
+        {
+          var regex = new RegExp('\{([^\{\}"\'=;]+)\}', 'g');
+          var match = null;
+          var last = 0;
+
+          while (match = regex.exec(str))
+          {
+            var val = match[0];
+
+            if (val.length > 2)
+            {
+              var value = resolver(val.substring(1, val.length - 1));
+              var tmp = val;
+
+              if (value != null)
+              {
+                tmp = value;
+              }
+
+              result.push(str.substring(last, match.index) + tmp);
+              last = match.index + val.length;
+            }
+          }
+
+          result.push(str.substring(last));
+        }
+
+        return result.join('');
+      }
+
+      // Ported from Editor.executeSimpleJsonPath - extracts values from JSON using a path
+      function executeSimpleJsonPath(jsonObject, pathExpression)
+      {
+        var steps = pathExpression.replace(/^\$\.?/, '').split('.');
+        var current = jsonObject;
+
+        for (var i = 0; i < steps.length; i++)
+        {
+          var step = steps[i];
+
+          if (!current)
+          {
+            return [];
+          }
+
+          var arrayMatch = step.match(/([^\[]+)\[(\d+)\]/);
+
+          if (arrayMatch)
+          {
+            var key = arrayMatch[1];
+            var index = parseInt(arrayMatch[2]);
+            current = current[key];
+
+            if (Array.isArray(current) && index < current.length)
+            {
+              current = current[index];
+            }
+            else
+            {
+              return [];
+            }
+          }
+          else
+          {
+            current = current[step];
+          }
+        }
+
+        return current !== undefined ? [current] : [];
+      }
+
+      // Clones all properties and replaces placeholders in string properties recursively
+      // Ported from ChatWindow's populateTemplate
+      function populateTemplate(obj, resolver, result)
+      {
+        if (result == null)
+        {
+          result = new obj.constructor();
+        }
+
+        for (var key in obj)
+        {
+          var value = obj[key];
+
+          if (typeof value === 'object')
+          {
+            result[key] = populateTemplate(value, resolver);
+          }
+          else if (typeof value === 'string')
+          {
+            result[key] = replacePlaceholders(value, resolver);
+          }
+          else
+          {
+            result[key] = value;
+          }
+        }
+
+        return result;
+      }
+
+      // AI system prompts from Editor.aiGlobals
+      var aiGlobals = {
+        'create': 'You are a helpful assistant that generates diagrams in either MermaidJS or draw.io XML ' +
+          'format based on the given prompt. Begin with a concise checklist (3-7 bullets) of what you will ' +
+          'do; keep items conceptual, not implementation-level. Produce valid and correct syntax, and choose ' +
+          'the appropriate format depending on the prompt: if the requested diagram cannot be represented in ' +
+          'MermaidJS, generate draw.io XML instead but do not use indentation and newlines. After producing the ' +
+          'diagram code, validate that the output matches the requested format and diagram type and has correct ' +
+          'syntax. Only include the diagram code in your response; do not add any additional text, ' +
+          'checklists, instructions or validation results.'
+      };
+
+      // AI provider configurations from Editor.aiConfigs
+      var aiConfigs = {
+        gpt: {
+          apiKey: 'gptApiKey',
+          endpoint: 'https://api.openai.com/v1/chat/completions',
+          requestHeaders: {
+            'Authorization': 'Bearer {apiKey}'
+          },
+          request: {
+            model: '{model}',
+            messages: [
+              {role: 'system', content: '{action}'},
+              {role: 'user', content: '{prompt}'}
+            ]
+          },
+          responsePath: '$.choices[0].message.content'
+        },
+        gemini: {
+          apiKey: 'geminiApiKey',
+          endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent',
+          requestHeaders: {
+            'X-Goog-Api-Key': '{apiKey}'
+          },
+          request: {
+            system_instruction: {
+              parts: [{text: '{action}'}]
+            },
+            contents: [{
+              parts: [{text: '{prompt}'}]
+            }]
+          },
+          responsePath: '$.candidates[0].content.parts[0].text'
+        },
+        claude: {
+          apiKey: 'claudeApiKey',
+          endpoint: 'https://api.anthropic.com/v1/messages',
+          requestHeaders: {
+            'X-API-Key': '{apiKey}',
+            'Anthropic-Version': '2023-06-01',
+            'Anthropic-Dangerous-Direct-Browser-Access': 'true'
+          },
+          request: {
+            max_tokens: 8192,
+            model: '{model}',
+            messages: [
+              {role: 'assistant', content: '{action}'},
+              {role: 'user', content: '{prompt}'}
+            ]
+          },
+          responsePath: '$.content[0].text'
+        }
+      };
+
+      // AI models from Editor.aiModels
+      var aiModels = [
+        {name: 'Claude 4.6 Opus', model: 'claude-opus-4-6', config: 'claude'},
+        {name: 'Claude 4.6 Sonnet', model: 'claude-sonnet-4-6', config: 'claude'},
+        {name: 'Gemini 3 Pro Preview', model: 'gemini-3-pro-preview', config: 'gemini'},
+        {name: 'Gemini 2.5 Pro', model: 'gemini-2.5-pro', config: 'gemini'},
+        {name: 'GPT-5.1', model: 'gpt-5.1-2025-11-13', config: 'gpt'},
+        {name: 'GPT-4.1', model: 'gpt-4.1-2025-04-14', config: 'gpt'},
+      ];
+
+      // Maps engine select values to config keys
+      var engineToConfig = {
+        'claude': 'claude',
+        'chatgpt': 'gpt',
+        'gemini': 'gemini'
+      };
+
+      // Populate model dropdown from aiModels
+      function populateModels()
+      {
+        modelEl.innerHTML = '';
+
+        for (var i = 0; i < aiModels.length; i++)
+        {
+          var opt = document.createElement('option');
+          opt.value = aiModels[i].model;
+          opt.textContent = aiModels[i].name;
+          opt.dataset.config = aiModels[i].config;
+          modelEl.appendChild(opt);
+        }
+      }
+
+      populateModels();
+
+      // ---- End AI config system ----
+
       function showAlert(message, type)
       {
         DT.showToast(message, type);
@@ -228,30 +430,31 @@
       function engineChanged()
       {
         var engine = engineEl.value;
-        var prefix = engine === 'chatgpt' ? 'gpt' : engine;
+        var configKey = engineToConfig[engine];
 
         var isAI = engine !== 'mermaidjs' && engine !== 'drawio';
         modelSection.style.display = isAI ? '' : 'none';
         keySection.style.display = isAI ? '' : 'none';
         promptSection.style.display = isAI ? '' : 'none';
 
+        // Show/hide model options based on engine's config key
         var options = modelEl.options;
+        var firstVisible = null;
+
         for (var i = 0; i < options.length; i++)
         {
-          options[i].style.display = options[i].value.indexOf(prefix) === 0 ? '' : 'none';
+          var visible = options[i].dataset.config === configKey;
+          options[i].style.display = visible ? '' : 'none';
+
+          if (visible && firstVisible == null)
+          {
+            firstVisible = options[i].value;
+          }
         }
 
-        if (engine === 'gemini')
+        if (firstVisible != null)
         {
-          modelEl.value = 'gemini-2.5-pro';
-        }
-        else if (engine === 'chatgpt')
-        {
-          modelEl.value = 'gpt-4.5-preview';
-        }
-        else if (engine === 'claude')
-        {
-          modelEl.value = 'claude-opus-4-6';
+          modelEl.value = firstVisible;
         }
 
         if (keys && keys[engine])
@@ -302,53 +505,12 @@
           .replace(/\n```$/, '')
           .replace(/<\?xml[^>]+\?>\s*/, '');
 
+        console.log('Extracted code:', [input], 'result', [result]);
+
         return result;
       }
 
-      function sendPostRequest(url, data, engine, model, apikey)
-      {
-        var headers = { 'Content-Type': 'application/json' };
-
-        if (engine === 'chatgpt')
-        {
-          headers['Authorization'] = 'Bearer ' + apikey;
-        }
-        else if (engine === 'claude')
-        {
-          headers['x-api-key'] = apikey;
-          headers['anthropic-version'] = '2023-06-01';
-          headers['anthropic-dangerous-direct-browser-access'] = 'true';
-        }
-
-        infoEl.textContent = 'Engine: ' + engine + ' | Model: ' + model + ' | Waiting...';
-        var t0 = Date.now();
-
-        var controller = new AbortController();
-        var timeoutId = setTimeout(function() { controller.abort(); }, 60000);
-
-        return fetch(url,
-        {
-          method: 'POST',
-          headers: headers,
-          body: JSON.stringify(data),
-          signal: controller.signal
-        }).then(function(response)
-        {
-          if (!response.ok)
-          {
-            throw new Error('HTTP error! Status: ' + response.status);
-          }
-          return response.json();
-        }).then(function(jsonResponse)
-        {
-          var dt = Date.now() - t0;
-          infoEl.textContent = 'Engine: ' + engine + ' | Model: ' + model + ' | Time: ' + dt + 'ms';
-          return jsonResponse;
-        }).finally(function()
-        {
-          clearTimeout(timeoutId);
-        });
-      }
+      var messageHandler = null;
 
       function preview(value)
       {
@@ -365,14 +527,22 @@
         var create = '#create=' + encodeURIComponent(JSON.stringify({type: 'message'}));
         var link = prefix + params + create;
 
+        // Remove previous listener to avoid sending stale data
+        if (messageHandler != null)
+        {
+          window.removeEventListener('message', messageHandler);
+        }
+
         // Waits for ready message event and sends create message to iframe
-        window.addEventListener('message', function(event)
+        messageHandler = function(event)
         {
           if (JSON.parse(event.data).event === 'ready')
           {
             event.source.postMessage({action: 'create', data: createObj}, '*');
           }
-        });
+        };
+
+        window.addEventListener('message', messageHandler);
 
         previewEl.src = link;
         previewEl.style.display = 'block';
@@ -387,18 +557,52 @@
         editBtn.onclick = function() { window.open(prefix + create); };
       }
 
+      function resetUI()
+      {
+        generateBtn.disabled = false;
+        previewContainer.classList.remove('preview-loading');
+        placeholderEl.style.display = 'flex';
+      }
+
       function generate()
       {
         var engine = engineEl.value;
-        var model = modelEl.value;
+        var selectedModel = modelEl.value;
         var apikey = apikeyEl.value;
         var prompt = promptEl.value || 'a random diagram';
 
-        if (engine !== 'mermaidjs' && engine !== 'drawio' && !apikey)
+        // Handle direct Mermaid/XML input
+        if (engine === 'mermaidjs' || engine === 'drawio')
+        {
+          preview(prompt);
+          return;
+        }
+
+        if (!apikey)
         {
           showAlert('API key is required for ' + engine, 'error');
           return;
         }
+
+        // Find the selected aiModel entry
+        var aiModel = null;
+
+        for (var i = 0; i < aiModels.length; i++)
+        {
+          if (aiModels[i].model === selectedModel)
+          {
+            aiModel = aiModels[i];
+            break;
+          }
+        }
+
+        if (aiModel == null || aiConfigs[aiModel.config] == null)
+        {
+          showAlert('Invalid model: ' + selectedModel, 'error');
+          return;
+        }
+
+        var config = aiConfigs[aiModel.config];
 
         generateBtn.disabled = true;
         viewBtn.disabled = true;
@@ -409,80 +613,108 @@
 
         var aiprompt = aiPromptSelectEl.value.replace(/%prompt%/g, prompt);
 
-        if (engine === 'gemini')
+        // Store the API key in aiGlobals for placeholder resolution
+        aiGlobals[config.apiKey] = apikey;
+
+        // Placeholder resolver, matching ChatWindow's resolver pattern
+        var resolver = function(name)
         {
-          var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apikey;
-          sendPostRequest(
-            url,
-            { contents: [{ parts: [{ text: aiprompt }] }] },
-            engine,
-            model,
-            apikey
-          ).then(function(response)
+          var value = null;
+
+          if (name === 'prompt')
           {
-            preview(extractCode(response.candidates[0].content.parts[0].text));
-          }).catch(function(error)
+            value = aiprompt;
+          }
+          else if (name === 'model')
           {
-            console.error('Error:', error);
-            showAlert('Error: ' + error.message, 'error');
-            generateBtn.disabled = false;
-            previewContainer.classList.remove('preview-loading');
-            placeholderEl.style.display = 'flex';
+            value = aiModel.model;
+          }
+          else if (name === 'apiKey')
+          {
+            name = config.apiKey;
+          }
+          else if (name === 'action')
+          {
+            name = 'create';
+          }
+
+          if (value == null)
+          {
+            value = replacePlaceholders(aiGlobals[name], resolver);
+          }
+
+          return value;
+        };
+
+        // Build request from config template
+        var url = replacePlaceholders(config.endpoint, resolver);
+        var params = populateTemplate(config.request, resolver);
+
+        // Build request headers from config
+        var headers = {'Content-Type': 'application/json'};
+
+        for (var key in config.requestHeaders)
+        {
+          headers[key] = replacePlaceholders(config.requestHeaders[key], resolver);
+        }
+
+        console.log('AI request', 'url', url, 'params', params, 'aiModel', aiModel, 'config', config);
+
+        var t0 = Date.now();
+        infoEl.textContent = 'Engine: ' + engine + ' | Model: ' + aiModel.name + ' | Waiting...';
+
+        var controller = new AbortController();
+        var timeoutId = setTimeout(function() { controller.abort(); }, 60000);
+
+        fetch(url,
+        {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(params),
+          signal: controller.signal
+        }).then(function(response)
+        {
+          if (response.ok)
+          {
+            return response.json();
+          }
+
+          // Parse error response body for detailed message, matching ChatWindow's pattern
+          return response.json().then(function(resp)
+          {
+            var message = 'HTTP error! Status: ' + response.status;
+
+            if (resp != null && resp.error != null && resp.error.message != null)
+            {
+              message = resp.error.message;
+            }
+
+            throw new Error(message);
+          }, function()
+          {
+            throw new Error('HTTP error! Status: ' + response.status);
           });
-        }
-        else if (engine === 'chatgpt')
+        }).then(function(jsonResponse)
         {
-          var url = 'https://api.openai.com/v1/chat/completions';
-          sendPostRequest(
-            url,
-            { model: model, messages: [{ role: 'user', content: aiprompt }] },
-            engine,
-            model,
-            apikey
-          ).then(function(response)
-          {
-            preview(extractCode(response.choices[0].message.content));
-          }).catch(function(error)
-          {
-            console.error('Error:', error);
-            showAlert('Error: ' + error.message, 'error');
-            generateBtn.disabled = false;
-            previewContainer.classList.remove('preview-loading');
-            placeholderEl.style.display = 'flex';
-          });
-        }
-        else if (engine === 'claude')
+          var dt = Date.now() - t0;
+          infoEl.textContent = 'Engine: ' + engine + ' | Model: ' + aiModel.name + ' | Time: ' + dt + 'ms';
+
+          // Extract text from response using config's JSONPath, matching ChatWindow's pattern
+          var result = executeSimpleJsonPath(jsonResponse, config.responsePath);
+          var text = ((result.length > 0) ? result[0] : '').trim();
+
+          console.log('AI response', 'response', jsonResponse, 'text', [text]);
+
+          preview(extractCode(text));
+        }).catch(function(error)
         {
-          var url = 'https://api.anthropic.com/v1/messages';
-          sendPostRequest(
-            url,
-            { max_tokens: 1024, model: model, messages: [{ role: 'user', content: aiprompt }] },
-            engine,
-            model,
-            apikey
-          ).then(function(response)
-          {
-            preview(extractCode(response.content[0].text));
-          }).catch(function(error)
-          {
-            console.error('Error:', error);
-            showAlert('Error: ' + error.message, 'error');
-            generateBtn.disabled = false;
-            previewContainer.classList.remove('preview-loading');
-            placeholderEl.style.display = 'flex';
-          });
-        }
-        else if (engine === 'mermaidjs' || engine === 'drawio')
+          console.error('Error:', error);
+          showAlert('Error: ' + error.message, 'error');
+          resetUI();
+        }).finally(function()
         {
-          preview(prompt);
-        }
-        else
-        {
-          showAlert('Invalid engine', 'error');
-          generateBtn.disabled = false;
-          previewContainer.classList.remove('preview-loading');
-          placeholderEl.style.display = 'flex';
-        }
+          clearTimeout(timeoutId);
+        });
       }
 
       generateBtn.addEventListener('click', generate);
