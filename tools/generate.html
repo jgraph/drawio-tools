@@ -95,7 +95,7 @@
             AI Generate
           </h1>
           <p class="tool-header__description">
-            Generate draw.io diagrams from natural language descriptions using AI (ChatGPT, Gemini) or paste Mermaid syntax directly.
+            Generate draw.io diagrams from natural language descriptions using AI (Claude, ChatGPT, Gemini, OpenRouter) or paste Mermaid syntax directly.
           </p>
         </div>
 
@@ -116,6 +116,7 @@
             <select id="engine">
               <option value="claude">Claude</option>
               <option value="chatgpt">ChatGPT</option>
+              <option value="openrouter">OpenRouter</option>
               <option value="gemini">Gemini</option>
               <option value="mermaidjs">Mermaid</option>
               <option value="drawio">draw.io XML</option>
@@ -125,12 +126,19 @@
           <div class="config-field" id="modelSection">
             <label for="model">Model</label>
             <select id="model">
-              <option value="claude-opus-4-6" selected>Claude 4.6 Opus</option>
-              <option value="claude-opus-4-5" selected>Claude 4.5 Opus</option>
-              <option value="gemini-3-pro-preview">Gemini 3 Pro Preview</option>
-              <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
-              <option value="gpt-4.5-preview">GPT-4.5 Preview</option>
-              <option value="gpt-4o">GPT-4o</option>
+              <option value="claude-opus-4-6" data-engine="claude" selected>Claude 4.6 Opus</option>
+              <option value="claude-opus-4-5" data-engine="claude">Claude 4.5 Opus</option>
+              <option value="gemini-3-pro-preview" data-engine="gemini">Gemini 3 Pro Preview</option>
+              <option value="gemini-2.5-pro" data-engine="gemini">Gemini 2.5 Pro</option>
+              <option value="gpt-4.5-preview" data-engine="chatgpt">GPT-4.5 Preview</option>
+              <option value="gpt-4o" data-engine="chatgpt">GPT-4o</option>
+              <option value="anthropic/claude-opus-4.6" data-engine="openrouter">OpenRouter - Anthropic Claude Opus 4.6</option>
+              <option value="anthropic/claude-sonnet-4.5" data-engine="openrouter">OpenRouter - Claude Sonnet 4.5</option>
+              <option value="google/gemini-3-pro-preview" data-engine="openrouter">OpenRouter - Gemini 3 Pro Preview</option>
+              <option value="x-ai/grok-4" data-engine="openrouter">OpenRouter - Grok 4</option>
+              <option value="deepseek/deepseek-v3.2" data-engine="openrouter">OpenRouter - DeepSeek V3.2</option>
+              <option value="qwen/qwen3-coder" data-engine="openrouter">OpenRouter - Qwen3 Coder</option>
+              <option value="z-ai/glm-5" data-engine="openrouter">OpenRouter - GLM 5</option>
             </select>
           </div>
 
@@ -228,7 +236,6 @@
       function engineChanged()
       {
         var engine = engineEl.value;
-        var prefix = engine === 'chatgpt' ? 'gpt' : engine;
 
         var isAI = engine !== 'mermaidjs' && engine !== 'drawio';
         modelSection.style.display = isAI ? '' : 'none';
@@ -238,7 +245,8 @@
         var options = modelEl.options;
         for (var i = 0; i < options.length; i++)
         {
-          options[i].style.display = options[i].value.indexOf(prefix) === 0 ? '' : 'none';
+          var optionEngine = options[i].getAttribute('data-engine');
+          options[i].style.display = optionEngine === engine ? '' : 'none';
         }
 
         if (engine === 'gemini')
@@ -248,6 +256,10 @@
         else if (engine === 'chatgpt')
         {
           modelEl.value = 'gpt-4.5-preview';
+        }
+        else if (engine === 'openrouter')
+        {
+          modelEl.value = 'qwen/qwen3-coder';
         }
         else if (engine === 'claude')
         {
@@ -309,7 +321,7 @@
       {
         var headers = { 'Content-Type': 'application/json' };
 
-        if (engine === 'chatgpt')
+        if (engine === 'chatgpt' || engine === 'openrouter')
         {
           headers['Authorization'] = 'Bearer ' + apikey;
         }
@@ -318,6 +330,12 @@
           headers['x-api-key'] = apikey;
           headers['anthropic-version'] = '2023-06-01';
           headers['anthropic-dangerous-direct-browser-access'] = 'true';
+        }
+
+        if (engine === 'openrouter')
+        {
+          headers['HTTP-Referer'] = window.location.origin;
+          headers['X-Title'] = 'drawio-tools';
         }
 
         infoEl.textContent = 'Engine: ' + engine + ' | Model: ' + model + ' | Waiting...';
@@ -430,9 +448,11 @@
             placeholderEl.style.display = 'flex';
           });
         }
-        else if (engine === 'chatgpt')
+        else if (engine === 'chatgpt' || engine === 'openrouter')
         {
-          var url = 'https://api.openai.com/v1/chat/completions';
+          var url = engine === 'openrouter'
+            ? 'https://openrouter.ai/api/v1/chat/completions'
+            : 'https://api.openai.com/v1/chat/completions';
           sendPostRequest(
             url,
             { model: model, messages: [{ role: 'user', content: aiprompt }] },
