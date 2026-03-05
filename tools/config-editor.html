@@ -70,20 +70,89 @@
     .tri-toggle button.active--true { background: var(--color-success); color: #fff; font-weight: 500; }
     .tri-toggle button.active--false { background: var(--color-error); color: #fff; font-weight: 500; }
 
-    .color-list { display: flex; flex-wrap: wrap; gap: 4px; padding: var(--spacing-sm) 0; }
+    .color-list { display: flex; flex-wrap: wrap; gap: 4px; padding: var(--spacing-sm) 0; min-height: 28px; }
     .color-swatch {
       width: 24px; height: 24px;
       border-radius: var(--radius-sm);
       border: 1px solid var(--color-border);
       cursor: pointer;
-      transition: transform var(--transition-fast);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+      position: relative;
     }
-    .color-swatch:hover { transform: scale(1.2); }
+    .color-swatch:hover { transform: scale(1.2); box-shadow: 0 0 0 2px var(--drawio-blue); }
     .color-swatch--add {
       display: flex; align-items: center; justify-content: center;
       background: var(--color-bg-secondary);
       font-size: 14px; color: var(--color-text-secondary);
     }
+    .color-swatch__delete {
+      position: absolute; top: -6px; right: -6px;
+      width: 14px; height: 14px;
+      background: var(--color-error); color: #fff;
+      border: none; border-radius: 50%;
+      font-size: 10px; line-height: 14px; text-align: center;
+      cursor: pointer; display: none; padding: 0;
+    }
+    .color-swatch:hover .color-swatch__delete { display: block; }
+    .color-swatch__picker {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      opacity: 0; cursor: pointer;
+      border: none; padding: 0;
+    }
+
+    .color-scheme-editor { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+    .color-scheme-row {
+      display: flex; flex-wrap: wrap; gap: 4px;
+      align-items: center;
+      padding: var(--spacing-xs) var(--spacing-sm);
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .color-scheme-row__label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+      min-width: 24px; text-align: center;
+    }
+    .color-scheme-entry {
+      display: flex; align-items: center; gap: 4px;
+      padding: 2px 6px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-xs);
+    }
+    .color-scheme-entry__swatch {
+      width: 16px; height: 16px;
+      border-radius: 2px;
+      border: 1px solid var(--color-border);
+      position: relative; cursor: pointer;
+      flex-shrink: 0;
+    }
+    .color-scheme-entry__swatch input[type="color"] {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      opacity: 0; cursor: pointer;
+      border: none; padding: 0;
+    }
+    .color-scheme-entry__key { color: var(--color-text-secondary); }
+    .color-scheme-entry__remove {
+      background: none; border: none; cursor: pointer;
+      color: var(--color-text-secondary); font-size: 12px;
+      padding: 0 2px; line-height: 1;
+    }
+    .color-scheme-entry__remove:hover { color: var(--color-error); }
+    .color-scheme-row__actions {
+      display: flex; gap: 2px; margin-left: auto;
+    }
+    .color-scheme-row__btn {
+      background: none; border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm); cursor: pointer;
+      font-size: var(--font-size-xs); padding: 2px 6px;
+      color: var(--color-text-secondary);
+    }
+    .color-scheme-row__btn:hover { background: var(--color-bg-tertiary); color: var(--color-text); }
 
     .tag-list { display: flex; flex-wrap: wrap; gap: var(--spacing-xs); }
     .tag {
@@ -452,6 +521,7 @@
                   <input type="text" id="presetColors-input" placeholder="Hex without # (e.g. E6D0DE)" style="flex: 1;">
                   <button type="button" class="btn btn--secondary btn--sm" id="presetColors-add">Add</button>
                 </div>
+                <p class="field__help">Click a swatch to change its colour. Hover and click &times; to remove.</p>
               </div>
               <div class="field">
                 <label>Custom Preset Colors</label>
@@ -478,14 +548,29 @@
                 <textarea id="cfg-colorNames" data-key="colorNames" data-type="json" placeholder='{"FFFFFF": "White", "000000": "Black"}' style="min-height: 60px;"></textarea>
                 <p class="field__help">Map of colour codes to display names (tooltips). Uppercase hex without #.</p>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Color Schemes -->
+        <div class="config-section">
+          <div class="card">
+            <div class="card__header"><h3 class="card__title">Color Schemes</h3></div>
+            <div class="card__body">
               <div class="field">
-                <label for="cfg-defaultColorSchemes">Default Color Schemes (JSON)</label>
-                <textarea id="cfg-defaultColorSchemes" data-key="defaultColorSchemes" data-type="json" placeholder='[[null, {"fill": "#f5f5f5", "stroke": "#666666"}, ...]]' style="min-height: 60px;"></textarea>
-                <p class="field__help">Colour schemes for the Style section. Keys: fill, stroke, gradient, font, title, border.</p>
+                <label>Default Color Schemes</label>
+                <div class="color-scheme-editor" id="defaultColorSchemes-editor"></div>
+                <div class="btn-group mt-sm">
+                  <button type="button" class="btn btn--secondary btn--sm" id="defaultColorSchemes-addRow">Add Row</button>
+                </div>
+                <p class="field__help">Colour schemes for the Style section. Each row is a scheme group. Click swatches to change colours.</p>
               </div>
               <div class="field">
-                <label for="cfg-customColorSchemes">Custom Color Schemes (JSON)</label>
-                <textarea id="cfg-customColorSchemes" data-key="customColorSchemes" data-type="json" placeholder='[[{"fill": "#dae8fc", "stroke": "#6c8ebf"}, ...]]' style="min-height: 60px;"></textarea>
+                <label>Custom Color Schemes</label>
+                <div class="color-scheme-editor" id="customColorSchemes-editor"></div>
+                <div class="btn-group mt-sm">
+                  <button type="button" class="btn btn--secondary btn--sm" id="customColorSchemes-addRow">Add Row</button>
+                </div>
                 <p class="field__help">Additional colour schemes added before default schemes</p>
               </div>
             </div>
@@ -497,6 +582,10 @@
           <div class="card">
             <div class="card__header"><h3 class="card__title">Default Styles</h3></div>
             <div class="card__body">
+              <p class="field__help mb-sm">
+                See the <a href="https://www.drawio.com/doc/faq/drawio-style-reference" target="_blank">draw.io style reference</a>
+                for available style keys and values. Use <em>Edit Style</em> (<code>Ctrl+E</code>) in the editor to inspect styles.
+              </p>
               <div class="field">
                 <label for="cfg-defaultTextStyle">Default Text Style</label>
                 <input type="text" id="cfg-defaultTextStyle" data-key="defaultTextStyle" placeholder="text;html=1;whiteSpace=wrap;...">
@@ -512,7 +601,8 @@
               <div class="field">
                 <label for="cfg-styles">Styles (JSON)</label>
                 <textarea id="cfg-styles" data-key="styles" data-type="json" placeholder='[{}, {"commonStyle": {"fontColor": "#5C5C5C", "strokeColor": "#006658"}}]' style="min-height: 60px;"></textarea>
-                <p class="field__help">Colours for the Style tab when selection is empty. Keys: commonStyle, vertexStyle, edgeStyle, graph.</p>
+                <p class="field__help">Colours for the Style tab when selection is empty. Keys: commonStyle, vertexStyle, edgeStyle, graph.
+                  See the <a href="https://www.drawio.com/doc/faq/drawio-style-reference" target="_blank">style reference</a>.</p>
               </div>
             </div>
           </div>
@@ -1022,30 +1112,67 @@
       function renderColorSwatches(listKey)
       {
         var container = document.getElementById(listKey + '-list');
-        var html = '';
+        container.innerHTML = '';
 
         colorLists[listKey].forEach(function(color, i)
         {
-          var bg = (color === 'none' || color === 'null') ?
-            'transparent; background-image: linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%); background-size: 8px 8px; background-position: 0 0, 4px 4px' :
-            '#' + escapeHtml(color);
-          var title = (color === 'none' || color === 'null') ? color : '#' + escapeHtml(color);
-          html += '<div class="color-swatch" style="background: ' + bg + ';" ' +
-            'title="' + title + '" data-list="' + listKey + '" data-index="' + i + '"></div>';
-        });
+          var isSpecial = (color === 'none' || color === 'null');
+          var swatch = document.createElement('div');
+          swatch.className = 'color-swatch';
+          swatch.title = isSpecial ? color : '#' + color;
+          swatch.setAttribute('data-list', listKey);
+          swatch.setAttribute('data-index', i);
 
-        container.innerHTML = html;
-
-        container.querySelectorAll('.color-swatch').forEach(function(swatch)
-        {
-          swatch.addEventListener('click', function()
+          if (isSpecial)
           {
-            var list = swatch.getAttribute('data-list');
-            var index = parseInt(swatch.getAttribute('data-index'));
-            colorLists[list].splice(index, 1);
-            syncColorList(list);
-            renderColorSwatches(list);
-          });
+            swatch.style.cssText = 'background: transparent; background-image: linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%); background-size: 8px 8px; background-position: 0 0, 4px 4px;';
+          }
+          else
+          {
+            swatch.style.background = '#' + color;
+          }
+
+          // Inline color picker (hidden, triggered by clicking the swatch)
+          if (!isSpecial)
+          {
+            var picker = document.createElement('input');
+            picker.type = 'color';
+            picker.className = 'color-swatch__picker';
+            picker.value = '#' + (color.length === 3 ?
+              color[0] + color[0] + color[1] + color[1] + color[2] + color[2] :
+              color.padEnd(6, '0'));
+            picker.addEventListener('input', (function(idx)
+            {
+              return function()
+              {
+                var newColor = picker.value.substring(1).toUpperCase();
+                colorLists[listKey][idx] = newColor;
+                swatch.style.background = '#' + newColor;
+                swatch.title = '#' + newColor;
+                syncColorList(listKey);
+              };
+            })(i));
+            swatch.appendChild(picker);
+          }
+
+          // Delete button
+          var del = document.createElement('button');
+          del.className = 'color-swatch__delete';
+          del.textContent = '\u00D7';
+          del.title = 'Remove';
+          del.addEventListener('click', (function(idx)
+          {
+            return function(e)
+            {
+              e.stopPropagation();
+              colorLists[listKey].splice(idx, 1);
+              syncColorList(listKey);
+              renderColorSwatches(listKey);
+            };
+          })(i));
+          swatch.appendChild(del);
+
+          container.appendChild(swatch);
         });
       }
 
@@ -1107,6 +1234,235 @@
         });
 
         renderColorSwatches(listKey);
+      }
+
+      // ============================================
+      // COLOR SCHEME EDITOR
+      // ============================================
+      var schemeData = {
+        defaultColorSchemes: [],
+        customColorSchemes: []
+      };
+
+      var schemeKeys = ['fill', 'stroke', 'gradient', 'font'];
+
+      function renderSchemeEditor(listKey)
+      {
+        var container = document.getElementById(listKey + '-editor');
+        container.innerHTML = '';
+
+        schemeData[listKey].forEach(function(row, rowIdx)
+        {
+          var rowEl = document.createElement('div');
+          rowEl.className = 'color-scheme-row';
+
+          var label = document.createElement('span');
+          label.className = 'color-scheme-row__label';
+          label.textContent = (rowIdx + 1);
+          rowEl.appendChild(label);
+
+          row.forEach(function(entry, entryIdx)
+          {
+            if (entry === null)
+            {
+              // null = default scheme placeholder
+              var nullTag = document.createElement('span');
+              nullTag.className = 'color-scheme-entry';
+              nullTag.innerHTML = '<span style="color: var(--color-text-secondary); font-style: italic;">default</span>';
+
+              var nullRemove = document.createElement('button');
+              nullRemove.className = 'color-scheme-entry__remove';
+              nullRemove.textContent = '\u00D7';
+              nullRemove.title = 'Remove';
+              nullRemove.addEventListener('click', (function(ri, ei)
+              {
+                return function()
+                {
+                  schemeData[listKey][ri].splice(ei, 1);
+                  syncSchemeData(listKey);
+                  renderSchemeEditor(listKey);
+                };
+              })(rowIdx, entryIdx));
+              nullTag.appendChild(nullRemove);
+              rowEl.appendChild(nullTag);
+              return;
+            }
+
+            // Render each color key as a swatch
+            schemeKeys.forEach(function(key)
+            {
+              if (!entry[key]) return;
+              var tag = document.createElement('span');
+              tag.className = 'color-scheme-entry';
+
+              var sw = document.createElement('span');
+              sw.className = 'color-scheme-entry__swatch';
+              sw.style.background = entry[key];
+
+              var colorInput = document.createElement('input');
+              colorInput.type = 'color';
+              colorInput.value = entry[key];
+              colorInput.addEventListener('input', (function(ri, ei, k)
+              {
+                return function()
+                {
+                  schemeData[listKey][ri][ei][k] = colorInput.value;
+                  sw.style.background = colorInput.value;
+                  syncSchemeData(listKey);
+                };
+              })(rowIdx, entryIdx, key));
+              sw.appendChild(colorInput);
+
+              var keyLabel = document.createElement('span');
+              keyLabel.className = 'color-scheme-entry__key';
+              keyLabel.textContent = key.charAt(0).toUpperCase();
+              keyLabel.title = key;
+
+              var remove = document.createElement('button');
+              remove.className = 'color-scheme-entry__remove';
+              remove.textContent = '\u00D7';
+              remove.title = 'Remove ' + key;
+              remove.addEventListener('click', (function(ri, ei, k)
+              {
+                return function()
+                {
+                  delete schemeData[listKey][ri][ei][k];
+                  // If entry is now empty, remove the whole entry
+                  var remaining = Object.keys(schemeData[listKey][ri][ei]).filter(function(k2)
+                  {
+                    return schemeKeys.indexOf(k2) > -1;
+                  });
+                  if (remaining.length === 0)
+                  {
+                    schemeData[listKey][ri].splice(ei, 1);
+                  }
+                  syncSchemeData(listKey);
+                  renderSchemeEditor(listKey);
+                };
+              })(rowIdx, entryIdx, key));
+
+              tag.appendChild(sw);
+              tag.appendChild(keyLabel);
+              tag.appendChild(remove);
+              rowEl.appendChild(tag);
+            });
+          });
+
+          // Row actions
+          var actions = document.createElement('span');
+          actions.className = 'color-scheme-row__actions';
+
+          var addEntry = document.createElement('button');
+          addEntry.className = 'color-scheme-row__btn';
+          addEntry.textContent = '+';
+          addEntry.title = 'Add colour entry';
+          addEntry.addEventListener('click', (function(ri)
+          {
+            return function()
+            {
+              schemeData[listKey][ri].push({ fill: '#dae8fc', stroke: '#6c8ebf' });
+              syncSchemeData(listKey);
+              renderSchemeEditor(listKey);
+            };
+          })(rowIdx));
+
+          var addNull = document.createElement('button');
+          addNull.className = 'color-scheme-row__btn';
+          addNull.textContent = '\u00F8';
+          addNull.title = 'Add default (null) entry';
+          addNull.addEventListener('click', (function(ri)
+          {
+            return function()
+            {
+              schemeData[listKey][ri].unshift(null);
+              syncSchemeData(listKey);
+              renderSchemeEditor(listKey);
+            };
+          })(rowIdx));
+
+          var addKey = document.createElement('button');
+          addKey.className = 'color-scheme-row__btn';
+          addKey.title = 'Add colour key to last entry';
+          addKey.textContent = 'key';
+          addKey.addEventListener('click', (function(ri)
+          {
+            return function()
+            {
+              var row = schemeData[listKey][ri];
+              var last = null;
+              for (var j = row.length - 1; j >= 0; j--)
+              {
+                if (row[j] !== null) { last = row[j]; break; }
+              }
+              if (!last)
+              {
+                DT.showToast('Add a colour entry first', 'warning');
+                return;
+              }
+              // Find first missing key
+              var missing = null;
+              for (var k = 0; k < schemeKeys.length; k++)
+              {
+                if (!last[schemeKeys[k]]) { missing = schemeKeys[k]; break; }
+              }
+              if (!missing)
+              {
+                DT.showToast('All colour keys already set', 'info');
+                return;
+              }
+              last[missing] = '#888888';
+              syncSchemeData(listKey);
+              renderSchemeEditor(listKey);
+            };
+          })(rowIdx));
+
+          var removeRow = document.createElement('button');
+          removeRow.className = 'color-scheme-row__btn';
+          removeRow.textContent = '\u2212';
+          removeRow.title = 'Remove row';
+          removeRow.addEventListener('click', (function(ri)
+          {
+            return function()
+            {
+              schemeData[listKey].splice(ri, 1);
+              syncSchemeData(listKey);
+              renderSchemeEditor(listKey);
+            };
+          })(rowIdx));
+
+          actions.appendChild(addNull);
+          actions.appendChild(addEntry);
+          actions.appendChild(addKey);
+          actions.appendChild(removeRow);
+          rowEl.appendChild(actions);
+
+          container.appendChild(rowEl);
+        });
+      }
+
+      function syncSchemeData(listKey)
+      {
+        if (schemeData[listKey].length > 0)
+        {
+          config[listKey] = JSON.parse(JSON.stringify(schemeData[listKey]));
+        }
+        else
+        {
+          delete config[listKey];
+        }
+        updateOutput();
+      }
+
+      function setupSchemeEditor(listKey)
+      {
+        document.getElementById(listKey + '-addRow').addEventListener('click', function()
+        {
+          schemeData[listKey].push([null, { fill: '#f5f5f5', stroke: '#666666' }]);
+          syncSchemeData(listKey);
+          renderSchemeEditor(listKey);
+        });
+
+        renderSchemeEditor(listKey);
       }
 
       // ============================================
@@ -1311,6 +1667,7 @@
           fontLists = { defaultFonts: [], customFonts: [] };
           colorLists = { presetColors: [], customPresetColors: [], defaultColors: [] };
           tagLists = { enabledLibraries: [], defaultCustomLibraries: [] };
+          schemeData = { defaultColorSchemes: [], customColorSchemes: [] };
 
           // Process each key
           Object.keys(obj).forEach(function(key)
@@ -1337,6 +1694,17 @@
               if (Array.isArray(val))
               {
                 colorLists[key] = val.map(function(c) { return c || ''; });
+                config[key] = val;
+              }
+              return;
+            }
+
+            // Color schemes
+            if (key === 'defaultColorSchemes' || key === 'customColorSchemes')
+            {
+              if (Array.isArray(val))
+              {
+                schemeData[key] = JSON.parse(JSON.stringify(val));
                 config[key] = val;
               }
               return;
@@ -1455,6 +1823,12 @@
           renderTagList(key);
         });
 
+        // Color schemes
+        ['defaultColorSchemes', 'customColorSchemes'].forEach(function(key)
+        {
+          renderSchemeEditor(key);
+        });
+
         // Macro parameters
         if (config.defaultMacroParameters)
         {
@@ -1489,6 +1863,7 @@
         fontLists = { defaultFonts: [], customFonts: [] };
         colorLists = { presetColors: [], customPresetColors: [], defaultColors: [] };
         tagLists = { enabledLibraries: [], defaultCustomLibraries: [] };
+        schemeData = { defaultColorSchemes: [], customColorSchemes: [] };
 
         // Reset macro param selects
         document.getElementById('cfg-dmp-toolbarStyle').value = '';
@@ -1530,6 +1905,8 @@
       setupColorList('defaultColors');
       setupTagList('enabledLibraries');
       setupTagList('defaultCustomLibraries');
+      setupSchemeEditor('defaultColorSchemes');
+      setupSchemeEditor('customColorSchemes');
       setupMacroParams();
 
       // Import toggle
