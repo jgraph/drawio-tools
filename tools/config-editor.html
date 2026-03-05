@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Graphical editor for draw.io editor configuration">
+  <title>Configuration Editor - draw.io Tools</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../styles/main.css">
+  <style>
+    .config-editor { max-width: 900px; margin: 0 auto; }
+
+    .config-section { margin-bottom: var(--spacing-lg); }
+    .config-section .card__body { display: flex; flex-direction: column; gap: var(--spacing-md); }
+
+    .field { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+    .field--inline { flex-direction: row; align-items: center; gap: var(--spacing-md); }
+    .field--inline label { margin-bottom: 0; white-space: nowrap; min-width: 160px; }
+    .field--inline input[type="text"],
+    .field--inline input[type="number"],
+    .field--inline input[type="url"],
+    .field--inline select { flex: 1; }
+
+    .field__help {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-md);
+    }
+    @media (max-width: 600px) { .field-row { grid-template-columns: 1fr; } }
+
+    .toggle-field {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-sm) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .toggle-field:last-child { border-bottom: none; }
+    .toggle-field__label { display: flex; flex-direction: column; gap: 2px; flex: 1; margin-bottom: 0; }
+    .toggle-field__name { font-weight: 500; font-size: var(--font-size-sm); }
+    .toggle-field__help { font-size: var(--font-size-xs); color: var(--color-text-secondary); }
+
+    /* Three-state toggle: unset / true / false */
+    .tri-toggle {
+      display: inline-flex;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .tri-toggle button {
+      padding: 4px 10px;
+      font-size: var(--font-size-xs);
+      border: none;
+      background: var(--color-bg);
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-family: inherit;
+    }
+    .tri-toggle button + button { border-left: 1px solid var(--color-border); }
+    .tri-toggle button.active--unset { background: var(--color-bg-tertiary); color: var(--color-text); font-weight: 500; }
+    .tri-toggle button.active--true { background: var(--color-success); color: #fff; font-weight: 500; }
+    .tri-toggle button.active--false { background: var(--color-error); color: #fff; font-weight: 500; }
+
+    .color-list { display: flex; flex-wrap: wrap; gap: 4px; padding: var(--spacing-sm) 0; }
+    .color-swatch {
+      width: 24px; height: 24px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border);
+      cursor: pointer;
+      transition: transform var(--transition-fast);
+    }
+    .color-swatch:hover { transform: scale(1.2); }
+    .color-swatch--add {
+      display: flex; align-items: center; justify-content: center;
+      background: var(--color-bg-secondary);
+      font-size: 14px; color: var(--color-text-secondary);
+    }
+
+    .tag-list { display: flex; flex-wrap: wrap; gap: var(--spacing-xs); }
+    .tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px var(--spacing-sm);
+      background: var(--color-bg-tertiary);
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-xs);
+    }
+    .tag__remove {
+      background: none; border: none; cursor: pointer;
+      color: var(--color-text-secondary); font-size: 14px; padding: 0 2px;
+      line-height: 1;
+    }
+    .tag__remove:hover { color: var(--color-error); }
+
+    .tag-input-wrap { display: flex; gap: var(--spacing-xs); }
+    .tag-input-wrap input { flex: 1; }
+    .tag-input-wrap .btn { flex-shrink: 0; }
+
+    .output-section { position: sticky; bottom: 0; z-index: 50; }
+    .output-bar {
+      background: var(--color-bg-secondary);
+      border-top: 1px solid var(--color-border);
+      padding: var(--spacing-md) var(--spacing-lg);
+      display: flex; align-items: center; gap: var(--spacing-md);
+      flex-wrap: wrap;
+    }
+    .output-bar .btn-group { flex-shrink: 0; }
+    .output-bar__info {
+      flex: 1;
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+      min-width: 100px;
+    }
+
+    .search-box {
+      position: sticky;
+      top: 50px; /* header height */
+      z-index: 50;
+      background: var(--color-bg);
+      padding: var(--spacing-sm) 0;
+      margin-bottom: var(--spacing-md);
+    }
+    .search-box input {
+      font-size: var(--font-size-base);
+      padding: var(--spacing-sm) var(--spacing-md) var(--spacing-sm) 36px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: 10px center;
+    }
+    .search-box__count {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+      margin-top: var(--spacing-xs);
+    }
+    .config-section.search-hidden { display: none; }
+    .toggle-field.search-hidden { display: none; }
+    .field.search-hidden { display: none; }
+    .field-row.search-hidden { display: none; }
+    .search-highlight {
+      background: var(--color-warning-bg);
+      border-radius: 2px;
+    }
+
+    .json-preview {
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-xs);
+      white-space: pre-wrap;
+      word-break: break-word;
+      padding: var(--spacing-md);
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+    }
+
+    .import-area textarea { min-height: 80px; font-size: var(--font-size-xs); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="container">
+        <div class="header__inner">
+          <a href="../" class="header__brand">
+            <img src="../assets/logo.svg" alt="draw.io" class="header__logo">
+            <span class="header__title">draw.io Tools</span>
+          </a>
+          <nav class="header__nav">
+            <a href="../" class="header__link">All Tools</a>
+            <a href="https://github.com/jgraph/drawio-tools" class="header__link" target="_blank">GitHub</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="container config-editor">
+        <nav class="breadcrumb">
+          <a href="../" class="breadcrumb__link">Tools</a>
+          <span class="breadcrumb__separator">/</span>
+          <span class="breadcrumb__current">Configuration Editor</span>
+        </nav>
+
+        <div class="tool-header">
+          <h1 class="tool-header__title">
+            <svg class="tool-header__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            Configuration Editor
+          </h1>
+          <p class="tool-header__description">
+            Visually configure the
+            <a href="https://www.drawio.com/doc/faq/configure-diagram-editor" target="_blank">draw.io editor settings</a>.
+            Toggle options, set values, and export as JSON or a configuration link.
+          </p>
+        </div>
+
+        <!-- Search -->
+        <div class="search-box" id="searchBox">
+          <input type="text" id="searchInput" placeholder="Search settings (e.g. grid, font, dark mode, compressXml...)">
+          <div class="search-box__count" id="searchCount"></div>
+        </div>
+
+        <!-- Import -->
+        <div class="card mb-md">
+          <div class="card__header" style="cursor: pointer;" id="importToggle">
+            <h3 class="card__title" style="display: flex; justify-content: space-between; align-items: center;">
+              Import Existing Configuration
+              <span id="importArrow" style="font-size: var(--font-size-xs);">&#9654;</span>
+            </h3>
+          </div>
+          <div class="card__body import-area" id="importArea" style="display: none;">
+            <textarea id="importJson" placeholder="Paste existing JSON configuration here..."></textarea>
+            <div class="btn-group mt-sm">
+              <button type="button" class="btn btn--primary btn--sm" id="importBtn">Import</button>
+              <button type="button" class="btn btn--secondary btn--sm" id="resetBtn">Reset All</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- General -->
+        <div class="config-section">
+          <div class="card">
+            <div class="card__header"><h3 class="card__title">General</h3></div>
+            <div class="card__body">
+              <div class="field-row">
+                <div class="field">
+                  <label for="cfg-version">Version</label>
+                  <input type="text" id="cfg-version" data-key="version" placeholder="e.g. 1.0">
+                  <p class="field__help">Configuration version identifier</p>
+                </div>
+                <div class="field">
+                  <label for="cfg-ui">UI Theme</label>
+                  <select id="cfg-ui" data-key="ui">
+                    <option value="">- Not set -</option>
+                    <option value="kennedy">Kennedy</option>
+                    <option value="atlas">Atlas</option>
+                    <option value="dark">Dark</option>
+                    <option value="min">Minimal</option>
+                  </select>
+                  <p class="field__help">Theme for user interface</p>
+                </div>
+              </div>
+              <div class="field">
+                <label for="cfg-settingsName">Settings Name</label>
+                <input type="text" id="cfg-settingsName" data-key="settingsName" placeholder=".drawio-config">
+                <p class="field__help">Key name for storing user settings in local storage</p>
+              </div>
+              <div id="general-toggles"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Canvas & Grid -->
+        <div class="config-section">
+          <div class="card">
+            <div class="card__header"><h3 class="card__title">Canvas &amp; Grid</h3></div>
+            <div class="card__body">
+              <div class="field-row">
+                <div class="field">
+                  <label for="cfg-defaultGridSize">Default Grid Size</label>
+                  <input type="number" id="cfg-defaultGridSize" data-key="defaultGridSize" placeholder="10" min="1">
+                </div>
+                <div class="field">
+                  <label for="cfg-gridSteps">Grid Steps</label>
+                  <input type="number" id="cfg-gridSteps" data-key="gridSteps" placeholder="e.g. 4" min="1">
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="cfg-zoomFactor">Zoom Factor</label>
+                  <input type="number" id="cfg-zoomFactor" data-key="zoomFactor" placeholder="1.2" min="1.01" step="0.05">
+                </div>
+                <div class="field">
+                  <label for="cfg-defaultEdgeLength">Default Edge Length</label>
+                  <input type="number" id="cfg-defaultEdgeLength" data-key="defaultEdgeLength" placeholder="80" min="1">
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="cfg-pageFormatWidth">Page Width (1/10 inch)</label>
+                  <input type="number" id="cfg-pageFormatWidth" placeholder="850" min="1">
+                </div>
+                <div class="field">
+                  <label for="cfg-pageFormatHeight">Page Height (1/10 inch)</label>
+                  <input type="number" id="cfg-pageFormatHeight" placeholder="1100" min="1">
+                </div>
+              </div>
+              <p class="field__help">Page format: US Letter = 850 x 1100, A4 = 827 x 1169</p>
+              <div id="canvas-toggles"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Appearance -->
+        <div class="config-section">
+          <div class="card">
+            <div class="card__header"><h3 class="card__title">Appearance</h3></div>
+            <div class="card__body">
+              <div class="field-row">
+                <div class="field">
+                  <label for="cfg-darkColor">Dark Mode Background</label>
+                  <div style="display: flex; gap: var(--spacing-sm); align-items: center;">
+                    <input type="color" id="cfg-darkColorPicker" value="#2A2A2A" style="width: 40px; height: 32px; padding: 2px; border: 1px solid var(--color-border); border-radius: var(--radius-sm);">
+                    <input type="text" id="cfg-darkColor" data-key="darkColor" placeholder="#2A2A2A" style="flex: 1;">
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="cfg-defaultAdaptiveColors">Adaptive Colors</label>
+                  <select id="cfg-defaultAdaptiveColors" data-key="defaultAdaptiveColors">
+                    <option value="">- Not set -</option>
+                    <option value="auto">auto</option>
+                    <option value="simple">simple</option>
+                    <option value="none">none</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label for="cfg-darkColorVar">Dark Color CSS Variable</label>
+                <input type="text" id="cfg-darkColorVar" data-key="darkColorVar" placeholder="--ge-dark-color">
+                <p class="field__help">CSS variable name for the dark background colour</p>
+              </div>
+              <div id="appearance-toggles"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="config-section">
+          <div class="card">
+            <div class="card__header"><h3 class="card__title">Sidebar &amp; Panels</h3></div>
+            <div class="card__body">
+              <div class="field-row">
+                <div class="field">
+                  <label for="cfg-thumbWidth">Thumbnail Width</label>
+                  <input type="number" id="cfg-thumbWidth" data-key="thumbWidth" placeholder="46" min="1">
+                </div>
+                <div class="field">
+                  <label for="cfg-thumbHeight">Thumbnail Height</label>
+                  <input type="number" id="cfg-thumbHeight" data-key="thumbHeight" placeholder="46" min="1">
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="cfg-sidebarWidth">Sidebar Width</label>
+                  <input type="number" id="cfg-sidebarWidth" data-key="sidebarWidth" placeholder="e.g. 250" min="1">
+                </div>
+                <div class="field">
+                  <label for="cfg-sidebarTitleSize">Title Font Size (pt)</label>
+                  <input type="number" id="cfg-sidebarTitleSize" data-key="sidebarTitleSize" placeholder="8" min="1">
+                </div>
+              </div>
+              <div id="sidebar-toggles"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Libraries -->
+        <div class="config-section">
+          <div class="card">
+            <div class="card__header"><h3 class="card__title">Libraries</h3></div>
+            <div class="card__body">
+              <div class="field">
+                <label for="cfg-defaultLibraries">Default Libraries</label>
+                <input type="text" id="cfg-defaultLibraries" data-key="defaultLibraries" placeholder="general;uml;er;bpmn;flowchart;basic;arrows2">
+                <p class="field__help">Semicolon-separated library keys shown in sidebar on startup</p>
+              </div>
+              <div class="field">
+                <label>Enabled Libraries</label>
+                <div class="tag-list" id="enabledLibraries-tags"></div>
+                <div class="tag-input-wrap mt-sm">
+                  <input type="text" id="enabledLibraries-input" placeholder="Add library key (e.g. general, uml)...">
+                  <button type="button" class="btn btn--secondary btn--sm" id="enabledLibraries-add">Add</button>
+                </div>
+                <p class="field__help">Libraries available in More Shapes dialog. Leave empty for all libraries.</p>
+              </div>
+              <div class="field">
+                <label>Default Custom Libraries</label>
+                <div class="tag-list" id="defaultCustomLibraries-tags"></div>
+                <div class="tag-input-wrap mt-sm">
+                  <input type="text" id="defaultCustomLibraries-input" placeholder="Add library ID (e.g. A1) or URL...">
+                  <button type="button" class="btn btn--secondary btn--sm" id="defaultCustomLibraries-add">Add</button>
+                </div>
+                <p class="field__help">IDs to load custom libraries (e.g. A1, A2 for Confluence, or URL-encoded URIs)</p>
+              </div>
+              <div class="field">
+                <label for="cfg-templateFile">Template File URL</label>
+                <input type="url" id="cfg-templateFile" data-key="templateFile" placeholder="https://app.diagrams.net/templates/index.xml">
+                <p class="field__help">URL of the source file for the Templates dialog</p>
+              </div>
+              <div class="field">
+                <label for="cfg-libraries">Libraries (JSON)</label>
+                <textarea id="cfg-libraries" data-key="libraries" data-type="json" placeholder='[{"title": {"main": "Company"}, "entries": [...]}]' style="min-height: 60px;"></textarea>
+                <p class="field__help">Custom library sections for the left panel and More Shapes dialog</p>
+              </div>
+              <div id="library-toggles"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fonts -->
+        <div class="config-section">
+          <div class="card">
+            <div class="card__header"><h3 class="card__title">Fonts</h3></div>
+            <div class="card__body">
+              <div class="field">
+                <label>Default Fonts</label>
+                <div class="tag-list" id="defaultFonts-tags"></div>
+                <div class="tag-input-wrap mt-sm">
+                  <input type="text" id="defaultFonts-input" placeholder="Add font name...">
+                  <button type="button" class="btn btn--secondary btn--sm" id="defaultFonts-add">Add</button>
+                </div>
+                <p class="field__help">Font names for the format panel font picker</p>
+              </div>
+              <div class="field">
+                <label>Custom Fonts</label>
+                <div class="tag-list" id="customFonts-tags"></div>
+                <div class="tag-input-wrap mt-sm">
+                  <input type="text" id="customFonts-input" placeholder="Add font name...">
+                  <button type="button" class="btn btn--secondary btn--sm" id="customFonts-add">Add</button>
+                </div>
+                <p class="field__help">Additional fonts added before default fonts</p>
+              </div>
+              <div class="field">
+                <label for="cfg-fontCss">Font CSS (@font-face rules)</label>
+                <textarea id="cfg-fontCss" data-key="fontCss" placeholder="@font-face { font-family: 'MyFont'; src: url('...'); }" style="min-height: 60px;"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Colors -->
+        <div class="config-section">
+          <div class="card">
+            <div class="card__header"><h3 class="card__title">Colors</h3></div>
+            <div class="card__body">
+              <div class="field">
+                <label>Preset Colors (upper palette)</label>
+                <div class="color-list" id="presetColors-list"></div>
+                <div class="tag-input-wrap mt-sm">
+                  <input type="color" id="presetColors-picker" style="width: 40px; height: 32px; padding: 2px; border: 1px solid var(--color-border); border-radius: var(--radius-sm);">
+                  <input type="text" id="presetColors-input" placeholder="Hex without # (e.g. E6D0DE)" style="flex: 1;">
+                  <button type="button" class="btn btn--secondary btn--sm" id="presetColors-add">Add</button>
+                </div>
+              </div>
+              <div class="field">
+                <label>Custom Preset Colors</label>
+                <div class="color-list" id="customPresetColors-list"></div>
+                <div class="tag-input-wrap mt-sm">
+                  <input type="color" id="customPresetColors-picker" style="width: 40px; height: 32px; padding: 2px; border: 1px solid var(--color-border); border-radius: var(--radius-sm);">
+                  <input type="text" id="customPresetColors-input" placeholder="Hex without # (e.g. FF5733)" style="flex: 1;">
+                  <button type="button" class="btn btn--secondary btn--sm" id="customPresetColors-add">Add</button>
+                </div>
+                <p class="field__help">Added before preset colors in the colour dialog</p>
+              </div>
+              <div class="field">
+                <label>Default Colors (lower palette)</label>
+                <div class="color-list" id="defaultColors-list"></div>
+                <div class="tag-input-wrap mt-sm">
+                  <input type="color" id="defaultColors-picker" style="width: 40px; height: 32px; padding: 2px; border: 1px solid var(--color-border); border-radius: var(--radius-sm);">
+                  <input type="text" id="defaultColors-input" placeholder="Hex without # (e.g. FF0000), or 'none'" style="flex: 1;">
+                  <button type="button" class="btn btn--secondary btn--sm" id="defaultColors-add">Add</button>
+                </div>
+                <p class="field__help">Colour codes for the lower palette in the colour dialog</p>
+              </div>
+              <div class="field">
+                <label for="cfg-colorNames">Color Names (JSON)</label>
+                <textarea id="cfg-colorNames" data-key="colorNames" data-type="json" placeholder='{"FFFFFF": "White", "000000": "Black"}' style="min-height: 60px;"></textarea>
+                <p class="field__help">Map of colour codes to display names (tooltips). Uppercase hex without #.</p>
+              </div>
+              <div class="field">
+                <label for="cfg-defaultColorSchemes">Default Color Schemes (JSON)</label>
+                <textarea id="cfg-defaultColorSchemes" data-key="defaultColorSchemes" data-type="json" placeholder='[[null, {"fill": "#f5f5f5", "stroke": "#666666"}, ...]]' style="min-height: 60px;"></textarea>
+                <p class="field__help">Colour schemes for the Style section. Keys: fill, stroke, gradient, font, title, border.</p>
+              </div>
+              <div class="field">
+                <label for="cfg-customColorSchemes">Custom Color Schemes (JSON)</label>
+                <textarea id="cfg-customColorSchemes" data-key="customColorSchemes" data-type="json" placeholder='[[{"fill": "#dae8fc", "stroke": "#6c8ebf"}, ...]]' style="min-height: 60px;"></textarea>
+                <p class="field__help">Additional colour schemes added before default schemes</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Default Styles -->
+        <div class="config-section">
+          <div class="card">
+            <div class="card__header"><h3 class="card__title">Default Styles</h3></div>
+            <div class="card__body">
+              <div class="field">
+                <label for="cfg-defaultTextStyle">Default Text Style</label>
+                <input type="text" id="cfg-defaultTextStyle" data-key="defaultTextStyle" placeholder="text;html=1;whiteSpace=wrap;...">
+              </div>
+              <div class="field">
+                <label for="cfg-defaultVertexStyle">Default Vertex Style (JSON)</label>
+                <textarea id="cfg-defaultVertexStyle" data-key="defaultVertexStyle" data-type="json" placeholder='{"fontFamily": "Arial"}' style="min-height: 60px;"></textarea>
+              </div>
+              <div class="field">
+                <label for="cfg-defaultEdgeStyle">Default Edge Style (JSON)</label>
+                <textarea id="cfg-defaultEdgeStyle" data-key="defaultEdgeStyle" data-type="json" placeholder='{"edgeStyle": "orthogonalEdgeStyle", "rounded": "0"}' style="min-height: 60px;"></textarea>
+              </div>
+              <div class="field">
+                <label for="cfg-styles">Styles (JSON)</label>
+                <textarea id="cfg-styles" data-key="styles" data-type="json" placeholder='[{}, {"commonStyle": {"fontColor": "#5C5C5C", "strokeColor": "#006658"}}]' style="min-height: 60px;"></textarea>
+                <p class="field__help">Colours for the Style tab when selection is empty. Keys: commonStyle, vertexStyle, edgeStyle, graph.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom CSS -->
+        <div class="config-section">
+          <div class="card">
+            <div class="card__header"><h3 class="card__title">Custom CSS</h3></div>
+            <div class="card__body">
+              <div class="field">
+                <label for="cfg-css">CSS Rules</label>
+                <textarea id="cfg-css" data-key="css" placeholder=".geMenubarContainer { background-color: #2A2A2A !important; }" style="min-height: 80px;"></textarea>
+                <p class="field__help">CSS rules to customize the draw.io user interface</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Export & Security -->
+        <div class="config-section">
+          <div class="card">
+            <div class="card__header"><h3 class="card__title">Export &amp; Security</h3></div>
+            <div class="card__body">
+              <div class="field-row">
+                <div class="field">
+                  <label for="cfg-maxImageBytes">Max Image Bytes</label>
+                  <input type="number" id="cfg-maxImageBytes" data-key="maxImageBytes" placeholder="1000000" min="0">
+                </div>
+                <div class="field">
+                  <label for="cfg-maxImageSize">Max Image Size (px)</label>
+                  <input type="number" id="cfg-maxImageSize" data-key="maxImageSize" placeholder="520" min="0">
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="cfg-autosaveDelay">Autosave Delay (ms)</label>
+                  <input type="number" id="cfg-autosaveDelay" data-key="autosaveDelay" placeholder="e.g. 2000" min="0">
+                </div>
+                <div class="field">
+                  <div></div>
+                </div>
+              </div>
+              <div id="export-toggles"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Collaboration -->
+        <div class="config-section">
+          <div class="card">
+            <div class="card__header"><h3 class="card__title">Collaboration &amp; Advanced</h3></div>
+            <div class="card__body">
+              <div class="field">
+                <label for="cfg-globalVars">Global Variables (JSON)</label>
+                <textarea id="cfg-globalVars" data-key="globalVars" data-type="json" placeholder='{"companyName": "Acme Corp"}' style="min-height: 60px;"></textarea>
+                <p class="field__help">Global placeholders available in all diagrams</p>
+              </div>
+              <div class="field">
+                <label for="cfg-emptyDiagramXml">Empty Diagram XML</label>
+                <textarea id="cfg-emptyDiagramXml" data-key="emptyDiagramXml" placeholder="<mxGraphModel><root><mxCell id='0'/><mxCell id='1' parent='0'/></root></mxGraphModel>" style="min-height: 60px;"></textarea>
+              </div>
+              <div class="field">
+                <label for="cfg-emptyLibraryXml">Empty Library XML</label>
+                <textarea id="cfg-emptyLibraryXml" data-key="emptyLibraryXml" placeholder="<mxlibrary>[]</mxlibrary>" style="min-height: 60px;"></textarea>
+              </div>
+              <div id="advanced-toggles"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confluence Server/DC -->
+        <div class="config-section">
+          <div class="card">
+            <div class="card__header"><h3 class="card__title">Confluence Server / Data Center</h3></div>
+            <div class="card__body">
+              <div id="confluence-toggles"></div>
+              <div class="field">
+                <label>Default Macro Parameters</label>
+                <div class="field-row">
+                  <div class="field">
+                    <label for="cfg-dmp-toolbarStyle" style="font-weight: normal;">Toolbar Style</label>
+                    <select id="cfg-dmp-toolbarStyle">
+                      <option value="">- Not set -</option>
+                      <option value="top">top</option>
+                      <option value="inline">inline</option>
+                      <option value="hidden">hidden</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="cfg-dmp-links" style="font-weight: normal;">Links</label>
+                    <select id="cfg-dmp-links">
+                      <option value="">- Not set -</option>
+                      <option value="auto">auto</option>
+                      <option value="blank">blank</option>
+                      <option value="self">self</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field-row">
+                  <div class="field">
+                    <label for="cfg-dmp-width" style="font-weight: normal;">Width</label>
+                    <input type="number" id="cfg-dmp-width" placeholder="e.g. 800" min="1">
+                  </div>
+                  <div class="field" style="padding-top: var(--spacing-lg);">
+                    <div id="dmp-toggles-container"></div>
+                  </div>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-md); padding-top: var(--spacing-sm);" id="dmp-booleans">
+                  <label class="checkbox"><input type="checkbox" id="cfg-dmp-border" data-tristate="true"> <span>Border</span></label>
+                  <label class="checkbox"><input type="checkbox" id="cfg-dmp-lightbox" data-tristate="true"> <span>Lightbox</span></label>
+                  <label class="checkbox"><input type="checkbox" id="cfg-dmp-simpleViewer" data-tristate="true"> <span>Simple Viewer</span></label>
+                </div>
+                <p class="field__help mt-sm">Override default macro parameters for Confluence Server/DC viewer</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- JSON Preview -->
+        <div class="config-section">
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title" style="display: flex; justify-content: space-between; align-items: center;">
+                JSON Preview
+                <span id="propertyCount" style="font-size: var(--font-size-xs); font-weight: normal; color: var(--color-text-secondary);">0 properties</span>
+              </h3>
+            </div>
+            <div class="card__body">
+              <div class="json-preview" id="jsonPreview">{}</div>
+              <div class="btn-group mt-md">
+                <button type="button" class="btn btn--primary" id="copyJsonBtn">Copy JSON</button>
+                <button type="button" class="btn btn--primary" id="copyLinkBtn">Copy draw.io Link</button>
+                <button type="button" class="btn btn--secondary" id="downloadJsonBtn">Download JSON</button>
+              </div>
+              <div class="field mt-md">
+                <label for="configLink">Configuration Link</label>
+                <input type="text" id="configLink" readonly placeholder="Generated draw.io link will appear here..." style="font-family: var(--font-family-mono); font-size: var(--font-size-xs);">
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__inner">
+          <span>&copy; 2026 JGraph Ltd. Apache-2.0 License.</span>
+          <div class="footer__links">
+            <a href="https://www.drawio.com">draw.io</a>
+            <a href="https://github.com/jgraph/drawio-tools">GitHub</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+  <script src="../utils/drawio-tools.js"></script>
+  <script>
+    (function()
+    {
+      var DT = window.DrawioTools;
+
+      // ============================================
+      // STATE
+      // ============================================
+      var config = {};
+      var fontLists = {
+        defaultFonts: [],
+        customFonts: []
+      };
+      var colorLists = {
+        presetColors: [],
+        customPresetColors: [],
+        defaultColors: []
+      };
+      var tagLists = {
+        enabledLibraries: [],
+        defaultCustomLibraries: []
+      };
+
+      // ============================================
+      // TOGGLE DEFINITIONS
+      // ============================================
+      var toggleGroups = {
+        'general-toggles': [
+          { key: 'override', name: 'Override', help: 'Ignore client-side settings' },
+          { key: 'debug', name: 'Debug', help: 'Enable debug output' },
+          { key: 'updateDefaultStyle', name: 'Update Default Style', help: 'Update defaults when styles change' },
+          { key: 'mathematicalTypesetting', name: 'Math Typesetting', help: 'Enable MathJax for mathematical typesetting' },
+          { key: 'internationalization', name: 'Internationalization', help: 'Enable UI language translation' }
+        ],
+        'canvas-toggles': [
+          { key: 'defaultPageVisible', name: 'Page Visible', help: 'Show page outline on canvas' },
+          { key: 'defaultGridEnabled', name: 'Grid Enabled', help: 'Show grid on canvas' },
+          { key: 'zoomWheel', name: 'Zoom with Mouse Wheel', help: 'Use mouse wheel for zoom without modifiers' },
+          { key: 'simpleLabels', name: 'Simple Labels', help: 'Disable word wrap and HTML for labels' },
+          { key: 'pasteAtMousePointer', name: 'Paste at Mouse', help: 'Paste elements at mouse pointer location' },
+          { key: 'fitDiagramOnLoad', name: 'Fit Diagram on Load', help: 'Fit diagram to window on load when partially visible' },
+          { key: 'selectParentLayer', name: 'Select Parent Layer', help: 'Selects parent layer for current selection' },
+          { key: 'enableInlineToolbar', name: 'Inline Toolbar', help: 'Enable the inline toolbar on selection' },
+          { key: 'enableWindowDocking', name: 'Window Docking', help: 'Enable window docking' },
+          { key: 'showLinkIcons', name: 'Show Link Icons', help: 'Show link icons on shapes' },
+          { key: 'showTooltipIcons', name: 'Show Tooltip Icons', help: 'Show tooltip icons on shapes' }
+        ],
+        'appearance-toggles': [
+          { key: 'enableCssDarkMode', name: 'CSS Dark Mode', help: 'Use CSS for dark mode rendering' },
+          { key: 'enableLightDarkColors', name: 'Light/Dark Colors', help: 'Use CSS light-dark() color function' }
+        ],
+        'sidebar-toggles': [
+          { key: 'sidebarTitles', name: 'Sidebar Titles', help: 'Show titles in the sidebar' },
+          { key: 'expandLibraries', name: 'Expand Libraries', help: 'Libraries expanded by default' }
+        ],
+        'library-toggles': [
+          { key: 'enableCustomLibraries', name: 'Enable Custom Libraries', help: 'Allow open and new library functions' },
+          { key: 'appendCustomLibraries', name: 'Append Custom Libraries', help: 'Custom libraries appear after built-in ones' }
+        ],
+        'export-toggles': [
+          { key: 'compressXml', name: 'Compress XML', help: 'Compress XML output in saved files' },
+          { key: 'includeDiagram', name: 'Include Diagram in Export', help: 'Include diagram data in export dialogs' },
+          { key: 'enableExportUrl', name: 'Enable Export URL', help: 'Enable the export URL feature' },
+          { key: 'lockdown', name: 'Lockdown', help: 'Disable data transmission apart from storage' },
+          { key: 'restrictExport', name: 'Restrict Export', help: 'Disable exporting diagrams to other formats' },
+          { key: 'enableNativeClipboard', name: 'Native Clipboard', help: 'Use native system clipboard' },
+          { key: 'replaceSvgDataUris', name: 'Replace SVG Data URIs', help: 'Replace data URIs with SVG sub-trees in export' },
+          { key: 'foreignObjectImages', name: 'Foreign Object Images', help: 'Replace foreignObject with images' },
+          { key: 'removeImageMetadata', name: 'Remove Image Metadata', help: 'Strip metadata from images' }
+        ],
+        'advanced-toggles': [
+          { key: 'shareCursorPosition', name: 'Share Cursor Position', help: 'Share cursor in real-time collaboration' },
+          { key: 'showRemoteCursors', name: 'Show Remote Cursors', help: 'Display other users\' cursors' },
+          { key: 'desktopAutoSync', name: 'Desktop Auto Sync', help: 'Auto-sync when local file changes (Desktop)' },
+          { key: 'oneDriveInlinePicker', name: 'OneDrive Inline Picker', help: 'Use inline picker for OneDrive' },
+          { key: 'enableAi', name: 'Enable AI', help: 'Enable AI diagram generation' }
+        ],
+        'confluence-toggles': [
+          { key: 'inplaceEdits', name: 'In-place Edits', help: 'Allow launching editor from viewer (Server/DC)' },
+          { key: 'forceSimpleViewer', name: 'Force Simple Viewer', help: 'Force simple viewer for all diagrams (Server/DC)' }
+        ],
+        'no-toggles': []
+      };
+
+      // ============================================
+      // RENDER TOGGLES
+      // ============================================
+      function renderToggles()
+      {
+        Object.keys(toggleGroups).forEach(function(containerId)
+        {
+          var container = document.getElementById(containerId);
+          if (!container) return;
+
+          var html = '';
+          toggleGroups[containerId].forEach(function(toggle)
+          {
+            html += '<div class="toggle-field">' +
+              '<div class="toggle-field__label">' +
+                '<span class="toggle-field__name">' + toggle.name + '</span>' +
+                '<span class="toggle-field__help">' + toggle.help + ' <code>' + toggle.key + '</code></span>' +
+              '</div>' +
+              '<div class="tri-toggle" data-key="' + toggle.key + '">' +
+                '<button type="button" data-value="unset" class="active--unset" title="Not set (use default)">&#8212;</button>' +
+                '<button type="button" data-value="true" title="Enabled">On</button>' +
+                '<button type="button" data-value="false" title="Disabled">Off</button>' +
+              '</div>' +
+            '</div>';
+          });
+          container.innerHTML = html;
+        });
+
+        // Attach click handlers
+        document.querySelectorAll('.tri-toggle').forEach(function(toggle)
+        {
+          toggle.querySelectorAll('button').forEach(function(btn)
+          {
+            btn.addEventListener('click', function()
+            {
+              var key = toggle.getAttribute('data-key');
+              var value = btn.getAttribute('data-value');
+
+              // Update visual state
+              toggle.querySelectorAll('button').forEach(function(b)
+              {
+                b.className = '';
+              });
+              btn.className = 'active--' + value;
+
+              // Update config
+              if (value === 'unset')
+              {
+                delete config[key];
+              }
+              else
+              {
+                config[key] = value === 'true';
+              }
+
+              updateOutput();
+            });
+          });
+        });
+      }
+
+      // ============================================
+      // TEXT/NUMBER FIELD HANDLERS
+      // ============================================
+      function setupFieldHandlers()
+      {
+        document.querySelectorAll('[data-key]').forEach(function(el)
+        {
+          if (el.classList.contains('tri-toggle') || el.closest('.tri-toggle')) return;
+
+          var key = el.getAttribute('data-key');
+          var isJson = el.getAttribute('data-type') === 'json';
+
+          el.addEventListener('input', function()
+          {
+            var val = el.value.trim();
+
+            if (val === '')
+            {
+              delete config[key];
+            }
+            else if (el.type === 'number')
+            {
+              var num = parseFloat(val);
+              if (!isNaN(num))
+              {
+                config[key] = num;
+              }
+            }
+            else if (isJson)
+            {
+              try
+              {
+                config[key] = JSON.parse(val);
+              }
+              catch (e)
+              {
+                // Keep raw string while user is typing - will validate on blur
+              }
+            }
+            else if (el.tagName === 'SELECT')
+            {
+              config[key] = val;
+            }
+            else
+            {
+              config[key] = val;
+            }
+
+            updateOutput();
+          });
+
+          // SELECT needs change event
+          if (el.tagName === 'SELECT')
+          {
+            el.addEventListener('change', function()
+            {
+              var val = el.value;
+              if (val === '')
+              {
+                delete config[key];
+              }
+              else
+              {
+                config[key] = val;
+              }
+              updateOutput();
+            });
+          }
+        });
+      }
+
+      // ============================================
+      // COLOR PICKER SYNC
+      // ============================================
+      function setupColorSync()
+      {
+        var picker = document.getElementById('cfg-darkColorPicker');
+        var text = document.getElementById('cfg-darkColor');
+
+        picker.addEventListener('input', function()
+        {
+          text.value = picker.value.toUpperCase();
+          text.dispatchEvent(new Event('input'));
+        });
+
+        text.addEventListener('input', function()
+        {
+          if (/^#[0-9A-Fa-f]{6}$/.test(text.value))
+          {
+            picker.value = text.value;
+          }
+        });
+      }
+
+      // ============================================
+      // PAGE FORMAT
+      // ============================================
+      function setupPageFormat()
+      {
+        var widthEl = document.getElementById('cfg-pageFormatWidth');
+        var heightEl = document.getElementById('cfg-pageFormatHeight');
+
+        function updatePageFormat()
+        {
+          var w = parseInt(widthEl.value);
+          var h = parseInt(heightEl.value);
+
+          if (!isNaN(w) && !isNaN(h))
+          {
+            config.pageFormat = { width: w, height: h };
+          }
+          else if (widthEl.value === '' && heightEl.value === '')
+          {
+            delete config.pageFormat;
+          }
+
+          updateOutput();
+        }
+
+        widthEl.addEventListener('input', updatePageFormat);
+        heightEl.addEventListener('input', updatePageFormat);
+      }
+
+      // ============================================
+      // FONT LISTS
+      // ============================================
+      function renderFontTags(listKey)
+      {
+        var container = document.getElementById(listKey + '-tags');
+        var html = '';
+
+        fontLists[listKey].forEach(function(font, i)
+        {
+          html += '<span class="tag">' +
+            '<span>' + escapeHtml(font) + '</span>' +
+            '<button type="button" class="tag__remove" data-list="' + listKey + '" data-index="' + i + '">&times;</button>' +
+          '</span>';
+        });
+
+        container.innerHTML = html;
+
+        container.querySelectorAll('.tag__remove').forEach(function(btn)
+        {
+          btn.addEventListener('click', function()
+          {
+            var list = btn.getAttribute('data-list');
+            var index = parseInt(btn.getAttribute('data-index'));
+            fontLists[list].splice(index, 1);
+            syncFontList(list);
+            renderFontTags(list);
+          });
+        });
+      }
+
+      function syncFontList(listKey)
+      {
+        if (fontLists[listKey].length > 0)
+        {
+          config[listKey] = fontLists[listKey].slice();
+        }
+        else
+        {
+          delete config[listKey];
+        }
+        updateOutput();
+      }
+
+      function setupFontList(listKey)
+      {
+        var input = document.getElementById(listKey + '-input');
+        var addBtn = document.getElementById(listKey + '-add');
+
+        function addFont()
+        {
+          var val = input.value.trim();
+          if (val)
+          {
+            fontLists[listKey].push(val);
+            input.value = '';
+            syncFontList(listKey);
+            renderFontTags(listKey);
+          }
+        }
+
+        addBtn.addEventListener('click', addFont);
+        input.addEventListener('keydown', function(e)
+        {
+          if (e.key === 'Enter')
+          {
+            e.preventDefault();
+            addFont();
+          }
+        });
+
+        renderFontTags(listKey);
+      }
+
+      // ============================================
+      // COLOR LISTS
+      // ============================================
+      function renderColorSwatches(listKey)
+      {
+        var container = document.getElementById(listKey + '-list');
+        var html = '';
+
+        colorLists[listKey].forEach(function(color, i)
+        {
+          var bg = (color === 'none' || color === 'null') ?
+            'transparent; background-image: linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%); background-size: 8px 8px; background-position: 0 0, 4px 4px' :
+            '#' + escapeHtml(color);
+          var title = (color === 'none' || color === 'null') ? color : '#' + escapeHtml(color);
+          html += '<div class="color-swatch" style="background: ' + bg + ';" ' +
+            'title="' + title + '" data-list="' + listKey + '" data-index="' + i + '"></div>';
+        });
+
+        container.innerHTML = html;
+
+        container.querySelectorAll('.color-swatch').forEach(function(swatch)
+        {
+          swatch.addEventListener('click', function()
+          {
+            var list = swatch.getAttribute('data-list');
+            var index = parseInt(swatch.getAttribute('data-index'));
+            colorLists[list].splice(index, 1);
+            syncColorList(list);
+            renderColorSwatches(list);
+          });
+        });
+      }
+
+      function syncColorList(listKey)
+      {
+        if (colorLists[listKey].length > 0)
+        {
+          config[listKey] = colorLists[listKey].slice();
+        }
+        else
+        {
+          delete config[listKey];
+        }
+        updateOutput();
+      }
+
+      function setupColorList(listKey)
+      {
+        var picker = document.getElementById(listKey + '-picker');
+        var input = document.getElementById(listKey + '-input');
+        var addBtn = document.getElementById(listKey + '-add');
+
+        picker.addEventListener('input', function()
+        {
+          input.value = picker.value.substring(1).toUpperCase();
+        });
+
+        function addColor()
+        {
+          var val = input.value.trim().replace(/^#/, '');
+          if (val === 'none' || val === 'null')
+          {
+            colorLists[listKey].push(val);
+            input.value = '';
+            syncColorList(listKey);
+            renderColorSwatches(listKey);
+          }
+          else if (/^[0-9A-Fa-f]{3,8}$/.test(val))
+          {
+            colorLists[listKey].push(val.toUpperCase());
+            input.value = '';
+            syncColorList(listKey);
+            renderColorSwatches(listKey);
+          }
+          else if (val)
+          {
+            DT.showToast('Invalid hex color: ' + val, 'error');
+          }
+        }
+
+        addBtn.addEventListener('click', addColor);
+        input.addEventListener('keydown', function(e)
+        {
+          if (e.key === 'Enter')
+          {
+            e.preventDefault();
+            addColor();
+          }
+        });
+
+        renderColorSwatches(listKey);
+      }
+
+      // ============================================
+      // TAG LISTS (enabledLibraries, defaultCustomLibraries)
+      // ============================================
+      function renderTagList(listKey)
+      {
+        var container = document.getElementById(listKey + '-tags');
+        var html = '';
+
+        tagLists[listKey].forEach(function(item, i)
+        {
+          html += '<span class="tag">' +
+            '<span>' + escapeHtml(item) + '</span>' +
+            '<button type="button" class="tag__remove" data-list="' + listKey + '" data-index="' + i + '">&times;</button>' +
+          '</span>';
+        });
+
+        container.innerHTML = html;
+
+        container.querySelectorAll('.tag__remove').forEach(function(btn)
+        {
+          btn.addEventListener('click', function()
+          {
+            var list = btn.getAttribute('data-list');
+            var index = parseInt(btn.getAttribute('data-index'));
+            tagLists[list].splice(index, 1);
+            syncTagList(list);
+            renderTagList(list);
+          });
+        });
+      }
+
+      function syncTagList(listKey)
+      {
+        if (tagLists[listKey].length > 0)
+        {
+          config[listKey] = tagLists[listKey].slice();
+        }
+        else
+        {
+          delete config[listKey];
+        }
+        updateOutput();
+      }
+
+      function setupTagList(listKey)
+      {
+        var input = document.getElementById(listKey + '-input');
+        var addBtn = document.getElementById(listKey + '-add');
+
+        function addItem()
+        {
+          var val = input.value.trim();
+          if (val)
+          {
+            tagLists[listKey].push(val);
+            input.value = '';
+            syncTagList(listKey);
+            renderTagList(listKey);
+          }
+        }
+
+        addBtn.addEventListener('click', addItem);
+        input.addEventListener('keydown', function(e)
+        {
+          if (e.key === 'Enter')
+          {
+            e.preventDefault();
+            addItem();
+          }
+        });
+
+        renderTagList(listKey);
+      }
+
+      // ============================================
+      // DEFAULT MACRO PARAMETERS
+      // ============================================
+      function setupMacroParams()
+      {
+        var toolbarStyle = document.getElementById('cfg-dmp-toolbarStyle');
+        var links = document.getElementById('cfg-dmp-links');
+        var width = document.getElementById('cfg-dmp-width');
+        var border = document.getElementById('cfg-dmp-border');
+        var lightbox = document.getElementById('cfg-dmp-lightbox');
+        var simpleViewer = document.getElementById('cfg-dmp-simpleViewer');
+
+        function updateMacroParams()
+        {
+          var params = {};
+          var hasValue = false;
+
+          if (toolbarStyle.value) { params.toolbarStyle = toolbarStyle.value; hasValue = true; }
+          if (links.value) { params.links = links.value; hasValue = true; }
+          if (width.value) { params.width = parseInt(width.value); hasValue = true; }
+          if (border.indeterminate === false) { params.border = border.checked; hasValue = true; }
+          if (lightbox.indeterminate === false) { params.lightbox = lightbox.checked; hasValue = true; }
+          if (simpleViewer.indeterminate === false) { params.simpleViewer = simpleViewer.checked; hasValue = true; }
+
+          if (hasValue)
+          {
+            config.defaultMacroParameters = params;
+          }
+          else
+          {
+            delete config.defaultMacroParameters;
+          }
+
+          updateOutput();
+        }
+
+        // Set checkboxes to indeterminate initially
+        [border, lightbox, simpleViewer].forEach(function(cb)
+        {
+          cb.indeterminate = true;
+          cb.addEventListener('click', function()
+          {
+            if (cb.dataset.cycleState === 'indeterminate')
+            {
+              cb.checked = true;
+              cb.indeterminate = false;
+              cb.dataset.cycleState = 'checked';
+            }
+            else if (cb.dataset.cycleState === 'checked')
+            {
+              cb.checked = false;
+              cb.indeterminate = false;
+              cb.dataset.cycleState = 'unchecked';
+            }
+            else
+            {
+              cb.checked = false;
+              cb.indeterminate = true;
+              cb.dataset.cycleState = 'indeterminate';
+            }
+            updateMacroParams();
+          });
+          cb.dataset.cycleState = 'indeterminate';
+          // Prevent default toggle
+          cb.addEventListener('mousedown', function(e) { e.preventDefault(); });
+        });
+
+        toolbarStyle.addEventListener('change', updateMacroParams);
+        links.addEventListener('change', updateMacroParams);
+        width.addEventListener('input', updateMacroParams);
+      }
+
+      // ============================================
+      // OUTPUT
+      // ============================================
+      function updateOutput()
+      {
+        var json = JSON.stringify(config, null, 2);
+        document.getElementById('jsonPreview').textContent = json;
+
+        var keys = Object.keys(config);
+        document.getElementById('propertyCount').textContent = keys.length + ' propert' + (keys.length === 1 ? 'y' : 'ies');
+
+        updateConfigLink();
+      }
+
+      function updateConfigLink()
+      {
+        var linkEl = document.getElementById('configLink');
+
+        if (Object.keys(config).length === 0)
+        {
+          linkEl.value = '';
+          return;
+        }
+
+        try
+        {
+          var jsonStr = JSON.stringify(config);
+          var encoded = DT.encode(jsonStr);
+
+          if (encoded.success)
+          {
+            linkEl.value = 'https://app.diagrams.net/#_CONFIG_' + encoded.data;
+          }
+          else
+          {
+            linkEl.value = 'Error generating link';
+          }
+        }
+        catch (e)
+        {
+          linkEl.value = 'Error: ' + e.message;
+        }
+      }
+
+      // ============================================
+      // IMPORT / EXPORT
+      // ============================================
+      function importConfig(jsonStr)
+      {
+        try
+        {
+          var obj = JSON.parse(jsonStr);
+          config = {};
+          fontLists = { defaultFonts: [], customFonts: [] };
+          colorLists = { presetColors: [], customPresetColors: [], defaultColors: [] };
+          tagLists = { enabledLibraries: [], defaultCustomLibraries: [] };
+
+          // Process each key
+          Object.keys(obj).forEach(function(key)
+          {
+            var val = obj[key];
+
+            // Font lists
+            if (key === 'defaultFonts' || key === 'customFonts')
+            {
+              if (Array.isArray(val))
+              {
+                fontLists[key] = val.map(function(f)
+                {
+                  return typeof f === 'object' ? f.fontFamily || '' : String(f);
+                });
+                config[key] = val;
+              }
+              return;
+            }
+
+            // Color lists
+            if (key === 'presetColors' || key === 'customPresetColors' || key === 'defaultColors')
+            {
+              if (Array.isArray(val))
+              {
+                colorLists[key] = val.map(function(c) { return c || ''; });
+                config[key] = val;
+              }
+              return;
+            }
+
+            // Tag lists
+            if (key === 'enabledLibraries' || key === 'defaultCustomLibraries')
+            {
+              if (Array.isArray(val))
+              {
+                tagLists[key] = val.map(function(v) { return String(v); });
+                config[key] = val;
+              }
+              return;
+            }
+
+            config[key] = val;
+          });
+
+          // Populate UI fields
+          populateFields();
+          DT.showToast('Configuration imported', 'success');
+        }
+        catch (e)
+        {
+          DT.showToast('Invalid JSON: ' + e.message, 'error');
+        }
+      }
+
+      function populateFields()
+      {
+        // Text/number/select fields
+        document.querySelectorAll('[data-key]').forEach(function(el)
+        {
+          if (el.closest('.tri-toggle')) return;
+
+          var key = el.getAttribute('data-key');
+          var isJson = el.getAttribute('data-type') === 'json';
+
+          if (config[key] !== undefined)
+          {
+            if (isJson)
+            {
+              el.value = JSON.stringify(config[key], null, 2);
+            }
+            else
+            {
+              el.value = config[key];
+            }
+          }
+          else
+          {
+            el.value = '';
+          }
+        });
+
+        // Page format
+        if (config.pageFormat)
+        {
+          document.getElementById('cfg-pageFormatWidth').value = config.pageFormat.width || '';
+          document.getElementById('cfg-pageFormatHeight').value = config.pageFormat.height || '';
+        }
+        else
+        {
+          document.getElementById('cfg-pageFormatWidth').value = '';
+          document.getElementById('cfg-pageFormatHeight').value = '';
+        }
+
+        // Dark color picker
+        var darkColor = config.darkColor || '';
+        if (/^#[0-9A-Fa-f]{6}$/.test(darkColor))
+        {
+          document.getElementById('cfg-darkColorPicker').value = darkColor;
+        }
+
+        // Toggles
+        document.querySelectorAll('.tri-toggle').forEach(function(toggle)
+        {
+          var key = toggle.getAttribute('data-key');
+          var value = config[key];
+
+          toggle.querySelectorAll('button').forEach(function(btn)
+          {
+            btn.className = '';
+          });
+
+          if (value === true)
+          {
+            toggle.querySelector('[data-value="true"]').className = 'active--true';
+          }
+          else if (value === false)
+          {
+            toggle.querySelector('[data-value="false"]').className = 'active--false';
+          }
+          else
+          {
+            toggle.querySelector('[data-value="unset"]').className = 'active--unset';
+          }
+        });
+
+        // Font lists
+        ['defaultFonts', 'customFonts'].forEach(function(key)
+        {
+          renderFontTags(key);
+        });
+
+        // Color lists
+        ['presetColors', 'customPresetColors', 'defaultColors'].forEach(function(key)
+        {
+          renderColorSwatches(key);
+        });
+
+        // Tag lists
+        ['enabledLibraries', 'defaultCustomLibraries'].forEach(function(key)
+        {
+          renderTagList(key);
+        });
+
+        // Macro parameters
+        if (config.defaultMacroParameters)
+        {
+          var dmp = config.defaultMacroParameters;
+          if (dmp.toolbarStyle) document.getElementById('cfg-dmp-toolbarStyle').value = dmp.toolbarStyle;
+          if (dmp.links) document.getElementById('cfg-dmp-links').value = dmp.links;
+          if (dmp.width) document.getElementById('cfg-dmp-width').value = dmp.width;
+
+          ['border', 'lightbox', 'simpleViewer'].forEach(function(prop)
+          {
+            var cb = document.getElementById('cfg-dmp-' + prop);
+            if (dmp[prop] !== undefined)
+            {
+              cb.checked = dmp[prop];
+              cb.indeterminate = false;
+              cb.dataset.cycleState = dmp[prop] ? 'checked' : 'unchecked';
+            }
+            else
+            {
+              cb.indeterminate = true;
+              cb.dataset.cycleState = 'indeterminate';
+            }
+          });
+        }
+
+        updateOutput();
+      }
+
+      function resetAll()
+      {
+        config = {};
+        fontLists = { defaultFonts: [], customFonts: [] };
+        colorLists = { presetColors: [], customPresetColors: [], defaultColors: [] };
+        tagLists = { enabledLibraries: [], defaultCustomLibraries: [] };
+
+        // Reset macro param selects
+        document.getElementById('cfg-dmp-toolbarStyle').value = '';
+        document.getElementById('cfg-dmp-links').value = '';
+        document.getElementById('cfg-dmp-width').value = '';
+        ['border', 'lightbox', 'simpleViewer'].forEach(function(prop)
+        {
+          var cb = document.getElementById('cfg-dmp-' + prop);
+          cb.indeterminate = true;
+          cb.checked = false;
+          cb.dataset.cycleState = 'indeterminate';
+        });
+
+        populateFields();
+        DT.showToast('Configuration reset', 'success');
+      }
+
+      // ============================================
+      // HELPERS
+      // ============================================
+      function escapeHtml(str)
+      {
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
+      }
+
+      // ============================================
+      // INIT
+      // ============================================
+      renderToggles();
+      setupFieldHandlers();
+      setupColorSync();
+      setupPageFormat();
+      setupFontList('defaultFonts');
+      setupFontList('customFonts');
+      setupColorList('presetColors');
+      setupColorList('customPresetColors');
+      setupColorList('defaultColors');
+      setupTagList('enabledLibraries');
+      setupTagList('defaultCustomLibraries');
+      setupMacroParams();
+
+      // Import toggle
+      var importToggle = document.getElementById('importToggle');
+      var importArea = document.getElementById('importArea');
+      var importArrow = document.getElementById('importArrow');
+      importToggle.addEventListener('click', function()
+      {
+        var isHidden = importArea.style.display === 'none';
+        importArea.style.display = isHidden ? '' : 'none';
+        importArrow.innerHTML = isHidden ? '&#9660;' : '&#9654;';
+      });
+
+      // Import button
+      document.getElementById('importBtn').addEventListener('click', function()
+      {
+        var json = document.getElementById('importJson').value.trim();
+        if (json) importConfig(json);
+      });
+
+      // Reset button
+      document.getElementById('resetBtn').addEventListener('click', resetAll);
+
+      // Copy JSON
+      document.getElementById('copyJsonBtn').addEventListener('click', function()
+      {
+        var json = JSON.stringify(config, null, 2);
+        DT.copyToClipboard(json).then(function(ok)
+        {
+          DT.showToast(ok ? 'JSON copied to clipboard' : 'Failed to copy', ok ? 'success' : 'error');
+        });
+      });
+
+      // Copy link
+      document.getElementById('copyLinkBtn').addEventListener('click', function()
+      {
+        var link = document.getElementById('configLink').value;
+        if (!link || link.indexOf('Error') === 0)
+        {
+          DT.showToast('No valid configuration to generate link', 'warning');
+          return;
+        }
+        DT.copyToClipboard(link).then(function(ok)
+        {
+          DT.showToast(ok ? 'Link copied to clipboard' : 'Failed to copy', ok ? 'success' : 'error');
+        });
+      });
+
+      // Download JSON
+      document.getElementById('downloadJsonBtn').addEventListener('click', function()
+      {
+        var json = JSON.stringify(config, null, 2);
+        DT.downloadFile(json, 'drawio-config.json', 'application/json');
+        DT.showToast('Configuration downloaded', 'success');
+      });
+
+      // ============================================
+      // SEARCH
+      // ============================================
+      var searchInput = document.getElementById('searchInput');
+      var searchCount = document.getElementById('searchCount');
+
+      // Build a flat index of searchable items
+      // Each item: { element, section, keywords }
+      var searchIndex = [];
+
+      function buildSearchIndex()
+      {
+        searchIndex = [];
+
+        // Index toggle fields
+        document.querySelectorAll('.toggle-field').forEach(function(el)
+        {
+          var toggle = el.querySelector('.tri-toggle');
+          var key = toggle ? toggle.getAttribute('data-key') : '';
+          var name = el.querySelector('.toggle-field__name');
+          var help = el.querySelector('.toggle-field__help');
+          var section = el.closest('.config-section');
+          var text = (key + ' ' + (name ? name.textContent : '') + ' ' + (help ? help.textContent : '')).toLowerCase();
+          searchIndex.push({ element: el, section: section, keywords: text, type: 'toggle' });
+        });
+
+        // Index .field elements (not inside .field-row)
+        document.querySelectorAll('.config-section .field').forEach(function(el)
+        {
+          if (el.parentElement.classList.contains('field-row')) return;
+          var section = el.closest('.config-section');
+          var text = el.textContent.toLowerCase();
+          // Also get data-key from inputs
+          var inputs = el.querySelectorAll('[data-key]');
+          inputs.forEach(function(inp) { text += ' ' + inp.getAttribute('data-key'); });
+          searchIndex.push({ element: el, section: section, keywords: text, type: 'field' });
+        });
+
+        // Index .field-row elements as a unit
+        document.querySelectorAll('.config-section .field-row').forEach(function(el)
+        {
+          var section = el.closest('.config-section');
+          var text = el.textContent.toLowerCase();
+          var inputs = el.querySelectorAll('[data-key]');
+          inputs.forEach(function(inp) { text += ' ' + inp.getAttribute('data-key'); });
+          // Include IDs of inputs for key matching
+          el.querySelectorAll('input, select, textarea').forEach(function(inp)
+          {
+            if (inp.id) text += ' ' + inp.id.replace('cfg-', '').replace('cfg-dmp-', '');
+          });
+          searchIndex.push({ element: el, section: section, keywords: text, type: 'field-row' });
+        });
+
+        // Index sections by their card title
+        document.querySelectorAll('.config-section').forEach(function(el)
+        {
+          var title = el.querySelector('.card__title');
+          if (title)
+          {
+            searchIndex.push({ element: el, section: el, keywords: title.textContent.toLowerCase(), type: 'section-title' });
+          }
+        });
+      }
+
+      function performSearch(query)
+      {
+        query = query.trim().toLowerCase();
+
+        // Sections that should never be hidden by search
+        var importCard = document.getElementById('importToggle');
+        var jsonPreviewSection = null;
+        document.querySelectorAll('.config-section').forEach(function(s)
+        {
+          var title = s.querySelector('.card__title');
+          if (title && title.textContent.indexOf('JSON Preview') > -1)
+          {
+            jsonPreviewSection = s;
+          }
+        });
+
+        if (!query)
+        {
+          // Show everything
+          document.querySelectorAll('.config-section, .toggle-field, .field, .field-row').forEach(function(el)
+          {
+            el.classList.remove('search-hidden');
+          });
+          searchCount.textContent = '';
+          return;
+        }
+
+        var terms = query.split(/\s+/);
+        var matchedSections = new Set();
+        var matchedElements = new Set();
+        var matchCount = 0;
+
+        searchIndex.forEach(function(entry)
+        {
+          var matches = terms.every(function(term)
+          {
+            return entry.keywords.indexOf(term) > -1;
+          });
+
+          if (matches)
+          {
+            matchedElements.add(entry.element);
+            matchedSections.add(entry.section);
+            if (entry.type !== 'section-title')
+            {
+              matchCount++;
+            }
+          }
+        });
+
+        // Hide/show sections
+        document.querySelectorAll('.config-section').forEach(function(s)
+        {
+          // Never hide import area or JSON preview
+          if (s.querySelector('#importToggle') || s === jsonPreviewSection)
+          {
+            s.classList.remove('search-hidden');
+            return;
+          }
+          if (matchedSections.has(s))
+          {
+            s.classList.remove('search-hidden');
+          }
+          else
+          {
+            s.classList.add('search-hidden');
+          }
+        });
+
+        // Hide/show individual fields and toggles within visible sections
+        searchIndex.forEach(function(entry)
+        {
+          if (entry.type === 'section-title') return;
+          if (!matchedSections.has(entry.section)) return;
+
+          // If the section was matched by title, show everything in it
+          var sectionMatchedByTitle = false;
+          searchIndex.forEach(function(e2)
+          {
+            if (e2.type === 'section-title' && e2.section === entry.section && matchedElements.has(e2.element))
+            {
+              sectionMatchedByTitle = true;
+            }
+          });
+
+          if (sectionMatchedByTitle)
+          {
+            entry.element.classList.remove('search-hidden');
+            return;
+          }
+
+          if (matchedElements.has(entry.element))
+          {
+            entry.element.classList.remove('search-hidden');
+          }
+          else
+          {
+            entry.element.classList.add('search-hidden');
+          }
+        });
+
+        searchCount.textContent = matchCount + ' result' + (matchCount !== 1 ? 's' : '');
+      }
+
+      // Debounced search
+      var searchTimeout;
+      searchInput.addEventListener('input', function()
+      {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(function()
+        {
+          performSearch(searchInput.value);
+        }, 150);
+      });
+
+      // Clear search on Escape
+      searchInput.addEventListener('keydown', function(e)
+      {
+        if (e.key === 'Escape')
+        {
+          searchInput.value = '';
+          performSearch('');
+          searchInput.blur();
+        }
+      });
+
+      // Build index after DOM is ready
+      buildSearchIndex();
+
+      updateOutput();
+    })();
+  </script>
+</body>
+</html>
