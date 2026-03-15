@@ -316,6 +316,7 @@
                     <option value="atlas">Atlas</option>
                     <option value="dark">Dark</option>
                     <option value="min">Minimal</option>
+                    <option value="sketch">Sketch</option>
                   </select>
                   <p class="field__help">Theme for user interface</p>
                 </div>
@@ -398,6 +399,33 @@
                 <label for="cfg-darkColorVar">Dark Color CSS Variable</label>
                 <input type="text" id="cfg-darkColorVar" data-key="darkColorVar" placeholder="--ge-dark-color">
                 <p class="field__help">CSS variable name for the dark background colour</p>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="cfg-shadowColor">Shadow Color</label>
+                  <div style="display: flex; gap: var(--spacing-sm); align-items: center;">
+                    <input type="color" id="cfg-shadowColorPicker" value="#808080" style="width: 40px; height: 32px; padding: 2px; border: 1px solid var(--color-border); border-radius: var(--radius-sm);">
+                    <input type="text" id="cfg-shadowColor" data-key="shadowColor" placeholder="#808080" style="flex: 1;">
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="cfg-shadowOpacity">Shadow Opacity</label>
+                  <input type="number" id="cfg-shadowOpacity" data-key="shadowOpacity" placeholder="1" min="0" max="1" step="0.1">
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="cfg-shadowOffsetX">Shadow Offset X</label>
+                  <input type="number" id="cfg-shadowOffsetX" data-key="shadowOffsetX" placeholder="e.g. 2">
+                </div>
+                <div class="field">
+                  <label for="cfg-shadowOffsetY">Shadow Offset Y</label>
+                  <input type="number" id="cfg-shadowOffsetY" data-key="shadowOffsetY" placeholder="e.g. 3">
+                </div>
+              </div>
+              <div class="field">
+                <label for="cfg-shadowBlur">Shadow Blur</label>
+                <input type="number" id="cfg-shadowBlur" data-key="shadowBlur" placeholder="e.g. 6" min="0">
               </div>
               <div id="appearance-toggles"></div>
             </div>
@@ -618,6 +646,98 @@
                 <textarea id="cfg-css" data-key="css" placeholder=".geMenubarContainer { background-color: #2A2A2A !important; }" style="min-height: 80px;"></textarea>
                 <p class="field__help">CSS rules to customize the draw.io user interface</p>
               </div>
+              <div class="field">
+                <label for="cfg-customCss">Custom CSS (alternative)</label>
+                <textarea id="cfg-customCss" data-key="customCss" placeholder="Additional CSS rules..." style="min-height: 60px;"></textarea>
+                <p class="field__help">Alternative CSS property. Injected as a separate &lt;style&gt; element.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Embedding -->
+        <div class="config-section">
+          <div class="card">
+            <div class="card__header"><h3 class="card__title">Embedding</h3></div>
+            <div class="card__body">
+              <div id="embedding-toggles"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Menu Customization -->
+        <div class="config-section">
+          <div class="card">
+            <div class="card__header"><h3 class="card__title">Menu Customization</h3></div>
+            <div class="card__body">
+              <div class="field">
+                <label>Hidden Menu Items</label>
+                <div class="tag-list" id="hideMenuItems-tags"></div>
+                <div class="tag-input-wrap mt-sm">
+                  <input type="text" id="hideMenuItems-input" placeholder="Add action name (e.g. print, exportPdf)...">
+                  <button type="button" class="btn btn--secondary btn--sm" id="hideMenuItems-add">Add</button>
+                </div>
+                <p class="field__help">Action names of menu items to hide</p>
+              </div>
+              <div class="field">
+                <label>Hidden Menus</label>
+                <div class="tag-list" id="hideMenus-tags"></div>
+                <div class="tag-input-wrap mt-sm">
+                  <input type="text" id="hideMenus-input" placeholder="Add menu name (e.g. extras, help)...">
+                  <button type="button" class="btn btn--secondary btn--sm" id="hideMenus-add">Add</button>
+                </div>
+                <p class="field__help">Names of top-level menus to hide from the menu bar</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Configuration -->
+        <div class="config-section">
+          <div class="card">
+            <div class="card__header"><h3 class="card__title">AI Configuration</h3></div>
+            <div class="card__body">
+              <div class="field-row">
+                <div class="field">
+                  <label for="cfg-gptApiKey">OpenAI API Key</label>
+                  <input type="text" id="cfg-gptApiKey" data-key="gptApiKey" placeholder="sk-...">
+                </div>
+                <div class="field">
+                  <label for="cfg-gptUrl">Custom GPT URL</label>
+                  <input type="url" id="cfg-gptUrl" data-key="gptUrl" placeholder="https://api.openai.com/v1/chat/completions">
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="cfg-geminiApiKey">Gemini API Key</label>
+                  <input type="text" id="cfg-geminiApiKey" data-key="geminiApiKey" placeholder="AI...">
+                </div>
+                <div class="field">
+                  <label for="cfg-claudeApiKey">Claude API Key</label>
+                  <input type="text" id="cfg-claudeApiKey" data-key="claudeApiKey" placeholder="sk-ant-...">
+                </div>
+              </div>
+              <div class="field">
+                <label for="cfg-aiActions">AI Actions (JSON)</label>
+                <textarea id="cfg-aiActions" data-key="aiActions" data-type="json" placeholder='{"myAction": {"prompt": "..."}}' style="min-height: 60px;"></textarea>
+                <p class="field__help">Custom AI action definitions</p>
+              </div>
+              <div class="field">
+                <label for="cfg-aiGlobals">AI Globals (JSON)</label>
+                <textarea id="cfg-aiGlobals" data-key="aiGlobals" data-type="json" placeholder='{}' style="min-height: 60px;"></textarea>
+                <p class="field__help">Global AI configuration and credentials</p>
+              </div>
+              <div class="field">
+                <label for="cfg-aiConfigs">AI Configs (JSON)</label>
+                <textarea id="cfg-aiConfigs" data-key="aiConfigs" data-type="json" placeholder='{}' style="min-height: 60px;"></textarea>
+                <p class="field__help">AI model provider configurations</p>
+              </div>
+              <div class="field">
+                <label for="cfg-aiModels">AI Models (JSON)</label>
+                <textarea id="cfg-aiModels" data-key="aiModels" data-type="json" placeholder='{}' style="min-height: 60px;"></textarea>
+                <p class="field__help">Available AI model definitions</p>
+              </div>
+              <div id="ai-toggles"></div>
             </div>
           </div>
         </div>
@@ -784,7 +904,9 @@
       };
       var tagLists = {
         enabledLibraries: [],
-        defaultCustomLibraries: []
+        defaultCustomLibraries: [],
+        hideMenuItems: [],
+        hideMenus: []
       };
 
       // ============================================
@@ -794,6 +916,8 @@
         'general-toggles': [
           { key: 'override', name: 'Override', help: 'Ignore client-side settings' },
           { key: 'debug', name: 'Debug', help: 'Enable debug output' },
+          { key: 'compact', name: 'Compact UI', help: 'Enable compact user interface mode' },
+          { key: 'noAutoFocus', name: 'No Auto Focus', help: 'Disable auto-focus on startup' },
           { key: 'updateDefaultStyle', name: 'Update Default Style', help: 'Update defaults when styles change' },
           { key: 'mathematicalTypesetting', name: 'Math Typesetting', help: 'Enable MathJax for mathematical typesetting' },
           { key: 'internationalization', name: 'Internationalization', help: 'Enable UI language translation' }
@@ -801,19 +925,25 @@
         'canvas-toggles': [
           { key: 'defaultPageVisible', name: 'Page Visible', help: 'Show page outline on canvas' },
           { key: 'defaultGridEnabled', name: 'Grid Enabled', help: 'Show grid on canvas' },
+          { key: 'defaultConnectable', name: 'Default Connectable', help: 'Shapes are connectable by default' },
+          { key: 'defaultConnectionArrowsEnabled', name: 'Connection Arrows', help: 'Show arrows on edges when hovering connections' },
+          { key: 'defaultFoldingEnabled', name: 'Folding Enabled', help: 'Enable shape folding (collapse/expand) by default' },
           { key: 'zoomWheel', name: 'Zoom with Mouse Wheel', help: 'Use mouse wheel for zoom without modifiers' },
           { key: 'simpleLabels', name: 'Simple Labels', help: 'Disable word wrap and HTML for labels' },
           { key: 'pasteAtMousePointer', name: 'Paste at Mouse', help: 'Paste elements at mouse pointer location' },
           { key: 'fitDiagramOnLoad', name: 'Fit Diagram on Load', help: 'Fit diagram to window on load when partially visible' },
+          { key: 'fitDiagramOnPage', name: 'Fit Diagram on Page', help: 'Fit diagram to page size' },
           { key: 'selectParentLayer', name: 'Select Parent Layer', help: 'Selects parent layer for current selection' },
           { key: 'enableInlineToolbar', name: 'Inline Toolbar', help: 'Enable the inline toolbar on selection' },
           { key: 'enableWindowDocking', name: 'Window Docking', help: 'Enable window docking' },
           { key: 'showLinkIcons', name: 'Show Link Icons', help: 'Show link icons on shapes' },
-          { key: 'showTooltipIcons', name: 'Show Tooltip Icons', help: 'Show tooltip icons on shapes' }
+          { key: 'showTooltipIcons', name: 'Show Tooltip Icons', help: 'Show tooltip icons on shapes' },
+          { key: 'showConnectHandle', name: 'Show Connect Handle', help: 'Show connection handle on hover' }
         ],
         'appearance-toggles': [
           { key: 'enableCssDarkMode', name: 'CSS Dark Mode', help: 'Use CSS for dark mode rendering' },
-          { key: 'enableLightDarkColors', name: 'Light/Dark Colors', help: 'Use CSS light-dark() color function' }
+          { key: 'enableLightDarkColors', name: 'Light/Dark Colors', help: 'Use CSS light-dark() color function' },
+          { key: 'enableAnimations', name: 'Enable Animations', help: 'Enable shape and layout animations' }
         ],
         'sidebar-toggles': [
           { key: 'sidebarTitles', name: 'Sidebar Titles', help: 'Show titles in the sidebar' },
@@ -838,7 +968,15 @@
           { key: 'shareCursorPosition', name: 'Share Cursor Position', help: 'Share cursor in real-time collaboration' },
           { key: 'showRemoteCursors', name: 'Show Remote Cursors', help: 'Display other users\' cursors' },
           { key: 'desktopAutoSync', name: 'Desktop Auto Sync', help: 'Auto-sync when local file changes (Desktop)' },
-          { key: 'oneDriveInlinePicker', name: 'OneDrive Inline Picker', help: 'Use inline picker for OneDrive' },
+          { key: 'oneDriveInlinePicker', name: 'OneDrive Inline Picker', help: 'Use inline picker for OneDrive' }
+        ],
+        'embedding-toggles': [
+          { key: 'passiveScroll', name: 'Passive Scroll', help: 'Enable passive scroll event listeners for inline embed mode' },
+          { key: 'noResizers', name: 'No Resizers', help: 'Hide shape resize handles' },
+          { key: 'preserveViewState', name: 'Preserve View State', help: 'Preserve view state in embed mode' },
+          { key: 'useInternalClipboard', name: 'Use Internal Clipboard', help: 'Use internal clipboard instead of native' }
+        ],
+        'ai-toggles': [
           { key: 'enableAi', name: 'Enable AI', help: 'Enable AI diagram generation' }
         ],
         'confluence-toggles': [
@@ -985,21 +1123,29 @@
       // ============================================
       function setupColorSync()
       {
-        var picker = document.getElementById('cfg-darkColorPicker');
-        var text = document.getElementById('cfg-darkColor');
+        var pairs = [
+          { picker: 'cfg-darkColorPicker', text: 'cfg-darkColor' },
+          { picker: 'cfg-shadowColorPicker', text: 'cfg-shadowColor' }
+        ];
 
-        picker.addEventListener('input', function()
+        pairs.forEach(function(pair)
         {
-          text.value = picker.value.toUpperCase();
-          text.dispatchEvent(new Event('input'));
-        });
+          var picker = document.getElementById(pair.picker);
+          var text = document.getElementById(pair.text);
 
-        text.addEventListener('input', function()
-        {
-          if (/^#[0-9A-Fa-f]{6}$/.test(text.value))
+          picker.addEventListener('input', function()
           {
-            picker.value = text.value;
-          }
+            text.value = picker.value.toUpperCase();
+            text.dispatchEvent(new Event('input'));
+          });
+
+          text.addEventListener('input', function()
+          {
+            if (/^#[0-9A-Fa-f]{6}$/.test(text.value))
+            {
+              picker.value = text.value;
+            }
+          });
         });
       }
 
@@ -1666,7 +1812,7 @@
           config = {};
           fontLists = { defaultFonts: [], customFonts: [] };
           colorLists = { presetColors: [], customPresetColors: [], defaultColors: [] };
-          tagLists = { enabledLibraries: [], defaultCustomLibraries: [] };
+          tagLists = { enabledLibraries: [], defaultCustomLibraries: [], hideMenuItems: [], hideMenus: [] };
           schemeData = { defaultColorSchemes: [], customColorSchemes: [] };
 
           // Process each key
@@ -1711,7 +1857,8 @@
             }
 
             // Tag lists
-            if (key === 'enabledLibraries' || key === 'defaultCustomLibraries')
+            if (key === 'enabledLibraries' || key === 'defaultCustomLibraries' ||
+                key === 'hideMenuItems' || key === 'hideMenus')
             {
               if (Array.isArray(val))
               {
@@ -1773,11 +1920,17 @@
           document.getElementById('cfg-pageFormatHeight').value = '';
         }
 
-        // Dark color picker
+        // Color pickers
         var darkColor = config.darkColor || '';
         if (/^#[0-9A-Fa-f]{6}$/.test(darkColor))
         {
           document.getElementById('cfg-darkColorPicker').value = darkColor;
+        }
+
+        var shadowColor = config.shadowColor || '';
+        if (/^#[0-9A-Fa-f]{6}$/.test(shadowColor))
+        {
+          document.getElementById('cfg-shadowColorPicker').value = shadowColor;
         }
 
         // Toggles
@@ -1818,7 +1971,7 @@
         });
 
         // Tag lists
-        ['enabledLibraries', 'defaultCustomLibraries'].forEach(function(key)
+        ['enabledLibraries', 'defaultCustomLibraries', 'hideMenuItems', 'hideMenus'].forEach(function(key)
         {
           renderTagList(key);
         });
@@ -1862,7 +2015,7 @@
         config = {};
         fontLists = { defaultFonts: [], customFonts: [] };
         colorLists = { presetColors: [], customPresetColors: [], defaultColors: [] };
-        tagLists = { enabledLibraries: [], defaultCustomLibraries: [] };
+        tagLists = { enabledLibraries: [], defaultCustomLibraries: [], hideMenuItems: [], hideMenus: [] };
         schemeData = { defaultColorSchemes: [], customColorSchemes: [] };
 
         // Reset macro param selects
@@ -1905,6 +2058,8 @@
       setupColorList('defaultColors');
       setupTagList('enabledLibraries');
       setupTagList('defaultCustomLibraries');
+      setupTagList('hideMenuItems');
+      setupTagList('hideMenus');
       setupSchemeEditor('defaultColorSchemes');
       setupSchemeEditor('customColorSchemes');
       setupMacroParams();
