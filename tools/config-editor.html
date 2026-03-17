@@ -309,16 +309,7 @@
                   <p class="field__help">Configuration version identifier</p>
                 </div>
                 <div class="field">
-                  <label for="cfg-ui">UI Theme</label>
-                  <select id="cfg-ui" data-key="ui">
-                    <option value="">- Not set -</option>
-                    <option value="kennedy">Kennedy</option>
-                    <option value="atlas">Atlas</option>
-                    <option value="dark">Dark</option>
-                    <option value="min">Minimal</option>
-                    <option value="sketch">Sketch</option>
-                  </select>
-                  <p class="field__help">Theme for user interface</p>
+                  <div></div>
                 </div>
               </div>
               <div class="field">
@@ -794,11 +785,34 @@
           </div>
         </div>
 
+        <!-- Confluence Cloud -->
+        <div class="config-section">
+          <div class="card">
+            <div class="card__header"><h3 class="card__title">Confluence Cloud</h3></div>
+            <div class="card__body">
+              <p class="field__help mb-sm">These options only apply to <strong>Confluence Cloud</strong>.</p>
+              <div class="field">
+                <label for="cfg-ui">UI Theme</label>
+                <select id="cfg-ui" data-key="ui">
+                  <option value="">- Not set -</option>
+                  <option value="kennedy">Kennedy</option>
+                  <option value="atlas">Atlas (default)</option>
+                  <option value="min">Minimal</option>
+                  <option value="sketch">Sketch</option>
+                  <option value="simple">Simple</option>
+                </select>
+                <p class="field__help">Theme for the editor user interface</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Confluence Server/DC -->
         <div class="config-section">
           <div class="card">
             <div class="card__header"><h3 class="card__title">Confluence Server / Data Center</h3></div>
             <div class="card__body">
+              <p class="field__help mb-sm">These options only apply to <strong>Confluence Server / Data Center</strong>.</p>
               <div id="confluence-toggles"></div>
               <div class="field">
                 <label>Default Macro Parameters</label>
@@ -915,7 +929,6 @@
       var toggleGroups = {
         'general-toggles': [
           { key: 'override', name: 'Override', help: 'Ignore client-side settings' },
-          { key: 'debug', name: 'Debug', help: 'Enable debug output' },
           { key: 'compact', name: 'Compact UI', help: 'Enable compact user interface mode' },
           { key: 'noAutoFocus', name: 'No Auto Focus', help: 'Disable auto-focus on startup' },
           { key: 'updateDefaultStyle', name: 'Update Default Style', help: 'Update defaults when styles change' },
@@ -967,7 +980,7 @@
         'advanced-toggles': [
           { key: 'shareCursorPosition', name: 'Share Cursor Position', help: 'Share cursor in real-time collaboration' },
           { key: 'showRemoteCursors', name: 'Show Remote Cursors', help: 'Display other users\' cursors' },
-          { key: 'desktopAutoSync', name: 'Desktop Auto Sync', help: 'Auto-sync when local file changes (Desktop)' },
+          { key: 'desktopAutoSync', name: 'Desktop Auto Sync', help: 'Auto-sync when local file changes (Desktop app only)' },
           { key: 'oneDriveInlinePicker', name: 'OneDrive Inline Picker', help: 'Use inline picker for OneDrive' }
         ],
         'embedding-toggles': [
@@ -980,8 +993,9 @@
           { key: 'enableAi', name: 'Enable AI', help: 'Enable AI diagram generation' }
         ],
         'confluence-toggles': [
-          { key: 'inplaceEdits', name: 'In-place Edits', help: 'Allow launching editor from viewer (Server/DC)' },
-          { key: 'forceSimpleViewer', name: 'Force Simple Viewer', help: 'Force simple viewer for all diagrams (Server/DC)' }
+          { key: 'debug', name: 'Debug', help: 'Enable debug output' },
+          { key: 'inplaceEdits', name: 'In-place Edits', help: 'Allow launching editor from viewer' },
+          { key: 'forceSimpleViewer', name: 'Force Simple Viewer', help: 'Force simple viewer for all diagrams' }
         ],
         'no-toggles': []
       };
