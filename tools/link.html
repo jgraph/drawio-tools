@@ -101,6 +101,8 @@
                   <option value="wipeOut">Wipe Out</option>
                   <option value="fadeIn">Fade In</option>
                   <option value="fadeOut">Fade Out</option>
+                  <option value="popIn">Pop In</option>
+                  <option value="popOut">Pop Out</option>
                   <option value="highlight">Highlight</option>
                   <option value="select">Select</option>
                   <option value="scroll">Scroll</option>
@@ -384,6 +386,12 @@
             {
               action.delay = 30;
               action.steps = 30;
+            }
+
+            if (name === 'popIn' || name === 'popOut')
+            {
+              action.delay = 25;
+              action.steps = 40;
             }
 
             action[name] = selector;
