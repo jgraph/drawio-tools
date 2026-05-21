@@ -20,10 +20,6 @@ A collection of web-based utilities for working with [draw.io](https://www.drawi
 - **[CSV Import](https://jgraph.github.io/drawio-tools/tools/csv.html)** - Convert CSV data into draw.io diagrams
 - **[Custom Links](https://jgraph.github.io/drawio-tools/tools/link.html)** - Create interactive diagram links with actions
 
-### Legacy Tools
-- [Navigator](https://jgraph.github.io/drawio-tools/tools/navigator.html) - Browser information viewer
-- [Tickets](https://jgraph.github.io/drawio-tools/tools/tickets.html) - Freshdesk tickets editor
-
 ## Development
 
 ### Prerequisites
