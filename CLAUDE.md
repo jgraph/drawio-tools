@@ -28,7 +28,7 @@ drawio-tools/
 │   ├── base64.html     # Image to Base64
 │   ├── viewer.html     # Diagram viewer
 │   ├── csv.html        # CSV import
-│   ├── link.html       # Custom links builder
+│   ├── link.html       # Custom links builder (deprecated: now built into the draw.io Edit Link dialog)
 │   ├── merge.html      # Image merge
 │   └── convert.html    # Redirect to text-tools.html (backward compat)
 ├── package.json        # npm metadata (no dependencies required)

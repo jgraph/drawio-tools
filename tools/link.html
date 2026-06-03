@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Create custom interactive links for draw.io diagrams with actions like toggle, show/hide, and animations">
-  <title>Custom Links - draw.io Tools</title>
+  <meta name="description" content="Deprecated: custom links can now be created directly in the draw.io editor via the Edit Link dialog. This tool builds custom interactive links with actions like toggle, show/hide, and animations.">
+  <title>Custom Links (Deprecated) - draw.io Tools</title>
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
   <link rel="stylesheet" href="../styles/main.css">
   <style>
@@ -39,6 +39,37 @@
     }
     .inline-form label {
       margin-bottom: 0;
+    }
+    .deprecation-notice {
+      display: flex;
+      gap: var(--spacing-sm);
+      align-items: flex-start;
+      padding: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+      background: var(--color-warning-bg);
+      border: 1px solid var(--color-warning);
+      border-radius: var(--radius-md);
+      color: #856404;
+    }
+    .deprecation-notice__icon {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      margin-top: 1px;
+    }
+    .deprecation-notice__title {
+      font-weight: 600;
+      margin-bottom: var(--spacing-xs);
+      font-size: var(--font-size-sm);
+    }
+    .deprecation-notice__text {
+      margin: 0;
+      font-size: var(--font-size-sm);
+      line-height: 1.5;
+    }
+    .deprecation-notice a {
+      color: inherit;
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -78,6 +109,23 @@
           <p class="tool-header__description">
             Build interactive custom links for draw.io diagrams with actions like toggle, show/hide, animations, and navigation.
           </p>
+        </div>
+
+        <div class="deprecation-notice">
+          <svg class="deprecation-notice__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <div>
+            <div class="deprecation-notice__title">This tool is deprecated</div>
+            <p class="deprecation-notice__text">
+              Custom links can now be created directly in the draw.io editor. Select a shape, open the
+              <strong>Edit Link</strong> dialog, and use the built-in custom link editor to add interactive
+              actions like toggle, show/hide, and animations &mdash; no need to copy a link from here.
+              This page remains available for reference but is no longer the recommended way to build custom links.
+            </p>
+          </div>
         </div>
 
         <div class="mb-sm">
