@@ -24,11 +24,9 @@ drawio-tools/
 ├── tools/              # Individual tool pages
 │   ├── text-tools.html # Text encoding/decoding
 │   ├── mxfile-tools.html # MxFile validation
-│   ├── generate.html   # AI diagram generation
 │   ├── base64.html     # Image to Base64
 │   ├── viewer.html     # Diagram viewer
 │   ├── csv.html        # CSV import
-│   ├── link.html       # Custom links builder (deprecated: now built into the draw.io Edit Link dialog)
 │   ├── merge.html      # Image merge
 │   └── convert.html    # Redirect to text-tools.html (backward compat)
 ├── package.json        # npm metadata (no dependencies required)
@@ -221,8 +219,7 @@ No build step required.
 
 1. **pako not loading**: Ensure CDN script is included before drawio-tools.js
 2. **Path issues**: Tools use `../assets/`, `../styles/`, `../utils/` (relative to tools/)
-3. **CORS errors**: AI tools need valid API keys and may have CORS restrictions
-4. **Dark mode flickering**: CSS uses system preference, no JS toggle needed
+3. **Dark mode flickering**: CSS uses system preference, no JS toggle needed
 
 ## Links
 
